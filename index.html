@@ -70,7 +70,7 @@
         </div>
 
         <!-- DASHBOARD SECTION -->
-        <div id="dashboard-section" class="hidden w-full max-w-6xl flex-col gap-6 fade-in">
+        <div id="dashboard-section" class="hidden w-full max-w-6xl flex flex-col gap-6 fade-in">
             
             <div class="flex justify-between items-end mb-2">
                 <div>
@@ -107,8 +107,13 @@
 
         const { createClient } = window.supabase;
         const supabaseUrl = 'https://yahrmbxtpryvyrfkitfq.supabase.co';
-        const supabaseKey = 'sb_publishable_1_n9Sh9UJi8U0xJgcnISyg_E-Hf0BLS';
-        const supabase = createClient(supabaseUrl, supabaseKey);
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY_HERE'; // ← Replace with your real anon key from Supabase dashboard
+        let supabase = null;
+        try {
+            supabase = createClient(supabaseUrl, supabaseKey);
+        } catch(e) {
+            console.warn('Supabase init failed — dashboard will use fallback data.', e);
+        }
 
         let currentRole = '';
 
@@ -169,7 +174,16 @@
 
             try {
                 // Fetch apps from Supabase
-                let { data: apps, error } = await supabase.from('apps').select('*').order('name');
+                let apps = null;
+                let error = null;
+
+                if (supabase) {
+                    const result = await supabase.from('apps').select('*').order('name');
+                    apps = result.data;
+                    error = result.error;
+                } else {
+                    error = { message: 'Supabase not initialised' };
+                }
 
                 // If Supabase RLS blocks us or returns empty, trigger fallback
                 if (error || !apps || apps.length === 0) {
@@ -262,6 +276,11 @@
                 document.body.appendChild(toast);
                 setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2500);
             };
+
+            if (!supabase) {
+                showToast('Database not connected — update your Supabase key to save changes.', true);
+                return;
+            }
 
             const updateData = {};
             updateData[column] = isChecked;
