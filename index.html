@@ -1,1 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Department Apps Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f7f6; padding: 20px; text-align: center; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .app-card { padding: 20px; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: #333; transition: 0.3s; display: block; }
+        .app-card:hover { background: #eef2f5; }
+        .admin-controls { margin-top: 15px; font-size: 0.9em; text-align: left; border-top: 1px solid #eee; padding-top: 10px;}
+        input[type="password"] { padding: 10px; width: 60%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px;}
+        button { padding: 10px 20px; background: #0056b3; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
 
+<div class="container">
+    <h2>English Department App Hub</h2>
+    
+    <div id="login-section">
+        <p>Please enter your access PIN:</p>
+        <input type="password" id="pin-input" placeholder="Enter PIN...">
+        <br>
+        <button onclick="login()">Access Hub</button>
+        <p id="error-msg" style="color: red; display: none;">Incorrect PIN. Please try again.</p>
+    </div>
+
+    <div id="dashboard-section" class="hidden">
+        <h3 id="welcome-msg"></h3>
+        <button onclick="logout()" style="background: #dc3545; margin-bottom: 20px;">Logout</button>
+        <div class="grid" id="app-grid"></div>
+    </div>
+</div>
+
+<script>
+    // Initialize Supabase
+    const supabaseUrl = 'YOUR_SUPABASE_URL';
+    const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+    const supabase = supabaseClient.createClient(supabaseUrl, supabaseKey);
+
+    let currentRole = '';
+
+    async function login() {
+        const pin = document.getElementById('pin-input').value;
+        const errorMsg = document.getElementById('error-msg');
+        
+        // Check the PIN against the hub_roles table
+        const { data, error } = await supabase
+            .from('hub_roles')
+            .select('role_name')
+            .eq('pin_code', pin)
+            .single();
+
+        if (data) {
+            currentRole = data.role_name;
+            errorMsg.style.display = 'none';
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('welcome-msg').innerText = `Welcome, ${currentRole.toUpperCase()}`;
+            loadDashboard();
+        } else {
+            errorMsg.style.display = 'block';
+        }
+    }
+
+    async function loadDashboard() {
+        let query = supabase.from('apps').select('*');
+
+        // Filter based on role
+        if (currentRole === 'teacher') {
+            query = query.eq('is_visible_teacher', true);
+        } else if (currentRole === 'student') {
+            query = query.eq('is_visible_student', true);
+        }
+
+        const { data: apps, error } = await query;
+        const grid = document.getElementById('app-grid');
+        grid.innerHTML = '';
+
+        apps.forEach(app => {
+            let card = document.createElement('div');
+            card.className = 'app-card';
+            
+            // App Link
+            let linkHTML = `<a href="${app.url}" target="_blank" style="text-decoration:none; color:inherit;">
+                                <h4>${app.name}</h4>
+                                <p style="color:gray; font-size:0.8em;">${app.name_kurdish}</p>
+                            </a>`;
+            
+            // Admin Controls (Only added if logged in as Admin)
+            let adminHTML = '';
+            if (currentRole === 'admin') {
+                adminHTML = `
+                    <div class="admin-controls">
+                        <label>
+                            <input type="checkbox" onchange="toggleAccess('${app.id}', 'is_visible_teacher', this.checked)" ${app.is_visible_teacher ? 'checked' : ''}>
+                            Teachers View
+                        </label><br>
+                        <label>
+                            <input type="checkbox" onchange="toggleAccess('${app.id}', 'is_visible_student', this.checked)" ${app.is_visible_student ? 'checked' : ''}>
+                            Students View
+                        </label>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = linkHTML + adminHTML;
+            grid.appendChild(card);
+        });
+    }
+
+    async function toggleAccess(appId, column, isChecked) {
+        // Update the Supabase database immediately when the admin toggles a checkbox
+        const updateData = {};
+        updateData[column] = isChecked;
+
+        const { error } = await supabase
+            .from('apps')
+            .update(updateData)
+            .eq('id', appId);
+
+        if (error) {
+            alert('Failed to update visibility settings.');
+            console.error(error);
+        }
+    }
+
+    function logout() {
+        currentRole = '';
+        document.getElementById('pin-input').value = '';
+        document.getElementById('login-section').classList.remove('hidden');
+        document.getElementById('dashboard-section').classList.add('hidden');
+    }
+</script>
+
+</body>
+</html>
