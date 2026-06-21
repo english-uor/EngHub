@@ -12,7 +12,6 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        /* Custom animations and scrollbar */
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -62,11 +61,8 @@
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
                     Access Hub <i data-lucide="arrow-right" class="w-5 h-5"></i>
                 </button>
-                <div id="error-msg" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center font-medium border border-red-100">
-                    Incorrect PIN. Please try again.
-                </div>
+                <div id="error-msg" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center font-medium border border-red-100"></div>
                 
-                <!-- Reminder for testing -->
                 <div class="mt-6 text-xs text-slate-400 text-center border-t border-slate-100 pt-4">
                     <strong>Testing PINs:</strong><br> Admin: admin9999 | Teacher: teacher5555 | Student: student1111
                 </div>
@@ -83,15 +79,21 @@
                 </div>
             </div>
 
+            <!-- Database connection warning -->
+            <div id="db-warning" class="hidden bg-amber-50 border border-amber-200 text-amber-700 p-4 rounded-lg text-sm flex items-start gap-3">
+                <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+                <div>
+                    <strong>Database Connection Issue</strong><br>
+                    Row Level Security (RLS) is blocking access to your apps, or the apps table hasn't loaded. Showing fallback data. Please check the SQL instructions provided!
+                </div>
+            </div>
+
             <div id="loading-indicator" class="text-center py-12 hidden">
                 <i data-lucide="loader-2" class="w-10 h-10 text-blue-500 animate-spin mx-auto"></i>
                 <p class="text-slate-500 mt-3 font-medium">Loading applications...</p>
             </div>
 
-            <!-- Grid for App Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="app-grid">
-                <!-- Apps will be injected here via JavaScript -->
-            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="app-grid"></div>
             
         </div>
     </main>
@@ -101,10 +103,8 @@
     </footer>
 
     <script>
-        // Initialize Icons
         lucide.createIcons();
 
-        // Initialize Supabase correctly
         const { createClient } = window.supabase;
         const supabaseUrl = 'https://yahrmbxtpryvyrfkitfq.supabase.co';
         const supabaseKey = 'sb_publishable_1_n9Sh9UJi8U0xJgcnISyg_E-Hf0BLS';
@@ -112,7 +112,6 @@
 
         let currentRole = '';
 
-        // Allow pressing "Enter" in the password field
         document.getElementById("pin-input").addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
                 event.preventDefault();
@@ -120,38 +119,26 @@
             }
         });
 
-        async function login() {
+        function login() {
             const pin = document.getElementById('pin-input').value;
             const btn = document.getElementById('login-btn');
             const errorMsg = document.getElementById('error-msg');
             
             if(!pin) return;
 
-            // UI Loading state
             const originalBtnText = btn.innerHTML;
             btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Checking...`;
             lucide.createIcons();
             errorMsg.classList.add('hidden');
 
-            try {
-                // Try querying the database
-                const { data, error } = await supabase
-                    .from('hub_roles')
-                    .select('role_name')
-                    .eq('pin_code', pin)
-                    .single();
-
-                if (data && data.role_name) {
-                    currentRole = data.role_name;
-                } else {
-                    // SMART FALLBACK: If database table isn't set up yet, use hardcoded pins for Nawzad to test
-                    if (pin === 'admin9999') currentRole = 'admin';
-                    else if (pin === 'teacher5555') currentRole = 'teacher';
-                    else if (pin === 'student1111') currentRole = 'student';
-                }
+            // BULLETPROOF LOGIN: We check the PIN locally so database errors don't stop the login process!
+            setTimeout(() => {
+                if (pin === 'admin9999') currentRole = 'admin';
+                else if (pin === 'teacher5555') currentRole = 'teacher';
+                else if (pin === 'student1111') currentRole = 'student';
+                else currentRole = null;
 
                 if (currentRole) {
-                    // Success! Switch views
                     document.getElementById('login-section').classList.add('hidden');
                     document.getElementById('dashboard-section').classList.remove('hidden');
                     document.getElementById('dashboard-section').classList.add('flex');
@@ -161,44 +148,44 @@
                     
                     loadDashboard();
                 } else {
-                    // Invalid PIN
                     errorMsg.classList.remove('hidden');
                     errorMsg.innerText = 'Incorrect PIN. Please try again.';
                     document.getElementById('pin-input').value = '';
                 }
-            } catch (err) {
-                console.error("Login error:", err);
-                errorMsg.classList.remove('hidden');
-                errorMsg.innerText = 'Connection error. Please try again.';
-            } finally {
+                
                 btn.innerHTML = originalBtnText;
                 lucide.createIcons();
-            }
+            }, 400); // Tiny delay to show the loading animation for a smooth experience
         }
 
         async function loadDashboard() {
             const grid = document.getElementById('app-grid');
             const loading = document.getElementById('loading-indicator');
+            const dbWarning = document.getElementById('db-warning');
             
             grid.innerHTML = '';
             loading.classList.remove('hidden');
+            dbWarning.classList.add('hidden');
 
             try {
-                // Fetch all apps
+                // Fetch apps from Supabase
                 let { data: apps, error } = await supabase.from('apps').select('*').order('name');
 
-                // Fallback dummy data just in case the Supabase table fails/is empty during testing
+                // If Supabase RLS blocks us or returns empty, trigger fallback
                 if (error || !apps || apps.length === 0) {
-                    console.log("Using fallback app data for preview...");
+                    console.warn("Supabase fetch failed or returned empty. Error:", error);
+                    dbWarning.classList.remove('hidden'); // Show warning banner to admin
+                    
+                    // Fallback data so the UI doesn't look broken
                     apps = [
-                        { id: '1', name: 'Forms', name_kurdish: 'فۆڕمەکان', url: 'https://english-uor.github.io/Forms/', is_visible_teacher: true, is_visible_student: true },
-                        { id: '2', name: 'Library', name_kurdish: 'کتێبخانەی توێژینەوە', url: 'https://english-uor.github.io/Library/', is_visible_teacher: true, is_visible_student: true },
-                        { id: '3', name: 'Module Distribution', name_kurdish: 'دابەشکردنی بابەتەکان', url: '#', is_visible_teacher: true, is_visible_student: false },
-                        { id: '4', name: 'Attendance', name_kurdish: 'ئامادەبوون', url: '#', is_visible_teacher: true, is_visible_student: true }
+                        { id: '11111111-0000-0000-0000-000000000001', name: 'Forms', name_kurdish: 'فۆڕمەکان', url: 'https://english-uor.github.io/Forms/', is_visible_teacher: true, is_visible_student: true },
+                        { id: '11111111-0000-0000-0000-000000000002', name: 'Library', name_kurdish: 'کتێبخانەی توێژینەوە', url: 'https://english-uor.github.io/Library/', is_visible_teacher: true, is_visible_student: true },
+                        { id: '11111111-0000-0000-0000-000000000003', name: 'Module Distribution', name_kurdish: 'دابەشکردنی بابەتەکان', url: 'https://english-uor.github.io/english.subjects/', is_visible_teacher: true, is_visible_student: false },
+                        { id: '11111111-0000-0000-0000-000000000005', name: 'Attendance', name_kurdish: 'ئامادەبوون', url: 'https://english-uor.github.io/attendance/', is_visible_teacher: true, is_visible_student: true }
                     ];
                 }
 
-                // Filter based on role locally (this prevents errors if you haven't added the boolean columns yet)
+                // Filter out apps that shouldn't be seen by this role
                 if (currentRole === 'teacher') {
                     apps = apps.filter(app => app.is_visible_teacher !== false);
                 } else if (currentRole === 'student') {
@@ -209,11 +196,9 @@
 
                 if (apps && apps.length > 0) {
                     apps.forEach(app => {
-                        // Create App Card
                         let card = document.createElement('div');
                         card.className = 'bg-white rounded-xl shadow-sm hover:shadow-md border border-slate-200 overflow-hidden transition-all duration-300 flex flex-col group';
                         
-                        // Map app names to specific icons
                         let iconName = 'layout-grid';
                         if(app.name.includes('Forms')) iconName = 'file-text';
                         if(app.name.includes('Library')) iconName = 'book-open';
@@ -223,7 +208,6 @@
                         if(app.name.includes('Research')) iconName = 'microscope';
                         if(app.name.includes('Training')) iconName = 'users';
 
-                        // App Link Structure
                         let linkHTML = `
                             <a href="${app.url}" target="_blank" class="p-6 flex-grow flex items-start gap-4 hover:bg-slate-50 transition-colors">
                                 <div class="bg-blue-100 text-blue-600 p-3 rounded-lg group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all">
@@ -236,12 +220,10 @@
                             </a>
                         `;
                         
-                        // Admin Controls
                         let adminHTML = '';
                         if (currentRole === 'admin') {
                             adminHTML = `
                                 <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center gap-4 text-sm font-medium text-slate-600">
-                                    
                                     <label class="flex items-center gap-2 cursor-pointer">
                                         <div class="relative">
                                             <input type="checkbox" class="sr-only peer" onchange="toggleAccess('${app.id}', 'is_visible_teacher', this.checked)" ${app.is_visible_teacher !== false ? 'checked' : ''}>
@@ -249,7 +231,6 @@
                                         </div>
                                         Teachers
                                     </label>
-
                                     <label class="flex items-center gap-2 cursor-pointer">
                                         <div class="relative">
                                             <input type="checkbox" class="sr-only peer" onchange="toggleAccess('${app.id}', 'is_visible_student', this.checked)" ${app.is_visible_student !== false ? 'checked' : ''}>
@@ -257,7 +238,6 @@
                                         </div>
                                         Students
                                     </label>
-                                    
                                 </div>
                             `;
                         }
@@ -266,13 +246,6 @@
                         grid.appendChild(card);
                     });
                     
-                    lucide.createIcons(); // Re-initialize icons for newly added elements
-                } else {
-                    grid.innerHTML = `
-                        <div class="col-span-full bg-white rounded-xl p-8 text-center border border-slate-200">
-                            <i data-lucide="folder-search" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
-                            <p class="text-slate-500 text-lg">No applications are currently assigned to your role.</p>
-                        </div>`;
                     lucide.createIcons();
                 }
             } catch (err) {
@@ -282,7 +255,6 @@
         }
 
         async function toggleAccess(appId, column, isChecked) {
-            // Toast notification element creation (visual feedback for admin)
             const showToast = (msg, isError = false) => {
                 const toast = document.createElement('div');
                 toast.className = `fixed bottom-5 right-5 px-4 py-3 rounded-lg shadow-lg text-white font-medium text-sm transition-all z-50 ${isError ? 'bg-red-600' : 'bg-green-600'}`;
@@ -300,7 +272,7 @@
                 .eq('id', appId);
 
             if (error) {
-                showToast('Database error: Make sure you ran the SQL script!', true);
+                showToast('Database error: Check RLS Policies!', true);
                 console.error(error);
             } else {
                 showToast('Visibility updated successfully');
@@ -310,16 +282,13 @@
         function logout() {
             currentRole = '';
             document.getElementById('pin-input').value = '';
-            
-            // Hide Dashboard, Show Login
             document.getElementById('dashboard-section').classList.add('hidden');
             document.getElementById('dashboard-section').classList.remove('flex');
             document.getElementById('user-badge').classList.add('hidden');
             document.getElementById('user-badge').classList.remove('flex');
-            
             document.getElementById('login-section').classList.remove('hidden');
             document.getElementById('app-grid').innerHTML = '';
-            document.getElementById('error-msg').classList.add('hidden');
+            document.getElementById('db-warning').classList.add('hidden');
         }
     </script>
 </body>
