@@ -1,274 +1,628 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Department Apps Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>UoR English Dept</title>
+    
+    <!-- Dynamic PWA Manifest Link -->
+    <link id="pwa-manifest" rel="manifest" href="">
+    <meta name="theme-color" content="#f8fafc" id="theme-color-meta">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Eng Dept">
+    
+    <!-- Icons fallback to Icon23.png -->
+    <link rel="icon" type="image/png" href="Icon23.png">
+    <link rel="apple-touch-icon" href="Icon23.png">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        .fade-in { animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0); }
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+                        kurdish: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif', 'Arial'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+                        'glass-dark': '0 4px 30px rgba(0, 0, 0, 0.5)',
+                    }
+                }
+            }
         }
-        body { background-color: #f8fafc; }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Mobile App Feel Adjustments */
+        body {
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        /* Advanced Glassmorphism */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .dark .glass-header {
+            background: rgba(11, 17, 33, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .search-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .dark .search-glass {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.05);
+        }
+
+        /* Fluid Animations */
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-enter {
+            animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        
+        @keyframes cardPop {
+            from { opacity: 0; transform: scale(0.94) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-card {
+            animation: cardPop 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+
+        /* Animated Background Blobs */
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+            animation: blob 12s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+
+        /* Splash Screen Cinematics */
+        @keyframes progress {
+            0% { width: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            100% { width: 100%; opacity: 1; }
+        }
+        .animate-progress {
+            animation: progress 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+        .delay-500 { animation-delay: 0.5s; }
+        .delay-1000 { animation-delay: 1.0s; }
+        .delay-1500 { animation-delay: 1.5s; }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(37, 99, 235, 0.2), inset 0 0 10px rgba(255,255,255,0.5); }
+            50% { box-shadow: 0 0 40px rgba(37, 99, 235, 0.5), inset 0 0 20px rgba(255,255,255,0.8); }
+        }
+        .dark .animate-logo-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        /* Mouse Spotlight Effect for Cards */
+        #apps-container:hover .app-card::after {
+            opacity: 1;
+        }
+        .app-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.25), transparent 40%);
+            z-index: 2;
+            pointer-events: none;
+        }
+        .dark .app-card::after {
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.08), transparent 40%);
+        }
+        
+        /* Dark mode rich background */
+        .dark body {
+            background-color: #050B14;
+        }
     </style>
 </head>
-<body class="min-h-screen text-slate-800 flex flex-col font-sans">
+<body class="bg-slate-50 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-500 select-none overflow-hidden relative">
 
-    <!-- Header -->
-    <header class="bg-blue-900 text-white shadow-md py-4 px-6 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <i data-lucide="graduation-cap" class="w-8 h-8 text-blue-300"></i>
-            <div>
-                <h1 class="text-xl font-bold leading-tight">University of Raparin</h1>
-                <p class="text-xs text-blue-200">English Department App Hub</p>
+    <!-- Animated Dynamic Background -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none transition-opacity duration-1000">
+        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-300/30 dark:bg-blue-600/10 blur-[100px] animate-blob"></div>
+        <div class="absolute top-[20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-300/30 dark:bg-indigo-600/10 blur-[100px] animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-[-10%] left-[10%] w-[60%] h-[60%] rounded-full bg-cyan-300/30 dark:bg-cyan-900/20 blur-[120px] animate-blob animation-delay-4000"></div>
+    </div>
+
+    <!-- Cinematic Welcome Splash Screen -->
+    <div id="splash-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white/80 dark:bg-[#050B14]/90 backdrop-blur-3xl transition-all duration-1000 px-6 text-center">
+        <div class="relative flex flex-col items-center max-w-lg">
+            <div class="w-24 h-24 rounded-[2rem] overflow-hidden bg-white border-2 border-white dark:border-slate-800 shadow-2xl mb-6 animate-logo-glow opacity-0 animate-fade-in-up">
+                <img src="Icon23.png" alt="Dept Logo" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%232563eb\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M22 10v6M2 10l10-5 10 5-10 5z\'/><path d=\'M6 12v5c3 3 9 3 12 0v-5\'/></svg>'">
+            </div>
+            
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight opacity-0 animate-fade-in-up delay-500">
+                University of Raparin
+            </h1>
+            
+            <!-- Welcome Messages (Vanish with splash screen) -->
+            <div class="mt-8 space-y-4 opacity-0 animate-fade-in-up delay-1000">
+                <p class="text-sm md:text-base text-slate-600 dark:text-slate-300 font-medium leading-relaxed px-4">
+                    Welcome to the Official Digital Services Platform of the English Language Department.
+                </p>
+                <div class="w-12 h-[1px] bg-slate-300 dark:bg-slate-700 mx-auto"></div>
+                <p class="text-sm md:text-base text-slate-600 dark:text-slate-300 font-kurdish leading-relaxed px-4" dir="rtl">
+                    بەخێربێن بۆ پلاتفۆرمی فەرمی خزمەتگوزارییە دیجیتاڵییەکانی بەشی زمانی ئینگلیزی.
+                </p>
+            </div>
+
+            <div class="mt-12 w-56 h-1.5 bg-slate-200/50 dark:bg-slate-800/50 rounded-full overflow-hidden shadow-inner opacity-0 animate-fade-in-up delay-1500">
+                <div class="h-full bg-gradient-to-r from-brand-400 to-indigo-500 rounded-full animate-progress"></div>
             </div>
         </div>
-        <div id="user-badge" class="hidden items-center gap-4">
-            <span id="role-display" class="bg-blue-700 px-3 py-1 rounded-full text-sm font-medium uppercase tracking-wider"></span>
-            <button onclick="logout()" class="text-blue-200 hover:text-white transition-colors flex items-center gap-1 text-sm font-medium">
-                <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden">
+        <div class="bg-slate-900/90 dark:bg-white/90 backdrop-blur-xl border border-white/10 text-white dark:text-slate-900 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 font-medium text-sm">
+            <i data-lucide="check-circle-2" class="w-5 h-5 text-green-400 dark:text-green-500"></i>
+            <span id="toast-msg">Action successful</span>
+        </div>
+    </div>
+
+    <!-- Sticky Header -->
+    <header class="sticky top-0 z-40 glass-header">
+        <div class="px-4 py-3.5 flex justify-between items-center max-w-5xl mx-auto w-full">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200/50 dark:border-slate-700/50 flex-shrink-0">
+                    <img src="Icon23.png" alt="Dept Logo" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%232563eb\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M22 10v6M2 10l10-5 10 5-10 5z\'/><path d=\'M6 12v5c3 3 9 3 12 0v-5\'/></svg>'">
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-[14px] font-extrabold leading-tight tracking-tight dark:text-white">University of Raparin</h1>
+                    <h2 class="text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-tight mt-0.5">College of Basic Education</h2>
+                    <h3 class="text-[11px] font-bold text-brand-600 dark:text-brand-400 leading-tight mt-0.5">English Language Dept</h3>
+                </div>
+            </div>
+            <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-slate-100/80 dark:bg-slate-800/80 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm border border-slate-200/50 dark:border-slate-700/50">
+                <i data-lucide="moon" id="theme-icon-moon" class="w-5 h-5 hidden dark:block"></i>
+                <i data-lucide="sun" id="theme-icon-sun" class="w-5 h-5 block dark:hidden"></i>
             </button>
         </div>
     </header>
 
-    <main class="flex-grow flex items-center justify-center p-6">
+    <!-- Main Content -->
+    <main class="flex-grow px-4 pb-12 max-w-5xl mx-auto w-full flex flex-col gap-8 pt-6">
+        
+        <!-- Search Bar (Ultra Premium) -->
+        <section class="relative z-10">
+            <div class="relative group max-w-2xl mx-auto">
+                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="w-5 h-5 text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500 dark:group-focus-within:text-brand-400 transition-colors"></i>
+                </div>
+                <input type="text" id="search-input" placeholder="Search applications / گەڕان..." 
+                    class="block w-full pl-13 pr-6 py-4 search-glass border border-slate-200/60 dark:border-slate-700/60 rounded-3xl text-base font-medium shadow-lg focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 dark:focus:ring-brand-400/50 dark:focus:border-brand-400 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-white"
+                    onkeyup="filterApps()">
+                <div class="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
+                     <span class="hidden sm:flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">⌘K</span>
+                </div>
+            </div>
+        </section>
 
-        <!-- LOGIN -->
-        <div id="login-section" class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full fade-in border border-slate-100">
-            <div class="text-center mb-8">
-                <div class="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
-                    <i data-lucide="shield-check" class="w-8 h-8"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-slate-800">Secure Access</h2>
-                <p class="text-slate-500 text-sm mt-1">Enter your assigned PIN to continue</p>
-            </div>
-            <div class="space-y-4">
-                <input type="password" id="pin-input" placeholder="Enter PIN..."
-                    class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-center text-lg tracking-widest font-mono">
-                <button id="login-btn" onclick="doLogin()"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
-                    Access Hub <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                </button>
-                <div id="error-msg" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center font-medium border border-red-100"></div>
-                <div class="mt-6 text-xs text-slate-400 text-center border-t border-slate-100 pt-4">
-                    <strong>PINs:</strong> Admin: admin9999 &nbsp;|&nbsp; Teacher: teacher5555 &nbsp;|&nbsp; Student: student1111
-                </div>
-            </div>
-        </div>
-
-        <!-- DASHBOARD -->
-        <div id="dashboard-section" class="hidden w-full max-w-6xl fade-in">
-            <div class="flex justify-between items-end mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800">Application Modules</h2>
-                    <p class="text-slate-500 text-sm">Select an application to launch</p>
-                </div>
-            </div>
-            <div id="db-warning" class="hidden mb-4 bg-amber-50 border border-amber-200 text-amber-700 p-4 rounded-lg text-sm flex items-start gap-3">
-                <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
-                <div><strong>Database not connected</strong><br>Add your Supabase anon key to enable live data. Showing built-in app list.</div>
-            </div>
-            <div id="loading-indicator" class="text-center py-12 hidden">
-                <i data-lucide="loader-2" class="w-10 h-10 text-blue-500 animate-spin mx-auto"></i>
-                <p class="text-slate-500 mt-3 font-medium">Loading applications...</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="app-grid"></div>
-        </div>
+        <!-- Applications Grid -->
+        <section id="apps-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5 lg:gap-6 pb-6 relative">
+            <!-- Cards will be injected here via JS -->
+        </section>
 
     </main>
 
-    <footer class="text-center py-6 text-slate-400 text-xs">
-        &copy; 2026 University of Raparin - English Department. Designed for administrative excellence.
+    <!-- Footer -->
+    <footer class="mt-auto py-8 text-center text-[11px] sm:text-xs text-slate-400 dark:text-slate-500 font-medium relative z-10 border-t border-slate-200/50 dark:border-slate-800/50">
+        <p class="mb-1">© 2026 University of Raparin</p>
+        <p>College of Basic Education • English Language Department</p>
     </footer>
 
 <script>
-// ── Icons ────────────────────────────────────────────────────
-lucide.createIcons();
-
-// ── Supabase (optional — paste your anon key to enable) ─────
-const SUPABASE_URL = 'https://yahrmbxtpryvyrfkitfq.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_1_n9Sh9UJi8U0xJgcnISyg_E-Hf0BLS';
-
-let db = null;
-// Only init Supabase if the key looks real (starts with eyJ or sb_)
-if (SUPABASE_KEY && (SUPABASE_KEY.startsWith('eyJ') || SUPABASE_KEY.startsWith('sb_'))) {
-    try {
-        db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    } catch(e) {
-        console.warn('Supabase init failed:', e);
-    }
-}
-
-// ── PINs ─────────────────────────────────────────────────────
-const PINS = {
-    'admin9999':    'admin',
-    'teacher5555':  'teacher',
-    'student1111':  'student'
-};
-
-// ── Fallback app list ────────────────────────────────────────
-const FALLBACK_APPS = [
-    { id:'11111111-0000-0000-0000-000000000001', name:'Forms',               name_kurdish:'فۆڕمەکان',                 url:'https://english-uor.github.io/Forms/',               is_visible_teacher:true,  is_visible_student:true  },
-    { id:'11111111-0000-0000-0000-000000000002', name:'Library',             name_kurdish:'کتێبخانەی توێژینەوە',       url:'https://english-uor.github.io/Library/',             is_visible_teacher:true,  is_visible_student:true  },
-    { id:'11111111-0000-0000-0000-000000000003', name:'Module Distribution', name_kurdish:'دابەشکردنی بابەتەکان',      url:'https://english-uor.github.io/english.subjects/',    is_visible_teacher:true,  is_visible_student:false },
-    { id:'11111111-0000-0000-0000-000000000004', name:'Training 4 Year',     name_kurdish:'Training-ڕاهێنان',          url:'https://english-uor.github.io/Training/',            is_visible_teacher:true,  is_visible_student:false },
-    { id:'11111111-0000-0000-0000-000000000005', name:'Attendance',          name_kurdish:'ئامادەبوون',                url:'https://english-uor.github.io/attendance/',          is_visible_teacher:true,  is_visible_student:true  },
-    { id:'11111111-0000-0000-0000-000000000006', name:'Topic Selection',     name_kurdish:'دیاریکردنی بابەتی داڕشتن', url:'https://english-uor.github.io/Topic-distribution/',  is_visible_teacher:true,  is_visible_student:true  },
-    { id:'11111111-0000-0000-0000-000000000007', name:'Research Evaluation', name_kurdish:'هەلسەنگاندنی توێژینەوە',   url:'https://english-uor.github.io/research-evaluation/', is_visible_teacher:true,  is_visible_student:false }
-];
-
-let currentRole = '';
-
-// Enter key support
-document.getElementById('pin-input').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') doLogin();
-});
-
-// ── LOGIN ────────────────────────────────────────────────────
-function doLogin() {
-    const pin      = document.getElementById('pin-input').value.trim();
-    const errorMsg = document.getElementById('error-msg');
-
-    errorMsg.classList.add('hidden');
-
-    if (!pin) return;
-
-    const role = PINS[pin];
-
-    if (role) {
-        currentRole = role;
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('dashboard-section').classList.remove('hidden');
-        document.getElementById('user-badge').classList.remove('hidden');
-        document.getElementById('user-badge').classList.add('flex');
-        document.getElementById('role-display').innerText = role;
-        loadDashboard();
-    } else {
-        errorMsg.classList.remove('hidden');
-        errorMsg.innerText = 'Incorrect PIN. Please try again.';
-        document.getElementById('pin-input').value = '';
-    }
-}
-
-// ── DASHBOARD ────────────────────────────────────────────────
-async function loadDashboard() {
-    const grid    = document.getElementById('app-grid');
-    const loading = document.getElementById('loading-indicator');
-    const warning = document.getElementById('db-warning');
-
-    grid.innerHTML = '';
-    loading.classList.remove('hidden');
-    warning.classList.add('hidden');
-
-    let apps = null;
-
-    if (db) {
-        try {
-            const { data, error } = await db.from('apps').select('*').order('name');
-            if (!error && data && data.length > 0) {
-                apps = data;
-            } else {
-                console.warn('Supabase returned no data or error:', error);
+    // ── Application Data (Premium Tailwind Mapping) ─────────────────────────────
+    const appsData = [
+        {
+            id: 1, titleEn: "Attendance Portal", titleKu: "پۆڕتاڵی ئامادەبوون (غیابات)", desc: "Manage attendance and absence records.", icon: "calendar-check", url: "https://english-uor.github.io/attendance/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-rose-300 dark:bg-rose-950/30 dark:border-rose-800/40 dark:hover:bg-rose-900/50 dark:hover:border-rose-500/60",
+                glow: "bg-rose-500/20 dark:bg-rose-500/30 group-hover:bg-rose-400/40",
+                iconBox: "bg-white dark:bg-rose-900/60 border-slate-100 dark:border-rose-700/50",
+                icon: "text-rose-500 dark:text-rose-400",
+                title: "text-slate-800 dark:text-rose-50",
+                subtitle: "text-slate-500 dark:text-rose-300/80",
+                desc: "text-slate-600 dark:text-rose-100/70",
+                divider: "border-slate-200/60 dark:border-rose-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-rose-900/40 group-hover/btn:bg-rose-100 dark:group-hover/btn:bg-rose-700/80 border-transparent dark:border-rose-800/30",
+                btnText: "text-slate-600 dark:text-rose-300 group-hover/btn:text-rose-600 dark:group-hover/btn:text-rose-100"
             }
-        } catch(e) {
-            console.warn('Supabase query failed:', e);
+        },
+        {
+            id: 2, titleEn: "Research Library", titleKu: "کتێبخانەی توێژینەوە", desc: "Access departmental research resources.", icon: "library", url: "https://english-uor.github.io/Library/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-emerald-300 dark:bg-emerald-950/30 dark:border-emerald-800/40 dark:hover:bg-emerald-900/50 dark:hover:border-emerald-500/60",
+                glow: "bg-emerald-500/20 dark:bg-emerald-500/30 group-hover:bg-emerald-400/40",
+                iconBox: "bg-white dark:bg-emerald-900/60 border-slate-100 dark:border-emerald-700/50",
+                icon: "text-emerald-500 dark:text-emerald-400",
+                title: "text-slate-800 dark:text-emerald-50",
+                subtitle: "text-slate-500 dark:text-emerald-300/80",
+                desc: "text-slate-600 dark:text-emerald-100/70",
+                divider: "border-slate-200/60 dark:border-emerald-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-emerald-900/40 group-hover/btn:bg-emerald-100 dark:group-hover/btn:bg-emerald-700/80 border-transparent dark:border-emerald-800/30",
+                btnText: "text-slate-600 dark:text-emerald-300 group-hover/btn:text-emerald-600 dark:group-hover/btn:text-emerald-100"
+            }
+        },
+        {
+            id: 3, titleEn: "Trainer Evaluation (Q4)", titleKu: "هەڵسەنگاندنی ڕاهێنەران (ق٤)", desc: "Training evaluation system.", icon: "award", url: "https://english-uor.github.io/Training/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/40 dark:hover:bg-amber-900/50 dark:hover:border-amber-500/60",
+                glow: "bg-amber-500/20 dark:bg-amber-500/30 group-hover:bg-amber-400/40",
+                iconBox: "bg-white dark:bg-amber-900/60 border-slate-100 dark:border-amber-700/50",
+                icon: "text-amber-500 dark:text-amber-400",
+                title: "text-slate-800 dark:text-amber-50",
+                subtitle: "text-slate-500 dark:text-amber-300/80",
+                desc: "text-slate-600 dark:text-amber-100/70",
+                divider: "border-slate-200/60 dark:border-amber-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-amber-900/40 group-hover/btn:bg-amber-100 dark:group-hover/btn:bg-amber-700/80 border-transparent dark:border-amber-800/30",
+                btnText: "text-slate-600 dark:text-amber-300 group-hover/btn:text-amber-600 dark:group-hover/btn:text-amber-100"
+            }
+        },
+        {
+            id: 4, titleEn: "Research Evaluation", titleKu: "هەڵسەنگاندنی توێژینەوە", desc: "Evaluate research projects.", icon: "microscope", url: "https://english-uor.github.io/research-evaluation/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-purple-300 dark:bg-purple-950/30 dark:border-purple-800/40 dark:hover:bg-purple-900/50 dark:hover:border-purple-500/60",
+                glow: "bg-purple-500/20 dark:bg-purple-500/30 group-hover:bg-purple-400/40",
+                iconBox: "bg-white dark:bg-purple-900/60 border-slate-100 dark:border-purple-700/50",
+                icon: "text-purple-500 dark:text-purple-400",
+                title: "text-slate-800 dark:text-purple-50",
+                subtitle: "text-slate-500 dark:text-purple-300/80",
+                desc: "text-slate-600 dark:text-purple-100/70",
+                divider: "border-slate-200/60 dark:border-purple-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-purple-900/40 group-hover/btn:bg-purple-100 dark:group-hover/btn:bg-purple-700/80 border-transparent dark:border-purple-800/30",
+                btnText: "text-slate-600 dark:text-purple-300 group-hover/btn:text-purple-600 dark:group-hover/btn:text-purple-100"
+            }
+        },
+        {
+            id: 5, titleEn: "Research Topic Selection", titleKu: "دیاریکردنی توێژینەوە (خوێندکار)", desc: "Students select research topics.", icon: "list-checks", url: "https://english-uor.github.io/Topic-distribution/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-cyan-300 dark:bg-cyan-950/30 dark:border-cyan-800/40 dark:hover:bg-cyan-900/50 dark:hover:border-cyan-500/60",
+                glow: "bg-cyan-500/20 dark:bg-cyan-500/30 group-hover:bg-cyan-400/40",
+                iconBox: "bg-white dark:bg-cyan-900/60 border-slate-100 dark:border-cyan-700/50",
+                icon: "text-cyan-500 dark:text-cyan-400",
+                title: "text-slate-800 dark:text-cyan-50",
+                subtitle: "text-slate-500 dark:text-cyan-300/80",
+                desc: "text-slate-600 dark:text-cyan-100/70",
+                divider: "border-slate-200/60 dark:border-cyan-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-cyan-900/40 group-hover/btn:bg-cyan-100 dark:group-hover/btn:bg-cyan-700/80 border-transparent dark:border-cyan-800/30",
+                btnText: "text-slate-600 dark:text-cyan-300 group-hover/btn:text-cyan-600 dark:group-hover/btn:text-cyan-100"
+            }
+        },
+        {
+            id: 6, titleEn: "Course Distribution", titleKu: "دابەشکردنی وانەکان", desc: "Course allocation and scheduling.", icon: "layout-template", url: "https://english-uor.github.io/english.subjects/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-blue-300 dark:bg-blue-950/30 dark:border-blue-800/40 dark:hover:bg-blue-900/50 dark:hover:border-blue-500/60",
+                glow: "bg-blue-500/20 dark:bg-blue-500/30 group-hover:bg-blue-400/40",
+                iconBox: "bg-white dark:bg-blue-900/60 border-slate-100 dark:border-blue-700/50",
+                icon: "text-blue-500 dark:text-blue-400",
+                title: "text-slate-800 dark:text-blue-50",
+                subtitle: "text-slate-500 dark:text-blue-300/80",
+                desc: "text-slate-600 dark:text-blue-100/70",
+                divider: "border-slate-200/60 dark:border-blue-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-blue-900/40 group-hover/btn:bg-blue-100 dark:group-hover/btn:bg-blue-700/80 border-transparent dark:border-blue-800/30",
+                btnText: "text-slate-600 dark:text-blue-300 group-hover/btn:text-blue-600 dark:group-hover/btn:text-blue-100"
+            }
+        },
+        {
+            id: 7, titleEn: "Forms Center", titleKu: "فۆڕمەکان", desc: "Department forms and documents.", icon: "file-text", url: "https://english-uor.github.io/Forms/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-violet-300 dark:bg-violet-950/30 dark:border-violet-800/40 dark:hover:bg-violet-900/50 dark:hover:border-violet-500/60",
+                glow: "bg-violet-500/20 dark:bg-violet-500/30 group-hover:bg-violet-400/40",
+                iconBox: "bg-white dark:bg-violet-900/60 border-slate-100 dark:border-violet-700/50",
+                icon: "text-violet-500 dark:text-violet-400",
+                title: "text-slate-800 dark:text-violet-50",
+                subtitle: "text-slate-500 dark:text-violet-300/80",
+                desc: "text-slate-600 dark:text-violet-100/70",
+                divider: "border-slate-200/60 dark:border-violet-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-violet-900/40 group-hover/btn:bg-violet-100 dark:group-hover/btn:bg-violet-700/80 border-transparent dark:border-violet-800/30",
+                btnText: "text-slate-600 dark:text-violet-300 group-hover/btn:text-violet-600 dark:group-hover/btn:text-violet-100"
+            }
         }
-    }
+    ];
 
-    if (!apps) {
-        warning.classList.remove('hidden');
-        apps = FALLBACK_APPS;
-    }
+    // ── Initialization ──────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+        initTheme();
+        lucide.createIcons();
+        setupDynamicPWA();
 
-    // Filter by role
-    if (currentRole === 'teacher') {
-        apps = apps.filter(a => a.is_visible_teacher !== false);
-    } else if (currentRole === 'student') {
-        apps = apps.filter(a => a.is_visible_student !== false);
-    }
+        // Keyboard Shortcut ⌘K for Search
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('search-input').focus();
+            }
+        });
 
-    loading.classList.add('hidden');
+        // Spotlight Glow Tracking
+        document.getElementById('apps-container').addEventListener('mousemove', e => {
+            for(const card of document.querySelectorAll('.app-card')) {
+                const rect = card.getBoundingClientRect(),
+                      x = e.clientX - rect.left,
+                      y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            }
+        });
 
-    const iconMap = {
-        'Forms':'file-text', 'Library':'book-open', 'Module':'network',
-        'Attendance':'calendar-check', 'Topic':'check-square',
-        'Research':'microscope', 'Training':'users'
-    };
-
-    apps.forEach(app => {
-        const iconName = Object.entries(iconMap).find(([k]) => app.name.includes(k))?.[1] || 'layout-grid';
-
-        const card = document.createElement('div');
-        card.className = 'bg-white rounded-xl shadow-sm hover:shadow-md border border-slate-200 overflow-hidden transition-all duration-300 flex flex-col group';
-
-        let html = `
-            <a href="${app.url}" target="_blank" class="p-6 flex-grow flex items-start gap-4 hover:bg-slate-50 transition-colors">
-                <div class="bg-blue-100 text-blue-600 p-3 rounded-lg group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                    <i data-lucide="${iconName}" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h4 class="font-bold text-slate-800 text-lg group-hover:text-blue-700 transition-colors">${app.name}</h4>
-                    <p class="text-slate-500 text-sm font-medium mt-1" dir="rtl">${app.name_kurdish || ''}</p>
-                </div>
-            </a>`;
-
-        if (currentRole === 'admin') {
-            html += `
-            <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center gap-4 text-sm font-medium text-slate-600">
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <div class="relative">
-                        <input type="checkbox" class="sr-only peer" onchange="toggleAccess('${app.id}','is_visible_teacher',this.checked)" ${app.is_visible_teacher !== false ? 'checked' : ''}>
-                        <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
-                    </div>
-                    Teachers
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <div class="relative">
-                        <input type="checkbox" class="sr-only peer" onchange="toggleAccess('${app.id}','is_visible_student',this.checked)" ${app.is_visible_student !== false ? 'checked' : ''}>
-                        <div class="w-9 h-5 bg-slate-300 rounded-full peer peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
-                    </div>
-                    Students
-                </label>
-            </div>`;
-        }
-
-        card.innerHTML = html;
-        grid.appendChild(card);
+        // Cinematic Splash Sequence
+        setTimeout(() => {
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            splash.style.transform = 'scale(1.05)';
+            
+            setTimeout(() => {
+                splash.style.display = 'none';
+                document.body.classList.remove('overflow-hidden');
+                
+                // Render apps stagger sequence AFTER splash disappears
+                renderApps(); 
+            }, 1000); 
+        }, 4000); // 4 seconds total to view welcome message before dashboard opens
     });
 
-    lucide.createIcons();
-}
+    // ── UI Rendering ────────────────────────────────────────────────────────────
+    function renderApps() {
+        const container = document.getElementById('apps-container');
+        container.innerHTML = '';
 
-// ── TOGGLE ACCESS (admin only) ───────────────────────────────
-async function toggleAccess(appId, column, isChecked) {
-    const toast = (msg, err=false) => {
-        const t = document.createElement('div');
-        t.className = `fixed bottom-5 right-5 px-4 py-3 rounded-lg shadow-lg text-white font-medium text-sm z-50 ${err ? 'bg-red-600' : 'bg-green-600'}`;
-        t.innerText = msg;
-        document.body.appendChild(t);
-        setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 2500);
-    };
+        appsData.forEach((app, index) => {
+            const delay = index * 0.08; 
+            const c = app.colors;
+            
+            const card = document.createElement('div');
+            card.className = `app-card relative rounded-[2rem] p-6 lg:p-7 backdrop-blur-xl border shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 animate-card flex flex-col justify-between h-full overflow-hidden group hover:-translate-y-1.5 hover:shadow-xl dark:hover:shadow-[0_20px_40px_rgb(0,0,0,0.5)] ${c.cardStyle}`;
+            card.style.animationDelay = `${delay}s`;
+            card.setAttribute('data-name-en', app.titleEn.toLowerCase());
+            card.setAttribute('data-name-ku', app.titleKu);
 
-    if (!db) { toast('Add Supabase key to save changes.', true); return; }
+            card.innerHTML = `
+                <!-- Dynamic Ambient Glow -->
+                <div class="absolute -top-12 -right-12 w-40 h-40 rounded-full blur-3xl transition-colors duration-500 pointer-events-none z-0 ${c.glow}"></div>
 
-    const { error } = await db.from('apps').update({ [column]: isChecked }).eq('id', appId);
-    error ? toast('DB error: ' + error.message, true) : toast('Visibility updated ✓');
-}
+                <div class="relative z-10 flex-grow">
+                    <div class="flex items-start gap-4 mb-5">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border group-hover:scale-105 transition-transform duration-300 ${c.iconBox}">
+                            <i data-lucide="${app.icon}" class="w-7 h-7 ${c.icon}"></i>
+                        </div>
+                        <div class="flex-grow pt-1.5">
+                            <h3 class="font-bold text-[17px] leading-tight tracking-tight ${c.title}">${app.titleEn}</h3>
+                            <h4 class="font-bold text-[13px] mt-1.5 font-kurdish leading-tight ${c.subtitle}" dir="rtl">${app.titleKu}</h4>
+                        </div>
+                    </div>
+                    <p class="text-[14px] mb-8 leading-relaxed font-medium ${c.desc}">
+                        ${app.desc}
+                    </p>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="relative z-10 grid grid-cols-3 gap-3 mt-auto pt-5 border-t ${c.divider}">
+                    <button onclick="openApp('${app.url}')" class="flex flex-col items-center justify-center gap-2 py-2 rounded-xl transition-all active:scale-90 group/btn ${c.btnText}">
+                        <div class="p-2.5 rounded-full transition-colors border ${c.btnBox}">
+                            <i data-lucide="external-link" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Open</span>
+                    </button>
+                    
+                    <button onclick="copyToClipboard('${app.url}')" class="flex flex-col items-center justify-center gap-2 py-2 rounded-xl transition-all active:scale-90 group/btn ${c.btnText}">
+                        <div class="p-2.5 rounded-full transition-colors border ${c.btnBox}">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Copy</span>
+                    </button>
+                    
+                    <button onclick="shareApp('${app.titleEn}', '${app.url}')" class="flex flex-col items-center justify-center gap-2 py-2 rounded-xl transition-all active:scale-90 group/btn ${c.btnText}">
+                        <div class="p-2.5 rounded-full transition-colors border ${c.btnBox}">
+                            <i data-lucide="share-2" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Share</span>
+                    </button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+        lucide.createIcons();
+    }
 
-// ── LOGOUT ───────────────────────────────────────────────────
-function logout() {
-    currentRole = '';
-    document.getElementById('pin-input').value = '';
-    document.getElementById('dashboard-section').classList.add('hidden');
-    document.getElementById('user-badge').classList.add('hidden');
-    document.getElementById('user-badge').classList.remove('flex');
-    document.getElementById('login-section').classList.remove('hidden');
-    document.getElementById('app-grid').innerHTML = '';
-    document.getElementById('db-warning').classList.add('hidden');
-}
+    // ── Search & Filter ─────────────────────────────────────────────────────────
+    function filterApps() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const cards = document.querySelectorAll('.app-card');
+        
+        cards.forEach(card => {
+            const en = card.getAttribute('data-name-en');
+            const ku = card.getAttribute('data-name-ku');
+            if (en.includes(query) || ku.includes(query)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // ── App Actions ─────────────────────────────────────────────────────────────
+    function openApp(url) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    function copyToClipboard(text) {
+        const fallbackCopyTextToClipboard = (text) => {
+            var textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast("Link copied successfully");
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        if (!navigator.clipboard) {
+            fallbackCopyTextToClipboard(text);
+            return;
+        }
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("Link copied successfully");
+        }).catch(err => {
+            fallbackCopyTextToClipboard(text);
+        });
+    }
+
+    function shareApp(title, url) {
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                text: `Check out ${title} from UoR English Dept:`,
+                url: url,
+            }).catch((error) => console.log('Error sharing', error));
+        } else {
+            copyToClipboard(url);
+            showToast("Link copied (Share API not supported)");
+        }
+    }
+
+    // ── UI Helpers ──────────────────────────────────────────────────────────────
+    let toastTimeout;
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        const msgEl = document.getElementById('toast-msg');
+        
+        msgEl.textContent = message;
+        toast.classList.remove('hidden');
+        toast.classList.remove('toast-enter');
+        
+        void toast.offsetWidth; 
+        toast.classList.add('toast-enter');
+
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 3000);
+    }
+
+    // ── Theme Management ────────────────────────────────────────────────────────
+    function initTheme() {
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('theme-color-meta').setAttribute('content', '#050B14');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.getElementById('theme-color-meta').setAttribute('content', '#f8fafc');
+        }
+    }
+
+    function toggleTheme() {
+        if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark');
+            localStorage.theme = 'light';
+            document.getElementById('theme-color-meta').setAttribute('content', '#f8fafc');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.theme = 'dark';
+            document.getElementById('theme-color-meta').setAttribute('content', '#050B14');
+        }
+    }
+
+    // ── Dynamic PWA Setup ───────────────────────────────────────────────────────
+    function setupDynamicPWA() {
+        const manifest = {
+            "name": "English Dept Apps Hub",
+            "short_name": "Eng Dept",
+            "description": "Official App Hub for UoR English Language Department",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#050B14",
+            "theme_color": "#2563eb",
+            "icons": [
+                { "src": "Icon23.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+                { "src": "Icon23.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+            ]
+        };
+        
+        const manifestString = JSON.stringify(manifest);
+        const manifestBlob = new Blob([manifestString], {type: 'application/json'});
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        document.getElementById('pwa-manifest').setAttribute('href', manifestUrl);
+
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', (event) => self.skipWaiting());
+                self.addEventListener('activate', (event) => event.waitUntil(clients.claim()));
+                self.addEventListener('fetch', (event) => {
+                    event.respondWith(caches.match(event.request).then((response) => response || fetch(event.request)));
+                });
+            `;
+            const swBlob = new Blob([swCode], {type: 'application/javascript'});
+            const swUrl = URL.createObjectURL(swBlob);
+            
+            navigator.serviceWorker.register(swUrl).catch(err => console.log('SW failed: ', err));
+        }
+    }
 </script>
 </body>
 </html>
