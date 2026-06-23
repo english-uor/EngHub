@@ -625,9 +625,9 @@
     }
 </script>
 <style>
-    /* 3D Perspective and Floating Animation for the Clock Window */
+    /* Ultra-Wide 3D Perspective and Floating Animation for the Clock Window */
     .perspective-container {
-        perspective: 1000px;
+        perspective: 1200px;
     }
     .perspective-card {
         transform-style: preserve-3d;
@@ -635,14 +635,14 @@
         transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
     .perspective-card:hover {
-        transform: rotateX(4deg) rotateY(-2deg) scale(1.01);
+        transform: rotateX(3deg) rotateY(-1deg) scale(1.005);
     }
     @keyframes floatWindow {
-        0%, 100% { transform: translateY(0px) rotateX(1deg); }
-        50% { transform: translateY(-8px) rotateX(-1deg); }
+        0%, 100% { transform: translateY(0px) rotateX(0.5deg); }
+        50% { transform: translateY(-6px) rotateX(-0.5deg); }
     }
 
-    /* Living Moving LED Border Animation Around the Window */
+    /* Moving RGB Cyber LED Border Animation Around the Window */
     .led-border-window {
         position: relative;
         overflow: hidden;
@@ -652,7 +652,7 @@
         position: absolute;
         top: -50%; left: -50%; width: 200%; height: 200%;
         background: conic-gradient(from 0deg, transparent 20%, #3b82f6, #8b5cf6, #ec4899, transparent 80%);
-        animation: rotateLED 4s linear infinite;
+        animation: rotateLED 5s linear infinite;
         z-index: 0;
     }
     .led-border-inner {
@@ -677,29 +677,38 @@
 
 <script>
     (function() {
-        // Core state handling for favorite apps
+        // Handle persistent storage for favorited/pinned apps
         let pinnedApps = JSON.parse(localStorage.getItem('uor_pinned_apps') || '[]');
 
         function initClockAndPins() {
-            // 1. Setup and Inject 3D Moving LED Clock Widget
+            // 1. Setup and Inject Ultra-Wide 3D Moving LED Clock Widget
             const mainEl = document.querySelector('main');
             if (mainEl && !document.getElementById('premium-led-clock-container')) {
                 const clockContainer = document.createElement('div');
                 clockContainer.id = 'premium-led-clock-container';
-                clockContainer.className = "perspective-container w-full max-w-2xl mx-auto mb-2 relative z-20 px-1";
+                // Extended width to max-w-5xl to blend perfectly with the rest of your app container layout
+                clockContainer.className = "perspective-container w-full max-w-5xl mx-auto mb-2 relative z-20 px-1";
                 
                 clockContainer.innerHTML = `
-                    <div class="perspective-card led-border-window rounded-3xl bg-slate-950/40 p-[2px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] dark:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.9)]">
-                        <div class="led-border-inner flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 rounded-[22px] bg-white/85 dark:bg-slate-900/90 border border-white/20 dark:border-slate-800/80 backdrop-blur-3xl">
-                            <div class="flex items-center gap-3 text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm tracking-wide">
+                    <div class="perspective-card led-border-window rounded-3xl bg-slate-950/40 p-[2px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)] dark:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.8)]">
+                        <div class="led-border-inner flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-4 rounded-[22px] bg-white/85 dark:bg-slate-900/90 border border-white/20 dark:border-slate-800/80 backdrop-blur-3xl">
+                            
+                            <div class="flex items-center gap-3 text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm tracking-wide order-1">
                                 <div class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_12px_#3b82f6] animate-pulse"></div>
                                 <i data-lucide="calendar" class="w-4 h-4 text-brand-500"></i>
                                 <span id="live-date">Loading date...</span>
                             </div>
-                            <div class="flex items-center gap-2.5 font-mono text-sm sm:text-base font-black bg-slate-950 text-cyan-400 dark:text-cyan-400 px-4 py-1.5 rounded-xl border border-slate-800 shadow-[inset_0_2px_10px_rgba(0,0,0,0.8),0_0_15px_rgba(34,211,238,0.25)] tracking-wider">
+
+                            <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/40 dark:border-slate-700/40 text-slate-500 dark:text-slate-400 font-medium text-[11px] sm:text-xs tracking-wider order-3 md:order-2 shadow-sm">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-rose-500 animate-bounce"></i>
+                                <span>Ranya, Kurdistan Region</span>
+                            </div>
+
+                            <div class="flex items-center gap-2.5 font-mono text-sm sm:text-base font-black bg-slate-950 text-cyan-400 dark:text-cyan-400 px-4 py-1.5 rounded-xl border border-slate-800 shadow-[inset_0_2px_10px_rgba(0,0,0,0.8),0_0_15px_rgba(34,211,238,0.25)] tracking-wider order-2 md:order-3">
                                 <i data-lucide="clock" class="w-4 h-4 text-cyan-400"></i>
                                 <span id="live-time">00:00:00 AM</span>
                             </div>
+
                         </div>
                     </div>
                 `;
@@ -727,7 +736,7 @@
                 if (!container) return;
                 container.innerHTML = '';
 
-                // Sort algorithm: Pinned items take total visual precedence
+                // Sort algorithm: Pinned items take total visual precedence and sort to top
                 const sortedData = [...appsData].sort((a, b) => {
                     const aPinned = pinnedApps.includes(a.id) ? 1 : 0;
                     const bPinned = pinnedApps.includes(b.id) ? 1 : 0;
@@ -790,9 +799,9 @@
                         </div>
                     `;
 
-                    // Card-wide wrapper action router
+                    // Card-wide wrapper listener for launching the app on full-body text click
                     card.addEventListener('click', (e) => {
-                        if (e.target.closest('button')) return; // Safety check for nested triggers
+                        if (e.target.closest('button')) return; // Avoid cross-triggering button parameters
                         openApp(app.url);
                     });
 
@@ -802,7 +811,7 @@
                 if (window.lucide) window.lucide.createIcons();
             };
 
-            // Favorite state toggle runtime function
+            // Favorite Pin State Switcher
             window.toggleAppPin = function(appId, event) {
                 if (event) {
                     event.stopPropagation();
@@ -818,10 +827,9 @@
                 }
                 
                 localStorage.setItem('uor_pinned_apps', JSON.stringify(pinnedApps));
-                renderApps(); // Smooth re-render to update grid positions
+                renderApps(); // Seamless instantaneous resort re-render
             };
 
-            // Fire initial icon rendering sequence
             if (window.lucide) window.lucide.createIcons();
         }
 
