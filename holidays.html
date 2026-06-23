@@ -477,12 +477,25 @@
         if (activeFilter === 'day') {
             items = items.filter(item => item.m === curMonth && item.d.includes(curDay));
         } else if (activeFilter === 'week') {
+            // Find the most recent Saturday (Start of the Kurdistan Week)
+            const simulatedToday = new Date(2026, now.getMonth(), now.getDate());
+            const currentDayOfWeek = simulatedToday.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+            
+            // Distance to the past Saturday: if Saturday(6), distance is 0. If Sunday(0), distance is 1.
+            const daysSinceSaturday = (currentDayOfWeek + 1) % 7; 
+            
+            const startOfWeek = new Date(simulatedToday);
+            startOfWeek.setDate(simulatedToday.getDate() - daysSinceSaturday);
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            endOfWeek.setHours(23, 59, 59, 999);
+
             items = items.filter(item => {
                 return item.d.some(day => {
                     const itemDate = new Date(2026, item.m - 1, day);
-                    const simulatedToday = new Date(2026, now.getMonth(), now.getDate());
-                    const diffDays = Math.ceil(Math.abs(itemDate - simulatedToday) / (1000 * 60 * 60 * 24));
-                    return diffDays <= 7 && itemDate.getMonth() === now.getMonth();
+                    return itemDate >= startOfWeek && itemDate <= endOfWeek;
                 });
             });
         } else if (activeFilter === 'month') {
