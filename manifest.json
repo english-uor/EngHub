@@ -1,6 +1,6 @@
 {
   "name": "English Department Apps Hub",
-  "short_name": "Eng Dept",
+  "short_name": "EngHub",
   "description": "Official Apps Hub for the UoR English Language Department",
   "start_url": "./index.html",
   "display": "standalone",
