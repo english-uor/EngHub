@@ -2,6 +2,7 @@ const CACHE_NAME = 'uor-english-dept-v1';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
+    './offline.html',
     './Icon23.png',
     './manifest.json',
     'https://cdn.tailwindcss.com',
