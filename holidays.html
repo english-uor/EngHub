@@ -5,21 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Enghub • Holidays & Occasions</title>
     
-    <meta name="theme-color" content="#050B14">
+    <meta name="theme-color" content="#050B14" id="theme-color-meta">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
+            darkMode: 'class', // Enables manual dark mode toggling via 'dark' class on HTML tag
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+                        kurdish: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif', 'Arial'],
+                    },
                     colors: {
                         brand: {
                             50: '#eff6ff',
+                            100: '#dbeafe',
                             500: '#3b82f6',
                             600: '#2563eb',
+                            900: '#1e3a8a',
                             950: '#050B14'
                         }
                     }
@@ -28,248 +35,516 @@
         }
     </script>
 
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         body {
-            background-color: #050B14;
             -webkit-tap-highlight-color: transparent;
             overscroll-behavior-y: none;
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.3);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        
+        /* Hide scrollbars elegantly */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
         }
 
         .active-pill {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.35);
+            color: white !important;
         }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Ambient background movement */
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            50% { transform: translate(25px, -40px) scale(1.08); }
+            100% { transform: translate(0px, 0px) scale(1); }
         }
-        .animate-fade-in { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .animate-blob {
+            animation: blob 12s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes cardPop {
+            from { opacity: 0; transform: scale(0.96) translateY(12px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-card {
+            animation: cardPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        /* Beautiful rotating LED stroke around next holiday window */
+        .led-border-window {
+            position: relative;
+            overflow: hidden;
+        }
+        .led-border-window::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(from 0deg, transparent 20%, #3b82f6, #8b5cf6, #ec4899, transparent 80%);
+            animation: rotateLED 5s linear infinite;
+            z-index: 0;
+        }
+        .led-border-inner {
+            position: relative;
+            z-index: 1;
+            margin: 3px;
+        }
+        @keyframes rotateLED {
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500/30">
+<body class="bg-slate-50 dark:bg-[#050B14] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col antialiased select-none overflow-x-hidden relative pb-10 transition-colors duration-500">
 
-    <header class="sticky top-0 z-40 bg-[#050B14]/80 backdrop-blur-md border-b border-white/5 px-4 py-4">
-        <div class="max-w-2xl mx-auto flex items-center justify-between">
-            <a href="index.html" class="w-10 h-10 rounded-full bg-slate-800/60 border border-white/5 flex items-center justify-center text-slate-300 hover:text-white transition-all active:scale-90">
-                <i data-lucide="chevron-left" class="w-5 h-5"></i>
+    <!-- Atmospheric Deep Glow Blobs -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[60%] h-[50%] rounded-full bg-blue-300/30 dark:bg-blue-600/10 blur-[100px] dark:blur-[120px] animate-blob transition-colors duration-700"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[50%] rounded-full bg-purple-300/30 dark:bg-purple-600/10 blur-[100px] dark:blur-[120px] animate-blob transition-colors duration-700" style="animation-delay: 4s;"></div>
+    </div>
+
+    <!-- Sticky Navigation Hub Header -->
+    <header class="sticky top-0 z-40 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 transition-colors duration-500">
+        <div class="px-4 py-3.5 flex justify-between items-center max-w-2xl mx-auto w-full">
+            <a href="#" class="w-10 h-10 rounded-full bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-white/5 flex items-center justify-center text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all active:scale-90 shadow-sm">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
             </a>
             <div class="text-center">
-                <h1 class="text-base font-black tracking-wide text-white">Enghub Directory</h1>
-                <p class="text-[11px] font-bold text-brand-400 mt-0.5 font-sans">Holidays & Occasions</p>
+                <h1 class="text-sm font-black tracking-wide text-slate-900 dark:text-white uppercase">Enghub Directory</h1>
+                <p class="text-[11px] font-bold text-brand-600 dark:text-brand-400 mt-0.5 font-kurdish" dir="rtl">ڕۆژژمێری پشوو و بۆنەکان</p>
             </div>
-            <div class="w-10 h-10 opacity-0 pointer-events-none"></div> </div>
+            <!-- Theme Toggle Button -->
+            <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-white/5 flex items-center justify-center text-amber-500 shadow-sm hover:scale-105 active:scale-95 transition-all">
+                <i id="theme-icon" data-lucide="sun" class="w-5 h-5"></i>
+            </button>
+        </div>
     </header>
 
-    <main class="flex-grow w-full max-w-2xl mx-auto px-4 pt-6 pb-12 flex flex-col gap-6">
+    <!-- Main Responsive Body -->
+    <main class="flex-grow w-full max-w-2xl mx-auto px-4 pt-6 flex flex-col gap-6">
 
-        <section class="grid grid-cols-2 p-1 bg-slate-900/80 rounded-2xl border border-white/5">
-            <button id="tab-holiday" onclick="switchType('holiday')" class="py-3 text-center text-sm font-bold font-kurdish rounded-xl transition-all duration-300 active:scale-95 active-pill text-white" dir="rtl">
+        <!-- Countdown Hero (Next Upcoming Holiday Widget) -->
+        <section id="countdown-section" class="w-full relative z-10 hidden">
+            <div class="led-border-window rounded-[2rem] bg-white/80 dark:bg-slate-950/80 p-[3px] shadow-xl dark:shadow-[0_0_40px_rgba(59,130,246,0.15)] transition-colors duration-500">
+                <div class="led-border-inner rounded-[1.85rem] bg-white/95 dark:bg-slate-900/90 backdrop-blur-3xl p-5 sm:p-6 flex flex-col gap-4 transition-colors duration-500">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2 bg-rose-100 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 px-3 py-1 rounded-full text-[11px] font-bold text-rose-600 dark:text-rose-400 font-kurdish" dir="rtl">
+                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                            بۆنەی داهاتوو
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <!-- Share Button -->
+                            <button onclick="shareUpcoming()" class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-colors shadow-sm" title="Share">
+                                <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <span id="hero-type-badge" class="text-[11px] font-bold text-brand-700 dark:text-brand-400 bg-brand-100 dark:bg-brand-500/10 border border-brand-200 dark:border-brand-500/20 px-3 py-1 rounded-full font-kurdish"></span>
+                        </div>
+                    </div>
+
+                    <div class="text-right mt-1">
+                        <h2 id="hero-title" class="text-lg sm:text-xl font-black font-kurdish text-slate-900 dark:text-white leading-snug" dir="rtl">...</h2>
+                        <div class="flex items-center justify-end gap-2 mt-2 text-slate-500 dark:text-slate-400 text-xs font-bold">
+                            <span id="hero-date-badge">...</span>
+                            <i data-lucide="calendar-days" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                    </div>
+
+                    <!-- Countdown Digital Timer Display -->
+                    <div class="grid grid-cols-3 gap-3 border-t border-slate-200 dark:border-white/5 pt-4 transition-colors duration-500">
+                        <div class="bg-slate-50 dark:bg-slate-950/50 rounded-xl p-2.5 text-center border border-slate-200 dark:border-white/5 transition-colors duration-500 shadow-inner dark:shadow-none">
+                            <span id="timer-days" class="block font-mono font-black text-lg sm:text-2xl text-cyan-600 dark:text-cyan-400">00</span>
+                            <span class="text-[9px] text-slate-500 font-kurdish font-bold">ڕۆژ</span>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-950/50 rounded-xl p-2.5 text-center border border-slate-200 dark:border-white/5 transition-colors duration-500 shadow-inner dark:shadow-none">
+                            <span id="timer-hours" class="block font-mono font-black text-lg sm:text-2xl text-cyan-600 dark:text-cyan-400">00</span>
+                            <span class="text-[9px] text-slate-500 font-kurdish font-bold">کاتژمێر</span>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-950/50 rounded-xl p-2.5 text-center border border-slate-200 dark:border-white/5 transition-colors duration-500 shadow-inner dark:shadow-none">
+                            <span id="timer-minutes" class="block font-mono font-black text-lg sm:text-2xl text-cyan-600 dark:text-cyan-400">00</span>
+                            <span class="text-[9px] text-slate-500 font-kurdish font-bold">خولەک</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Selector Toggle Segment -->
+        <section class="grid grid-cols-2 p-1.5 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none transition-colors duration-500">
+            <button id="tab-holiday" onclick="switchType('holiday')" class="py-3 text-center text-xs sm:text-sm font-bold font-kurdish rounded-xl transition-all duration-300 active:scale-95 active-pill" dir="rtl">
                 پشووە فەرمییەکان 📡
             </button>
-            <button id="tab-occasion" onclick="switchType('occasion')" class="py-3 text-center text-sm font-bold font-kurdish rounded-xl transition-all duration-300 active:scale-95 text-slate-400 hover:text-slate-200" dir="rtl">
+            <button id="tab-occasion" onclick="switchType('occasion')" class="py-3 text-center text-xs sm:text-sm font-bold font-kurdish rounded-xl transition-all duration-300 active:scale-95 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200" dir="rtl">
                 بۆنە فەرمییەکان 🌟
             </button>
         </section>
 
-        <section class="grid grid-cols-4 gap-1.5 p-1 bg-slate-900/40 rounded-xl border border-white/5">
-            <button id="filter-day" onclick="switchFilter('day')" class="py-2.5 text-xs font-black font-kurdish rounded-lg transition-all text-slate-400 hover:text-slate-200">ئەمڕۆ</button>
-            <button id="filter-week" onclick="switchFilter('week')" class="py-2.5 text-xs font-black font-kurdish rounded-lg transition-all text-slate-400 hover:text-slate-200">ئەم هەفتەیە</button>
-            <button id="filter-month" onclick="switchFilter('month')" class="py-2.5 text-xs font-black font-kurdish rounded-lg transition-all text-slate-400 hover:text-slate-200">ئەم مانگە</button>
-            <button id="filter-year" onclick="switchFilter('year')" class="py-2.5 text-xs font-black font-kurdish rounded-lg transition-all text-white active-pill">ئەمساڵ</button>
+        <!-- Search Bar and Time Filter Stack -->
+        <section class="flex flex-col gap-4">
+            <!-- Glass Search Module -->
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="w-5 h-5 text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500 transition-colors"></i>
+                </div>
+                <input type="text" id="search-input" placeholder="...گەڕان بەدوای پشوو یان بۆنەدا" dir="rtl"
+                    class="block w-full pr-5 pl-12 py-3.5 bg-white/70 dark:bg-slate-900/40 backdrop-blur-md border border-slate-200 dark:border-white/5 rounded-2xl text-sm font-bold outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 text-slate-900 dark:text-white font-kurdish shadow-sm dark:shadow-none"
+                    onkeyup="performSearch()">
+            </div>
+
+            <!-- Time Horizon Quick Filters -->
+            <div class="grid grid-cols-4 gap-1.5 p-1 bg-white/60 dark:bg-slate-900/40 backdrop-blur-md rounded-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none transition-colors duration-500">
+                <button id="filter-day" onclick="switchFilter('day')" class="py-2.5 text-[10px] sm:text-xs font-black font-kurdish rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">ئەمڕۆ</button>
+                <button id="filter-week" onclick="switchFilter('week')" class="py-2.5 text-[10px] sm:text-xs font-black font-kurdish rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">ئەم هەفتەیە</button>
+                <button id="filter-month" onclick="switchFilter('month')" class="py-2.5 text-[10px] sm:text-xs font-black font-kurdish rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">ئەم مانگە</button>
+                <button id="filter-year" onclick="switchFilter('year')" class="py-2.5 text-[10px] sm:text-xs font-black font-kurdish rounded-lg transition-all active-pill">ئەمساڵ</button>
+            </div>
         </section>
 
-        <section id="list-render-target" class="flex flex-col gap-4">
-            </section>
+        <!-- List Directory Content Output Frame -->
+        <section id="directory-render-target" class="flex flex-col gap-4">
+            <!-- Loop elements populated here dynamically -->
+        </section>
 
     </main>
 
-<script>
-    // System Structural Unified Database Matrix
-    const trackingDatabase = [
-        // Type: HOLIDAYS (پشووەکان)
-        { type: 'holiday', m: 1, d: [1], text: "سەری ساڵی زایینی", dateStr: "١/١" },
-        { type: 'holiday', m: 3, d: [5], text: "ڕۆژی دەستپێکردنی ڕاپەڕینی گەلی کوردستان", dateStr: "٣/٥" },
-        { type: 'holiday', m: 3, d: [11], text: "یادی ڕاگەیاندنی ڕێکەوتننامەی ١١ی ئاداری ١٩٧٠", dateStr: "٣/١١" },
-        { type: 'holiday', m: 3, d: [14], text: "ڕۆژی لەدایكبوونی ڕابەر و سیمبولی نیشتمانیی مستەفا بارزانیی", dateStr: "٣/١٤" },
-        { type: 'holiday', m: 3, d: [20, 21, 22], text: "جەژنی ڕەمەزانی پیرۆز*", dateStr: "٣/٢٠-٢٢" },
-        { type: 'holiday', m: 3, d: [21, 22, 23], text: "جەژنی نەورۆز", dateStr: "٢١-٢٣ / ٣" },
-        { type: 'holiday', m: 4, d: [1], text: "سەری ساڵی بابلی ئاشووری - بابلی کلدانی", dateStr: "٤/١" },
-        { type: 'holiday', m: 4, d: [5], text: "جەژنی گەورە (بۆ مەسیحییەکان) - سێ ڕۆژ پشوو", dateStr: "٤/٥" },
-        { type: 'holiday', m: 4, d: [9], text: "ڕۆژی ئازادکردنی عێراق لە ڕژێمی دیکتاتۆری سەرکوتکار", dateStr: "٤/٩" },
-        { type: 'holiday', m: 4, d: [15], text: "جەژنی سەری ساڵی ئێزدییەکان", dateStr: "٤/١٥" },
-        { type: 'holiday', m: 5, d: [1], text: "ڕۆژی کرێکارانی جیهان", dateStr: "٥/١" },
-        { type: 'holiday', m: 5, d: [14], text: "جەژنی هەڵکشان (بۆ مەسیحییەکان) - یەک ڕۆژ پشوو", dateStr: "٥/١٤" },
-        { type: 'holiday', m: 5, d: [27, 28, 29, 30], text: "جەژنی قوربانی پیرۆز*", dateStr: "٥/٢٧-٣٠" },
-        { type: 'holiday', m: 6, d: [16], text: "سەری ساڵی کۆچی*", dateStr: "٦/١٦" },
-        { type: 'holiday', m: 6, d: [25], text: "ڕۆژی عاشورا*", dateStr: "٦/٢٥" },
-        { type: 'holiday', m: 7, d: [12], text: "جەژنی نووسەر دیل (بۆ ئاشوورییەکان) - یەک ڕۆژ پشوو", dateStr: "٧/١٢" },
-        { type: 'holiday', m: 7, d: [14], text: "شۆڕشی (١٤) ی تەمووزی ١٩٥٨", dateStr: "٧/١٤" },
-        { type: 'holiday', m: 7, d: [28, 29, 30, 31], text: "جەژنی نەورۆز", dateStr: "٢٨-٣١ / ٧" },
-        { type: 'holiday', m: 8, d: [25], text: "یادی لەدایكبوونی پێغەمبەری مەزن (د.خ)*", dateStr: "٨/٢٥" },
-        { type: 'holiday', m: 10, d: [6, 7, 8, 9, 10, 11, 12], text: "جەژنی جەمایێ (بۆ ئێزدییەکان)", dateStr: "١٠/٦-١٢" },
-        { type: 'holiday', m: 12, d: [18], text: "جەژنی ڕۆژیێن ئێزی (بۆ ئێزدییەکان)", dateStr: "١٢/١٨" },
-        { type: 'holiday', m: 12, d: [25], text: "یادی لەدایكبوونی حەزرەتی مەسیح (د.خ)", dateStr: "١٢/٢٥" },
+    <!-- Toast Notification for Share action -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 opacity-0 translate-y-10 pointer-events-none flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-full shadow-2xl font-kurdish font-bold text-sm" dir="rtl">
+        <i data-lucide="check-circle-2" class="w-5 h-5 text-green-400 dark:text-green-600"></i>
+        <span>زانیارییەکان لەبەرگیرانەوە!</span>
+    </div>
 
-        // Type: OCCASIONS (بۆنەکان)
-        { type: 'occasion', m: 1, d: [4], text: "جەژنی قەوڵتاس", dateStr: "١/٤" },
-        { type: 'occasion', m: 1, d: [22], text: "ڕۆژی دامەزراندنی کۆماری کوردستان", dateStr: "١/٢٢" },
-        { type: 'occasion', m: 2, d: [1], text: "ساڵیادی شەهیدانی (١)ی شوبات", dateStr: "٢/١" },
-        { type: 'occasion', m: 2, d: [18], text: "ڕۆژی قوتابیان و لاوان", dateStr: "٢/١٨" },
-        { type: 'occasion', m: 2, d: [25], text: "ڕۆژی ڕۆژنامەگەریی پێکهاتەی تورکمان", dateStr: "٢/٢٥" },
-        { type: 'occasion', m: 3, d: [1], text: "كۆچی دوایی ڕابەر و سیمبولی نیشتمانیی مستەفا بارزانیی", dateStr: "٣/١" },
-        { type: 'occasion', m: 3, d: [7], text: "ڕۆژی ڕزگارکردنی شاری سلێمانی", dateStr: "٣/٧" },
-        { type: 'occasion', m: 3, d: [8], text: "ڕۆژی جیهانی ژنان", dateStr: "٣/٨" },
-        { type: 'occasion', m: 3, d: [10], text: "ڕۆژی جلی میللی نەتەوەیی", dateStr: "٣/١٠" },
-        { type: 'occasion', m: 3, d: [11], text: "ڕۆژی ڕزگارکردنی شاری هەولێر", dateStr: "٣/١١" },
-        { type: 'occasion', m: 3, d: [14], text: "ڕۆژی ڕزگارکردنی شاری دهۆك", dateStr: "٣/١٤" },
-        { type: 'occasion', m: 3, d: [16], text: "ڕۆژی کیمیابارانکردنی هەڵەبجە", dateStr: "٣/١٦" },
-        { type: 'occasion', m: 3, d: [20], text: "ڕۆژی سەركەوتنی ڕاپەڕینی گەلی كوردستان", dateStr: "٣/٢٠" },
-        { type: 'occasion', m: 3, d: [21], text: "ڕۆژی ڕزگارکردنی شاری کەرکوك", dateStr: "٣/٢١" },
-        { type: 'occasion', m: 4, d: [4], text: "ساڵیادی قوربانیانی جینۆسایدی کوردی فەیلی", dateStr: "٤/٤" },
-        { type: 'occasion', m: 4, d: [5], text: "ساڵیادی دەرچوونی بڕیاری (٦٨٨)ی ئەنجومەنی ئاسایش", dateStr: "٤/٥" },
-        { type: 'occasion', m: 4, d: [14], text: "ساڵیادی شەهیدانی جینۆسایدی ئەنفال", dateStr: "٤/١٤" },
-        { type: 'occasion', m: 4, d: [16], text: "یادی کیمیابارانکردنی بالیسان - ڕۆژی ژینگە", dateStr: "٤/١٦" },
-        { type: 'occasion', m: 4, d: [22], text: "ڕۆژی ڕۆژنامەگەری کوردی", dateStr: "٤/٢٢" },
-        { type: 'occasion', m: 4, d: [24], text: "ساڵیادی بۆردومانکردنی شاری قەڵادزێ", dateStr: "٤/٢٤" },
-        { type: 'occasion', m: 5, d: [12], text: "ساڵیادی دامەزراندنی بنكەی لالش", dateStr: "٥/١٢" },
-        { type: 'occasion', m: 5, d: [15], text: "ساڵیادی دامەزراندنی یەکێتیی مامۆستایانی کوردستان", dateStr: "٥/١٥" },
-        { type: 'occasion', m: 7, d: [31], text: "ساڵیادی قوربانیانی ئەنفالکردنی بارزانییەکان", dateStr: "٧/٣١" },
-        { type: 'occasion', m: 8, d: [3], text: "ڕۆژی کۆمەڵکوژی (جینۆساید) ئێزدییەکان", dateStr: "٨/٣" },
-        { type: 'occasion', m: 8, d: [7], text: "ڕۆژی شەهیدانی ئاشووریان", dateStr: "٨/٧" },
-        { type: 'occasion', m: 8, d: [25], text: "ساڵیادی قوربانیانی ئەنفالکردنی بادینان", dateStr: "٨/٢٥" },
-        { type: 'occasion', m: 9, d: [11], text: "ساڵیادی هەڵگیرسانی شۆڕشی ئەیلوول", dateStr: "٩/١١" },
-        { type: 'occasion', m: 9, d: [21], text: "ساڵیادی دامەزراندنی یەکێتیی زانایانی ئیسلامیی کوردستان", dateStr: "٩/٢١" },
-        { type: 'occasion', m: 11, d: [17], text: "ڕۆژی زمان و کولتوری پێکهاتەی تورکمان", dateStr: "١١/١٧" },
-        { type: 'occasion', m: 12, d: [17], text: "ڕۆژی ئاڵای کوردستان", dateStr: "١٢/١٧" }
+<script>
+    // System Holiday Master Database with unified theme color property
+    const database = [
+        // Category: HOLIDAYS (پشووەکان)
+        { type: 'holiday', m: 1, d: [1], text: "سەری ساڵی زایینی", dateStr: "١/١", icon: "sparkles", theme: "amber" },
+        { type: 'holiday', m: 3, d: [5], text: "ڕۆژی دەستپێکردنی ڕاپەڕینی گەلی کوردستان", dateStr: "٣/٥", icon: "flag", theme: "red" },
+        { type: 'holiday', m: 3, d: [11], text: "یادی ڕاگەیاندنی ڕێکەوتننامەی ١١ی ئاداری ١٩٧٠", dateStr: "٣/١١", icon: "scroll", theme: "blue" },
+        { type: 'holiday', m: 3, d: [14], text: "ڕۆژی لەدایكبوونی ڕابەر و سیمبولی نیشتمانیی مستەفا بارزانیی", dateStr: "٣/١٤", icon: "crown", theme: "yellow" },
+        { type: 'holiday', m: 3, d: [20, 21, 22], text: "جەژنی ڕەمەزانی پیرۆز*", dateStr: "٣/٢٠-٢٢", icon: "moon", theme: "indigo" },
+        { type: 'holiday', m: 3, d: [21, 22, 23], text: "جەژنی نەورۆز", dateStr: "٢١-٢٣ / ٣", icon: "flame", theme: "orange" },
+        { type: 'holiday', m: 4, d: [1], text: "سەری ساڵی بابلی ئاشووری - بابلی کلدانی", dateStr: "٤/١", icon: "landmark", theme: "teal" },
+        { type: 'holiday', m: 4, d: [5], text: "جەژنی گەورە (بۆ مەسیحییەکان) - سێ ڕۆژ پشوو", dateStr: "٤/٥", icon: "cross", theme: "emerald" },
+        { type: 'holiday', m: 4, d: [9], text: "ڕۆژی ئازادکردنی عێراق لە ڕژێمی دیکتاتۆری سەرکوتکار", dateStr: "٤/٩", icon: "shield-alert", theme: "sky" },
+        { type: 'holiday', m: 4, d: [15], text: "جەژنی سەری ساڵی ئێزدییەکان", dateStr: "٤/١٥", icon: "sun", theme: "yellow" },
+        { type: 'holiday', m: 5, d: [1], text: "ڕۆژی کرێکارانی جیهان", dateStr: "٥/١", icon: "wrench", theme: "pink" },
+        { type: 'holiday', m: 5, d: [14], text: "جەژنی هەڵکشان (بۆ مەسیحییەکان) - یەک ڕۆژ پشوو", dateStr: "٥/١٤", icon: "cloud-lightning", theme: "purple" },
+        { type: 'holiday', m: 5, d: [27, 28, 29, 30], text: "جەژنی قوربانی پیرۆز*", dateStr: "٥/٢٧-٣٠", icon: "peace", theme: "green" },
+        { type: 'holiday', m: 6, d: [16], text: "سەری ساڵی کۆچی*", dateStr: "٦/١٦", icon: "compass", theme: "rose" },
+        { type: 'holiday', m: 6, d: [25], text: "ڕۆژی عاشورا*", dateStr: "٦/٢٥", icon: "activity", theme: "red" },
+        { type: 'holiday', m: 7, d: [12], text: "جەژنی نووسەر دیل (بۆ ئاشوورییەکان) - یەک ڕۆژ پشوو", dateStr: "٧/١٢", icon: "pen-tool", theme: "sky" },
+        { type: 'holiday', m: 7, d: [14], text: "شۆڕشی (١٤) ی تەمووزی ١٩٥٨", dateStr: "٧/١٤", icon: "swords", theme: "amber" },
+        { type: 'holiday', m: 8, d: [25], text: "یادی لەدایكبوونی پێغەمبەری مەزن (د.خ)*", dateStr: "٨/٢٥", icon: "book-open", theme: "indigo" },
+        { type: 'holiday', m: 10, d: [6, 7, 8, 9, 10, 11, 12], text: "جەژنی جەمایێ (بۆ ئێزدییەکان)", dateStr: "١٠/٦-١٢", icon: "users", theme: "emerald" },
+        { type: 'holiday', m: 12, d: [18], text: "جەژنی ڕۆژیێن ئێزی (بۆ ئێزدییەکان)", dateStr: "١٢/١٨", icon: "flame", theme: "yellow" },
+        { type: 'holiday', m: 12, d: [25], text: "یادی لەدایكبوونی حەزرەتی مەسیح (د.خ)", dateStr: "١٢/٢٥", icon: "gift", theme: "red" },
+
+        // Category: OCCASIONS (بۆنەکان)
+        { type: 'occasion', m: 1, d: [4], text: "جەژنی قەوڵتاس", dateStr: "١/٤", icon: "sparkles", theme: "cyan" },
+        { type: 'occasion', m: 1, d: [22], text: "ڕۆژی دامەزراندنی کۆماری کوردستان", dateStr: "١/٢٢", icon: "flag", theme: "red" },
+        { type: 'occasion', m: 2, d: [1], text: "ساڵیادی شەهیدانی (١)ی شوبات", dateStr: "٢/١", icon: "skull", theme: "slate" },
+        { type: 'occasion', m: 2, d: [18], text: "ڕۆژی قوتابیان و لاوان", dateStr: "٢/١٨", icon: "graduation-cap", theme: "blue" },
+        { type: 'occasion', m: 2, d: [25], text: "ڕۆژی ڕۆژنامەگەریی پێکهاتەی تورکمان", dateStr: "٢/٢٥", icon: "newspaper", theme: "sky" },
+        { type: 'occasion', m: 3, d: [1], text: "كۆچی دوایی ڕابەر و سیمبولی نیشتمانیی مستەفا بارزانیی", dateStr: "٣/١", icon: "frown", theme: "slate" },
+        { type: 'occasion', m: 3, d: [7], text: "ڕۆژی ڕزگارکردنی شاری سلێمانی", dateStr: "٣/٧", icon: "anchor", theme: "indigo" },
+        { type: 'occasion', m: 3, d: [8], text: "ڕۆژی جیهانی ژنان", dateStr: "٣/٨", icon: "heart", theme: "pink" },
+        { type: 'occasion', m: 3, d: [10], text: "ڕۆژی جلی میللی نەتەوەیی", dateStr: "٣/١0", icon: "shirt", theme: "teal" },
+        { type: 'occasion', m: 3, d: [11], text: "ڕۆژی ڕزگارکردنی شاری هەولێر", dateStr: "٣/١١", icon: "castle", theme: "yellow" },
+        { type: 'occasion', m: 3, d: [14], text: "ڕۆژی ڕزگارکردنی شاری دهۆك", dateStr: "٣/١٤", icon: "map-pin", theme: "emerald" },
+        { type: 'occasion', m: 3, d: [16], text: "ڕۆژی کیمیابارانکردنی هەڵەبجە", dateStr: "٣/١٦", icon: "wind", theme: "slate" },
+        { type: 'occasion', m: 3, d: [20], text: "ڕۆژی سەركەوتنی ڕاپەڕینی گەلی كوردستان", dateStr: "٣/٢٠", icon: "target", theme: "orange" },
+        { type: 'occasion', m: 3, d: [21], text: "ڕۆژی ڕزگارکردنی شاری کەرکوك", dateStr: "٣/٢١", icon: "shield", theme: "blue" },
+        { type: 'occasion', m: 4, d: [4], text: "ساڵیادی قوربانیانی جینۆسایدی کوردی فەیلی", dateStr: "٤/٤", icon: "history", theme: "purple" },
+        { type: 'occasion', m: 4, d: [5], text: "ساڵیادی دەرچوونی بڕیاری (٦٨٨)ی ئەنجومەنی ئاسایش", dateStr: "٤/٥", icon: "gavel", theme: "amber" },
+        { type: 'occasion', m: 4, d: [14], text: "ساڵیادی شەهیدانی جینۆسایدی ئەنفال", dateStr: "٤/١٤", icon: "droplet", theme: "red" },
+        { type: 'occasion', m: 4, d: [16], text: "یادی کیمیابارانکردنی بالیسان - ڕۆژی ژینگە", dateStr: "٤/١٦", icon: "leaf", theme: "green" },
+        { type: 'occasion', m: 4, d: [22], text: "ڕۆژی ڕۆژنامەگەری کوردی", dateStr: "٤/٢٢", icon: "pen", theme: "purple" },
+        { type: 'occasion', m: 4, d: [24], text: "ساڵیادی بۆردومانکردنی شاری قەڵادزێ", dateStr: "٤/٢٤", icon: "flame", theme: "red" },
+        { type: 'occasion', m: 5, d: [12], text: "ساڵیادی دامەزراندنی بنكەی لالش", dateStr: "٥/١٢", icon: "milestone", theme: "yellow" },
+        { type: 'occasion', m: 5, d: [15], text: "ساڵیادی دامەزراندنی یەکێتیی مامۆستایانی کوردستان", dateStr: "٥/١٥", icon: "book", theme: "emerald" },
+        { type: 'occasion', m: 7, d: [31], text: "ساڵیادی قوربانیانی ئەنفالکردنی بارزانییەکان", dateStr: "٧/٣١", icon: "shield-alert", theme: "slate" },
+        { type: 'occasion', m: 8, d: [3], text: "ڕۆژی کۆمەڵکوژی (جینۆساید) ئێزدییەکان", dateStr: "٨/٣", icon: "frown", theme: "slate" },
+        { type: 'occasion', m: 8, d: [7], text: "ڕۆژی شەهیدانی ئاشووریان", dateStr: "٨/٧", icon: "flame", theme: "red" },
+        { type: 'occasion', m: 8, d: [25], text: "ساڵیادی قوربانیانی ئەنفالکردنی بادینان", dateStr: "٨/٢٥", icon: "eye", theme: "slate" },
+        { type: 'occasion', m: 9, d: [11], text: "ساڵیادی هەڵگیرسانی شۆڕشی ئەیلوول", dateStr: "٩/١١", icon: "mountain", theme: "amber" },
+        { type: 'occasion', m: 9, d: [21], text: "ساڵیادی دامەزراندنی یەکێتیی زانایانی ئیسلامیی کوردستان", dateStr: "٩/٢١", icon: "book-open", theme: "teal" },
+        { type: 'occasion', m: 11, d: [17], text: "ڕۆژی زمان و کولتوری پێکهاتەی تورکمان", dateStr: "١١/١٧", icon: "languages", theme: "indigo" },
+        { type: 'occasion', m: 12, d: [17], text: "ڕۆژی ئاڵای کوردستان", dateStr: "١٢/١٧", icon: "flag", theme: "red" }
     ];
 
-    const monthNamesKurdish = {
+    const monthsKurdishMap = {
         1: "کانوونی دووەم (January)", 2: "شوبات (February)", 3: "ئادار (March)",
         4: "نیسان (April)", 5: "ئایار (May)", 6: "حوزەیران (June)",
         7: "تەممووز (July)", 8: "ئاب (August)", 9: "ئەیلوول (September)",
         10: "تشرینی یەکەم (October)", 11: "تشرینی دووەم (November)", 12: "کانوونی یەکەم (December)"
     };
 
-    let currentType = 'holiday';
-    let currentFilter = 'year';
+    let activeType = 'holiday';
+    let activeFilter = 'year';
+    let searchQuery = '';
+    let countdownInterval = null;
 
     document.addEventListener('DOMContentLoaded', () => {
-        lucide.createIcons();
-        renderFilteredData();
+        syncTheme();
+        calculateAndSetNextUpcoming();
+        renderTimeline();
     });
 
+    // Share functionality
+    function shareUpcoming() {
+        const title = document.getElementById('hero-title').innerText;
+        const date = document.getElementById('hero-date-badge').innerText;
+        const text = `بۆنەی داهاتوو: ${title} لە ${date}\nلە ڕێگەی Enghub ەوە`;
+        
+        // Creating a temporary textarea to copy text (works universally)
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showToast();
+        } catch (err) {
+            console.error('Failed to copy', err);
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function showToast() {
+        const toast = document.getElementById('toast');
+        toast.classList.remove('opacity-0', 'translate-y-10');
+        setTimeout(() => {
+            toast.classList.add('opacity-0', 'translate-y-10');
+        }, 3500);
+    }
+
+    // Theme toggling functionality
+    function syncTheme() {
+        const isDark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        const icon = document.getElementById('theme-icon');
+        
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('theme-color-meta').setAttribute('content', '#050B14');
+            if(icon) icon.setAttribute('data-lucide', 'sun');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.getElementById('theme-color-meta').setAttribute('content', '#f8fafc');
+            if(icon) icon.setAttribute('data-lucide', 'moon');
+        }
+        lucide.createIcons();
+    }
+
+    function toggleTheme() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const icon = document.getElementById('theme-icon');
+        
+        if (isDark) {
+            document.documentElement.classList.remove('dark');
+            localStorage.theme = 'light';
+            document.getElementById('theme-color-meta').setAttribute('content', '#f8fafc');
+            icon.setAttribute('data-lucide', 'moon');
+        } else {
+            document.documentElement.classList.add('dark');
+            localStorage.theme = 'dark';
+            document.getElementById('theme-color-meta').setAttribute('content', '#050B14');
+            icon.setAttribute('data-lucide', 'sun');
+        }
+        lucide.createIcons();
+    }
+
     function switchType(type) {
-        currentType = type;
+        activeType = type;
         ['holiday', 'occasion'].forEach(t => {
             const btn = document.getElementById(`tab-${t}`);
             if (t === type) {
-                btn.classList.add('active-pill', 'text-white');
-                btn.classList.remove('text-slate-400', 'hover:text-slate-200');
+                btn.classList.add('active-pill');
+                btn.classList.remove('text-slate-500', 'dark:text-slate-400', 'hover:text-slate-800', 'dark:hover:text-slate-200');
             } else {
-                btn.classList.remove('active-pill', 'text-white');
-                btn.classList.add('text-slate-400', 'hover:text-slate-200');
+                btn.classList.remove('active-pill');
+                btn.classList.add('text-slate-500', 'dark:text-slate-400', 'hover:text-slate-800', 'dark:hover:text-slate-200');
             }
         });
-        renderFilteredData();
+        renderTimeline();
     }
 
     function switchFilter(filter) {
-        currentFilter = filter;
+        activeFilter = filter;
         ['day', 'week', 'month', 'year'].forEach(f => {
             const btn = document.getElementById(`filter-${f}`);
             if (f === filter) {
-                btn.classList.add('active-pill', 'text-white');
-                btn.classList.remove('text-slate-400', 'hover:text-slate-200');
+                btn.classList.add('active-pill');
+                btn.classList.remove('text-slate-500', 'dark:text-slate-400', 'hover:bg-slate-100', 'dark:hover:bg-slate-800');
             } else {
-                btn.classList.remove('active-pill', 'text-white');
-                btn.classList.add('text-slate-400', 'hover:text-slate-200');
+                btn.classList.remove('active-pill');
+                btn.classList.add('text-slate-500', 'dark:text-slate-400', 'hover:bg-slate-100', 'dark:hover:bg-slate-800');
             }
         });
-        renderFilteredData();
+        renderTimeline();
     }
 
-    function renderFilteredData() {
-        const target = document.getElementById('list-render-target');
-        target.innerHTML = '';
+    function performSearch() {
+        searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+        renderTimeline();
+    }
 
-        const systemTime2026 = new Date();
-        const curYear = 2026; 
-        const curMonth = systemTime2026.getMonth() + 1; // 1-12
-        const curDay = systemTime2026.getDate();
+    // Advanced search to bridge english digits to kurdish formats
+    function cleanNumeral(str) {
+        const replaceMap = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+        return str.replace(/[٠-٩]/g, d => replaceMap[d]);
+    }
 
-        // Filter by primary Category Type
-        let filtered = trackingDatabase.filter(item => item.type === currentType);
+    // Engine: Calculates next chronological event of 2026 and sets countdown timer
+    function calculateAndSetNextUpcoming() {
+        const now = new Date();
+        const currentYr = 2026; // System base anchor matching Kurdish directory context
+        const sysTime = new Date(currentYr, now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
 
-        // Filter by Time Horizon Proximity Range
-        if (currentFilter === 'day') {
-            filtered = filtered.filter(item => item.m === curMonth && item.d.includes(curDay));
-        } else if (currentFilter === 'week') {
-            // Evaluates proximity checking matching timeline spans within 7 days
-            filtered = filtered.filter(item => {
-                return item.d.some(day => {
-                    const itemDate = new Date(curYear, item.m - 1, day);
-                    const diffTime = Math.abs(itemDate - systemTime2026);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    return diffDays <= 7 && itemDate.getMonth() === systemTime2026.getMonth();
-                });
+        let absoluteUpcoming = null;
+        let minimumDiff = Infinity;
+
+        database.forEach(item => {
+            item.d.forEach(day => {
+                const targetDate = new Date(currentYr, item.m - 1, day);
+                const diff = targetDate - sysTime;
+                
+                if (diff > 0 && diff < minimumDiff) {
+                    minimumDiff = diff;
+                    absoluteUpcoming = { ...item, dayTarget: day };
+                }
             });
-        } else if (currentFilter === 'month') {
-            filtered = filtered.filter(item => item.m === curMonth);
+        });
+
+        // Fallback to first event of next year cycle if all events this year passed
+        if (!absoluteUpcoming) {
+            let earliestEvent = database[0];
+            absoluteUpcoming = { ...earliestEvent, dayTarget: earliestEvent.d[0] };
         }
 
-        if (filtered.length === 0) {
+        if (absoluteUpcoming) {
+            document.getElementById('countdown-section').classList.remove('hidden');
+            document.getElementById('hero-title').textContent = absoluteUpcoming.text;
+            document.getElementById('hero-type-badge').textContent = absoluteUpcoming.type === 'holiday' ? 'پشووی فەرمی' : 'بۆنەی نیشتمانی';
+            document.getElementById('hero-date-badge').textContent = `ڕۆژی ${absoluteUpcoming.dayTarget}/${absoluteUpcoming.m} ی ٢٠٢٦`;
+
+            const targetTime = new Date(currentYr, absoluteUpcoming.m - 1, absoluteUpcoming.dayTarget, 0, 0, 0).getTime();
+            
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            function updateTimer() {
+                const present = new Date().getTime();
+                // Simulation of 2026 calendar view
+                const simulatedPresent = new Date(currentYr, now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds()).getTime();
+                const distance = targetTime - simulatedPresent;
+
+                if (distance < 0) {
+                    document.getElementById('timer-days').textContent = "00";
+                    document.getElementById('timer-hours').textContent = "00";
+                    document.getElementById('timer-minutes').textContent = "00";
+                    clearInterval(countdownInterval);
+                    return;
+                }
+
+                const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+                document.getElementById('timer-days').textContent = d.toString().padStart(2, '0');
+                document.getElementById('timer-hours').textContent = h.toString().padStart(2, '0');
+                document.getElementById('timer-minutes').textContent = m.toString().padStart(2, '0');
+            }
+            
+            countdownInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+    }
+
+    function renderTimeline() {
+        const target = document.getElementById('directory-render-target');
+        target.innerHTML = '';
+
+        const now = new Date();
+        const curMonth = now.getMonth() + 1;
+        const curDay = now.getDate();
+
+        // 1. Initial Category Filter
+        let items = database.filter(item => item.type === activeType);
+
+        // 2. Proximity Time Filter
+        if (activeFilter === 'day') {
+            items = items.filter(item => item.m === curMonth && item.d.includes(curDay));
+        } else if (activeFilter === 'week') {
+            items = items.filter(item => {
+                return item.d.some(day => {
+                    const itemDate = new Date(2026, item.m - 1, day);
+                    const simulatedToday = new Date(2026, now.getMonth(), now.getDate());
+                    const diffDays = Math.ceil(Math.abs(itemDate - simulatedToday) / (1000 * 60 * 60 * 24));
+                    return diffDays <= 7 && itemDate.getMonth() === now.getMonth();
+                });
+            });
+        } else if (activeFilter === 'month') {
+            items = items.filter(item => item.m === curMonth);
+        }
+
+        // 3. Search Filter
+        if (searchQuery) {
+            items = items.filter(item => {
+                const textMatch = item.text.toLowerCase().includes(searchQuery);
+                const descDateClean = cleanNumeral(item.dateStr);
+                const queryClean = cleanNumeral(searchQuery);
+                return textMatch || descDateClean.includes(queryClean) || item.dateStr.includes(searchQuery);
+            });
+        }
+
+        if (items.length === 0) {
             target.innerHTML = `
-                <div class="glass-panel rounded-2xl p-8 text-center animate-fade-in">
-                    <i data-lucide="calendar-range" class="w-10 h-10 mx-auto text-slate-600 mb-3"></i>
-                    <p class="font-kurdish font-bold text-slate-400 text-sm" dir="rtl">هیچ پشوو یان بۆنەیەک بۆ ئەم ماوەیە دیاری نەکراوە.</p>
-                    <p class="text-[11px] text-slate-600 font-sans mt-1">No items found for this active time slice</p>
+                <div class="bg-white/60 dark:bg-slate-900/40 backdrop-blur-md rounded-2xl p-10 text-center animate-card border border-slate-200 dark:border-white/5 transition-colors duration-500">
+                    <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center text-slate-400 dark:text-slate-500 mx-auto mb-4 border border-slate-200 dark:border-white/5 shadow-inner">
+                        <i data-lucide="search-code" class="w-6 h-6"></i>
+                    </div>
+                    <p class="font-kurdish font-extrabold text-slate-600 dark:text-slate-400 text-[14px]" dir="rtl">هیچ پشوو یان بۆنەیەک نەدۆزرایەوە!</p>
+                    <p class="text-[10px] text-slate-400 dark:text-slate-600 font-sans mt-1.5 font-bold">No matching data slices discovered</p>
                 </div>`;
             lucide.createIcons();
             return;
         }
 
-        // Group elements by matching Months for elegant structural parsing layout
-        const groupedByMonth = {};
-        filtered.forEach(item => {
-            if (!groupedByMonth[item.m]) groupedByMonth[item.m] = [];
-            groupedByMonth[item.m].push(item);
+        // Group by month number
+        const groups = {};
+        items.forEach(item => {
+            if (!groups[item.m]) groups[item.m] = [];
+            groups[item.m].push(item);
         });
 
-        // Loop and paint UI blocks
-        Object.keys(groupedByMonth).sort((a, b) => a - b).forEach(monthNum => {
-            const monthHeader = document.createElement('div');
-            monthHeader.className = "mt-4 mb-2 px-1 flex items-center justify-between text-xs font-black font-kurdish tracking-wider text-brand-400 border-r-2 border-brand-500 pr-2 animate-fade-in";
-            monthHeader.dir = "rtl";
-            monthHeader.textContent = monthNamesKurdish[monthNum];
-            target.appendChild(monthHeader);
+        // Render sorted groups
+        Object.keys(groups).sort((a, b) => a - b).forEach(mNum => {
+            const mHeader = document.createElement('div');
+            mHeader.className = "mt-5 mb-2 px-1 flex items-center justify-between text-xs font-black font-kurdish text-brand-600 dark:text-brand-400 border-r-[3px] border-brand-500 pr-3.5 animate-card transition-colors duration-500";
+            mHeader.dir = "rtl";
+            mHeader.textContent = monthsKurdishMap[mNum];
+            target.appendChild(mHeader);
 
-            groupedByMonth[monthNum].forEach(item => {
+            groups[mNum].forEach(item => {
                 const card = document.createElement('div');
-                card.className = "glass-panel rounded-2xl p-4 flex items-center justify-between gap-4 animate-fade-in hover:bg-slate-800/20 transition-all duration-300";
+                const tColor = item.theme || 'brand'; // fallback color theme
                 
-                // Eastern right-aligned block matching script layout configs
+                // Adaptive color mapping logic using Tailwind arbitrary classes or safe utilities
+                card.className = "bg-white/60 dark:bg-slate-900/30 backdrop-blur-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none rounded-[1.5rem] p-4.5 flex items-center justify-between gap-4 animate-card hover:bg-white/90 dark:hover:bg-slate-800/40 hover:-translate-y-0.5 transition-all duration-300 group";
+                
                 card.innerHTML = `
-                    <div class="flex items-center gap-3.5 order-2 flex-shrink-0">
-                        <div class="px-3 py-2 rounded-xl bg-slate-900/90 border border-white/5 font-mono font-black text-xs text-brand-400 tracking-tight shadow-inner min-w-[54px] text-center">
+                    <div class="flex items-center gap-3 order-2 flex-shrink-0">
+                        <div class="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-white/5 font-mono font-black text-xs text-${tColor}-600 dark:text-${tColor}-400 tracking-tight shadow-inner min-w-[54px] text-center transition-colors duration-500 group-hover:scale-105">
                             ${item.dateStr}
                         </div>
                     </div>
-                    <div class="text-right flex-grow order-1 pr-1">
-                        <p class="font-kurdish font-bold text-[14px] leading-snug text-slate-100" dir="rtl">${item.text}</p>
+                    <div class="text-right flex-grow order-1 flex items-center justify-end gap-3.5">
+                        <p class="font-kurdish font-bold text-[14px] leading-snug text-slate-800 dark:text-slate-100 transition-colors duration-500" dir="rtl">${item.text}</p>
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center border border-${tColor}-200 dark:border-white/5 text-${tColor}-600 dark:text-${tColor}-400 bg-${tColor}-100 dark:bg-${tColor}-500/10 transition-colors duration-500">
+                            <i data-lucide="${item.icon || 'calendar'}" class="w-4.5 h-4.5"></i>
+                        </div>
                     </div>
                 `;
                 target.appendChild(card);
