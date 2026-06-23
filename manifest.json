@@ -8,6 +8,30 @@
   "background_color": "#050B14",
   "theme_color": "#050B14",
   "categories": ["education", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Attendance",
+      "url": "https://english-uor.github.io/attendance/",
+      "description": "Open directly to attendance system checking records"
+    },
+    {
+      "name": "Library",
+      "url": "https://english-uor.github.io/Library/",
+      "description": "Open directly to research book records"
+    },
+    {
+      "name": "Forms",
+      "url": "https://english-uor.github.io/Forms/",
+      "description": "Open directly to document generation logs"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ],
   "icons": [
     {
       "src": "Icon23.png",
