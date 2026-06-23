@@ -2,7 +2,6 @@ const CACHE_NAME = 'uor-english-dept-v1';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
-    './offline.html',
     './Icon23.png',
     './manifest.json',
     'https://cdn.tailwindcss.com',
@@ -43,24 +42,18 @@ self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 
     event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-
-            fetch(event.request).then((networkResponse) => {
-                if (networkResponse && networkResponse.status === 200) {
-                    caches.open(CACHE_NAME)
-                    .then((cache) => cache.put(event.request, networkResponse));
-                }
-            }).catch(() => {});
-
-            return cachedResponse;
-        }
-
-        return fetch(event.request).catch(() => {
-            if (event.request.mode === 'navigate') {
-                return caches.match('./offline.html');
+        caches.match(event.request).then((cachedResponse) => {
+            if (cachedResponse) {
+                // Background update synchronization
+                fetch(event.request).then((networkResponse) => {
+                    if (networkResponse && networkResponse.status === 200) {
+                        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
+                    }
+                }).catch(() => { /* Maintain offline silence on network dropouts */ });
+                
+                return cachedResponse;
             }
-        });
-
-    })
-);
+            return fetch(event.request);
+        })
+    );
+});
