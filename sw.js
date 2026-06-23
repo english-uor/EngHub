@@ -1,33 +1,35 @@
-const CACHE_NAME = 'uor-english-dept-v1';
+// Version-stamped explicit cache control string
+const CACHE_NAME = 'uor-english-dept-v2026-06-23';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
+    './offline.html',
     './Icon23.png',
     './manifest.json',
     'https://cdn.tailwindcss.com',
     'https://unpkg.com/lucide@latest'
 ];
 
-// Installation Cycle: Capture and bundle application frameworks offline
+// Capture and cache structural assets immediately on first install
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
         .then((cache) => {
-            console.log('Pre-Caching Critical Visual Shell Assets...');
+            console.log('Pre-Caching System Assets...');
             return cache.addAll(ASSETS_TO_CACHE);
         })
         .then(() => self.skipWaiting())
     );
 });
 
-// Activation Cycle: Erase historical cache profiles
+// Clear out old caches when a version bump is discovered
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cache) => {
                     if (cache !== CACHE_NAME) {
-                        console.log('Clearing Outdated Caches:', cache);
+                        console.log('Wiping Legacy Cache Scope Block:', cache);
                         return caches.delete(cache);
                     }
                 })
@@ -36,24 +38,30 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Fetch Interception Matrix: Advanced Stale-While-Revalidate Engine
+// Fetch Interception Engine: Stale-While-Revalidate with full Navigation Fallback
 self.addEventListener('fetch', (event) => {
-    // Only intercept local assets or critical scripts
     if (event.request.method !== 'GET') return;
 
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
             if (cachedResponse) {
-                // Background update synchronization
+                // Fetch fresh copy in the background to update the cache
                 fetch(event.request).then((networkResponse) => {
                     if (networkResponse && networkResponse.status === 200) {
                         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
                     }
-                }).catch(() => { /* Maintain offline silence on network dropouts */ });
+                }).catch(() => { /* Fail silently if offline */ });
                 
                 return cachedResponse;
             }
-            return fetch(event.request);
+            
+            // Asset is not cached, attempt to download over the network
+            return fetch(event.request).catch(() => {
+                // If network fails completely and user is navigating, drop to offline view page
+                if (event.request.mode === 'navigate') {
+                    return caches.match('./offline.html');
+                }
+            });
         })
     );
 });
