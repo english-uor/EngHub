@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Enghub • Holidays & Occasions</title>
+    
+    <meta name="theme-color" content="#050B14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            950: '#050B14'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            background-color: #050B14;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .active-pill {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500/30">
+
+    <header class="sticky top-0 z-40 bg-[#050B14]/80 backdrop-blur-md border-b border-white/5 px-4 py-4">
+        <div class="max-w-2xl mx-auto flex items-center justify-between">
+            <a href="index.html" class="w-10 h-10 rounded-full bg-slate-800/60 border border-white/5 flex items-center justify-center text-slate-300 hover:text-white transition-all active:scale-90">
+                <i data-lucide="chevron-left" class="w-5 h-5"></i>
+            </a>
+            <div class="text-center">
+                <h1 class="text-base font-black tracking-wide text-white">Enghub Directory</h1>
+                <p class="text-[11px] font-bold text-brand-400 mt-0.5 font-sans">Holidays & Occasions</p>
+            </div>
+            <div class="w-10 h-10 opacity-0 pointer-events-none"></div> </div>
+    </header>
+
+    <main class="flex-grow w-full max-w-2xl mx-auto px-4 pt-6 pb-12 flex flex-col gap-6">
+
+        <section class="grid grid-cols-2 p-1 bg-slate-900/80 rounded-2xl border border-white/5">
+            <button id="tab-holiday" onclick="switchType('holiday')" class="py-3 text-center text-sm font-bold font-kurdish rounded-xl transition-all duration-300 active:scale-95 active-pill text-white" dir="rtl">
+                پشووە فەرمییەکان 📡
+            </button>
+            <button id="tab-occasion" onclick="switchType('occasion')" class="py-3 text-center text-sm font-bold font-kurdish rounded-xl transition-all duration-300 active:scale-95 text-slate-400 hover:text-slate-200" dir="rtl">
+                بۆنە فەرمییەکان 🌟
+            </button>
+        </section>
+
+        <section class="grid grid-cols-4 gap-1.5 p-1 bg-slate-900/40 rounded-xl border border-white/5">
+            <button id="filter-day" onclick="switchFilter('day')" class="py-2.5 text-xs font-black font-kurdish rounded-lg transition-all text-slate-400 hover:text-slate-200">ئەمڕۆ</button>
+            <button id="filter-week" onclick="switchFilter('week')" class="py-2.5 text-xs font-black font-kurdish rounded-lg transition-all text-slate-400 hover:text-slate-200">ئەم هەفتەیە</button>
+            <button id="filter-month" onclick="switchFilter('month')" class="py-2.5 text-xs font-black font-kurdish rounded-lg transition-all text-slate-400 hover:text-slate-200">ئەم مانگە</button>
+            <button id="filter-year" onclick="switchFilter('year')" class="py-2.5 text-xs font-black font-kurdish rounded-lg transition-all text-white active-pill">ئەمساڵ</button>
+        </section>
+
+        <section id="list-render-target" class="flex flex-col gap-4">
+            </section>
+
+    </main>
+
+<script>
+    // System Structural Unified Database Matrix
+    const trackingDatabase = [
+        // Type: HOLIDAYS (پشووەکان)
+        { type: 'holiday', m: 1, d: [1], text: "سەری ساڵی زایینی", dateStr: "١/١" },
+        { type: 'holiday', m: 3, d: [5], text: "ڕۆژی دەستپێکردنی ڕاپەڕینی گەلی کوردستان", dateStr: "٣/٥" },
+        { type: 'holiday', m: 3, d: [11], text: "یادی ڕاگەیاندنی ڕێکەوتننامەی ١١ی ئاداری ١٩٧٠", dateStr: "٣/١١" },
+        { type: 'holiday', m: 3, d: [14], text: "ڕۆژی لەدایكبوونی ڕابەر و سیمبولی نیشتمانیی مستەفا بارزانیی", dateStr: "٣/١٤" },
+        { type: 'holiday', m: 3, d: [20, 21, 22], text: "جەژنی ڕەمەزانی پیرۆز*", dateStr: "٣/٢٠-٢٢" },
+        { type: 'holiday', m: 3, d: [21, 22, 23], text: "جەژنی نەورۆز", dateStr: "٢١-٢٣ / ٣" },
+        { type: 'holiday', m: 4, d: [1], text: "سەری ساڵی بابلی ئاشووری - بابلی کلدانی", dateStr: "٤/١" },
+        { type: 'holiday', m: 4, d: [5], text: "جەژنی گەورە (بۆ مەسیحییەکان) - سێ ڕۆژ پشوو", dateStr: "٤/٥" },
+        { type: 'holiday', m: 4, d: [9], text: "ڕۆژی ئازادکردنی عێراق لە ڕژێمی دیکتاتۆری سەرکوتکار", dateStr: "٤/٩" },
+        { type: 'holiday', m: 4, d: [15], text: "جەژنی سەری ساڵی ئێزدییەکان", dateStr: "٤/١٥" },
+        { type: 'holiday', m: 5, d: [1], text: "ڕۆژی کرێکارانی جیهان", dateStr: "٥/١" },
+        { type: 'holiday', m: 5, d: [14], text: "جەژنی هەڵکشان (بۆ مەسیحییەکان) - یەک ڕۆژ پشوو", dateStr: "٥/١٤" },
+        { type: 'holiday', m: 5, d: [27, 28, 29, 30], text: "جەژنی قوربانی پیرۆز*", dateStr: "٥/٢٧-٣٠" },
+        { type: 'holiday', m: 6, d: [16], text: "سەری ساڵی کۆچی*", dateStr: "٦/١٦" },
+        { type: 'holiday', m: 6, d: [25], text: "ڕۆژی عاشورا*", dateStr: "٦/٢٥" },
+        { type: 'holiday', m: 7, d: [12], text: "جەژنی نووسەر دیل (بۆ ئاشوورییەکان) - یەک ڕۆژ پشوو", dateStr: "٧/١٢" },
+        { type: 'holiday', m: 7, d: [14], text: "شۆڕشی (١٤) ی تەمووزی ١٩٥٨", dateStr: "٧/١٤" },
+        { type: 'holiday', m: 7, d: [28, 29, 30, 31], text: "جەژنی نەورۆز", dateStr: "٢٨-٣١ / ٧" },
+        { type: 'holiday', m: 8, d: [25], text: "یادی لەدایكبوونی پێغەمبەری مەزن (د.خ)*", dateStr: "٨/٢٥" },
+        { type: 'holiday', m: 10, d: [6, 7, 8, 9, 10, 11, 12], text: "جەژنی جەمایێ (بۆ ئێزدییەکان)", dateStr: "١٠/٦-١٢" },
+        { type: 'holiday', m: 12, d: [18], text: "جەژنی ڕۆژیێن ئێزی (بۆ ئێزدییەکان)", dateStr: "١٢/١٨" },
+        { type: 'holiday', m: 12, d: [25], text: "یادی لەدایكبوونی حەزرەتی مەسیح (د.خ)", dateStr: "١٢/٢٥" },
+
+        // Type: OCCASIONS (بۆنەکان)
+        { type: 'occasion', m: 1, d: [4], text: "جەژنی قەوڵتاس", dateStr: "١/٤" },
+        { type: 'occasion', m: 1, d: [22], text: "ڕۆژی دامەزراندنی کۆماری کوردستان", dateStr: "١/٢٢" },
+        { type: 'occasion', m: 2, d: [1], text: "ساڵیادی شەهیدانی (١)ی شوبات", dateStr: "٢/١" },
+        { type: 'occasion', m: 2, d: [18], text: "ڕۆژی قوتابیان و لاوان", dateStr: "٢/١٨" },
+        { type: 'occasion', m: 2, d: [25], text: "ڕۆژی ڕۆژنامەگەریی پێکهاتەی تورکمان", dateStr: "٢/٢٥" },
+        { type: 'occasion', m: 3, d: [1], text: "كۆچی دوایی ڕابەر و سیمبولی نیشتمانیی مستەفا بارزانیی", dateStr: "٣/١" },
+        { type: 'occasion', m: 3, d: [7], text: "ڕۆژی ڕزگارکردنی شاری سلێمانی", dateStr: "٣/٧" },
+        { type: 'occasion', m: 3, d: [8], text: "ڕۆژی جیهانی ژنان", dateStr: "٣/٨" },
+        { type: 'occasion', m: 3, d: [10], text: "ڕۆژی جلی میللی نەتەوەیی", dateStr: "٣/١٠" },
+        { type: 'occasion', m: 3, d: [11], text: "ڕۆژی ڕزگارکردنی شاری هەولێر", dateStr: "٣/١١" },
+        { type: 'occasion', m: 3, d: [14], text: "ڕۆژی ڕزگارکردنی شاری دهۆك", dateStr: "٣/١٤" },
+        { type: 'occasion', m: 3, d: [16], text: "ڕۆژی کیمیابارانکردنی هەڵەبجە", dateStr: "٣/١٦" },
+        { type: 'occasion', m: 3, d: [20], text: "ڕۆژی سەركەوتنی ڕاپەڕینی گەلی كوردستان", dateStr: "٣/٢٠" },
+        { type: 'occasion', m: 3, d: [21], text: "ڕۆژی ڕزگارکردنی شاری کەرکوك", dateStr: "٣/٢١" },
+        { type: 'occasion', m: 4, d: [4], text: "ساڵیادی قوربانیانی جینۆسایدی کوردی فەیلی", dateStr: "٤/٤" },
+        { type: 'occasion', m: 4, d: [5], text: "ساڵیادی دەرچوونی بڕیاری (٦٨٨)ی ئەنجومەنی ئاسایش", dateStr: "٤/٥" },
+        { type: 'occasion', m: 4, d: [14], text: "ساڵیادی شەهیدانی جینۆسایدی ئەنفال", dateStr: "٤/١٤" },
+        { type: 'occasion', m: 4, d: [16], text: "یادی کیمیابارانکردنی بالیسان - ڕۆژی ژینگە", dateStr: "٤/١٦" },
+        { type: 'occasion', m: 4, d: [22], text: "ڕۆژی ڕۆژنامەگەری کوردی", dateStr: "٤/٢٢" },
+        { type: 'occasion', m: 4, d: [24], text: "ساڵیادی بۆردومانکردنی شاری قەڵادزێ", dateStr: "٤/٢٤" },
+        { type: 'occasion', m: 5, d: [12], text: "ساڵیادی دامەزراندنی بنكەی لالش", dateStr: "٥/١٢" },
+        { type: 'occasion', m: 5, d: [15], text: "ساڵیادی دامەزراندنی یەکێتیی مامۆستایانی کوردستان", dateStr: "٥/١٥" },
+        { type: 'occasion', m: 7, d: [31], text: "ساڵیادی قوربانیانی ئەنفالکردنی بارزانییەکان", dateStr: "٧/٣١" },
+        { type: 'occasion', m: 8, d: [3], text: "ڕۆژی کۆمەڵکوژی (جینۆساید) ئێزدییەکان", dateStr: "٨/٣" },
+        { type: 'occasion', m: 8, d: [7], text: "ڕۆژی شەهیدانی ئاشووریان", dateStr: "٨/٧" },
+        { type: 'occasion', m: 8, d: [25], text: "ساڵیادی قوربانیانی ئەنفالکردنی بادینان", dateStr: "٨/٢٥" },
+        { type: 'occasion', m: 9, d: [11], text: "ساڵیادی هەڵگیرسانی شۆڕشی ئەیلوول", dateStr: "٩/١١" },
+        { type: 'occasion', m: 9, d: [21], text: "ساڵیادی دامەزراندنی یەکێتیی زانایانی ئیسلامیی کوردستان", dateStr: "٩/٢١" },
+        { type: 'occasion', m: 11, d: [17], text: "ڕۆژی زمان و کولتوری پێکهاتەی تورکمان", dateStr: "١١/١٧" },
+        { type: 'occasion', m: 12, d: [17], text: "ڕۆژی ئاڵای کوردستان", dateStr: "١٢/١٧" }
+    ];
+
+    const monthNamesKurdish = {
+        1: "کانوونی دووەم (January)", 2: "شوبات (February)", 3: "ئادار (March)",
+        4: "نیسان (April)", 5: "ئایار (May)", 6: "حوزەیران (June)",
+        7: "تەممووز (July)", 8: "ئاب (August)", 9: "ئەیلوول (September)",
+        10: "تشرینی یەکەم (October)", 11: "تشرینی دووەم (November)", 12: "کانوونی یەکەم (December)"
+    };
+
+    let currentType = 'holiday';
+    let currentFilter = 'year';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        renderFilteredData();
+    });
+
+    function switchType(type) {
+        currentType = type;
+        ['holiday', 'occasion'].forEach(t => {
+            const btn = document.getElementById(`tab-${t}`);
+            if (t === type) {
+                btn.classList.add('active-pill', 'text-white');
+                btn.classList.remove('text-slate-400', 'hover:text-slate-200');
+            } else {
+                btn.classList.remove('active-pill', 'text-white');
+                btn.classList.add('text-slate-400', 'hover:text-slate-200');
+            }
+        });
+        renderFilteredData();
+    }
+
+    function switchFilter(filter) {
+        currentFilter = filter;
+        ['day', 'week', 'month', 'year'].forEach(f => {
+            const btn = document.getElementById(`filter-${f}`);
+            if (f === filter) {
+                btn.classList.add('active-pill', 'text-white');
+                btn.classList.remove('text-slate-400', 'hover:text-slate-200');
+            } else {
+                btn.classList.remove('active-pill', 'text-white');
+                btn.classList.add('text-slate-400', 'hover:text-slate-200');
+            }
+        });
+        renderFilteredData();
+    }
+
+    function renderFilteredData() {
+        const target = document.getElementById('list-render-target');
+        target.innerHTML = '';
+
+        const systemTime2026 = new Date();
+        const curYear = 2026; 
+        const curMonth = systemTime2026.getMonth() + 1; // 1-12
+        const curDay = systemTime2026.getDate();
+
+        // Filter by primary Category Type
+        let filtered = trackingDatabase.filter(item => item.type === currentType);
+
+        // Filter by Time Horizon Proximity Range
+        if (currentFilter === 'day') {
+            filtered = filtered.filter(item => item.m === curMonth && item.d.includes(curDay));
+        } else if (currentFilter === 'week') {
+            // Evaluates proximity checking matching timeline spans within 7 days
+            filtered = filtered.filter(item => {
+                return item.d.some(day => {
+                    const itemDate = new Date(curYear, item.m - 1, day);
+                    const diffTime = Math.abs(itemDate - systemTime2026);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    return diffDays <= 7 && itemDate.getMonth() === systemTime2026.getMonth();
+                });
+            });
+        } else if (currentFilter === 'month') {
+            filtered = filtered.filter(item => item.m === curMonth);
+        }
+
+        if (filtered.length === 0) {
+            target.innerHTML = `
+                <div class="glass-panel rounded-2xl p-8 text-center animate-fade-in">
+                    <i data-lucide="calendar-range" class="w-10 h-10 mx-auto text-slate-600 mb-3"></i>
+                    <p class="font-kurdish font-bold text-slate-400 text-sm" dir="rtl">هیچ پشوو یان بۆنەیەک بۆ ئەم ماوەیە دیاری نەکراوە.</p>
+                    <p class="text-[11px] text-slate-600 font-sans mt-1">No items found for this active time slice</p>
+                </div>`;
+            lucide.createIcons();
+            return;
+        }
+
+        // Group elements by matching Months for elegant structural parsing layout
+        const groupedByMonth = {};
+        filtered.forEach(item => {
+            if (!groupedByMonth[item.m]) groupedByMonth[item.m] = [];
+            groupedByMonth[item.m].push(item);
+        });
+
+        // Loop and paint UI blocks
+        Object.keys(groupedByMonth).sort((a, b) => a - b).forEach(monthNum => {
+            const monthHeader = document.createElement('div');
+            monthHeader.className = "mt-4 mb-2 px-1 flex items-center justify-between text-xs font-black font-kurdish tracking-wider text-brand-400 border-r-2 border-brand-500 pr-2 animate-fade-in";
+            monthHeader.dir = "rtl";
+            monthHeader.textContent = monthNamesKurdish[monthNum];
+            target.appendChild(monthHeader);
+
+            groupedByMonth[monthNum].forEach(item => {
+                const card = document.createElement('div');
+                card.className = "glass-panel rounded-2xl p-4 flex items-center justify-between gap-4 animate-fade-in hover:bg-slate-800/20 transition-all duration-300";
+                
+                // Eastern right-aligned block matching script layout configs
+                card.innerHTML = `
+                    <div class="flex items-center gap-3.5 order-2 flex-shrink-0">
+                        <div class="px-3 py-2 rounded-xl bg-slate-900/90 border border-white/5 font-mono font-black text-xs text-brand-400 tracking-tight shadow-inner min-w-[54px] text-center">
+                            ${item.dateStr}
+                        </div>
+                    </div>
+                    <div class="text-right flex-grow order-1 pr-1">
+                        <p class="font-kurdish font-bold text-[14px] leading-snug text-slate-100" dir="rtl">${item.text}</p>
+                    </div>
+                `;
+                target.appendChild(card);
+            });
+        });
+
+        lucide.createIcons();
+    }
+</script>
+</body>
+</html>
