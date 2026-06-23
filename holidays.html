@@ -237,7 +237,6 @@
         { type: 'holiday', m: 6, d: [25], text: "ڕۆژی عاشورا*", dateStr: "٦/٢٥", icon: "activity", theme: "red" },
         { type: 'holiday', m: 7, d: [12], text: "جەژنی نووسەر دیل (بۆ ئاشوورییەکان) - یەک ڕۆژ پشوو", dateStr: "٧/١٢", icon: "pen-tool", theme: "sky" },
         { type: 'holiday', m: 7, d: [14], text: "شۆڕشی (١٤) ی تەمووزی ١٩٥٨", dateStr: "٧/١٤", icon: "swords", theme: "amber" },
-        { type: 'holiday', m: 7, d: [28, 29, 30, 31], text: "جەژنی نەورۆز", dateStr: "٢٨-٣١ / ٧", icon: "sun-dim", theme: "orange" },
         { type: 'holiday', m: 8, d: [25], text: "یادی لەدایكبوونی پێغەمبەری مەزن (د.خ)*", dateStr: "٨/٢٥", icon: "book-open", theme: "indigo" },
         { type: 'holiday', m: 10, d: [6, 7, 8, 9, 10, 11, 12], text: "جەژنی جەمایێ (بۆ ئێزدییەکان)", dateStr: "١٠/٦-١٢", icon: "users", theme: "emerald" },
         { type: 'holiday', m: 12, d: [18], text: "جەژنی ڕۆژیێن ئێزی (بۆ ئێزدییەکان)", dateStr: "١٢/١٨", icon: "flame", theme: "yellow" },
@@ -401,7 +400,7 @@
     // Engine: Calculates next chronological event of 2026 and sets countdown timer
     function calculateAndSetNextUpcoming() {
         const now = new Date();
-        const currentYr = 2026; // System base anchor matching Kurdish directory context
+        const currentYr = new Date().getFullYear(); // System base anchor matching Kurdish directory context
         const sysTime = new Date(currentYr, now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
 
         let absoluteUpcoming = null;
@@ -429,7 +428,7 @@
             document.getElementById('countdown-section').classList.remove('hidden');
             document.getElementById('hero-title').textContent = absoluteUpcoming.text;
             document.getElementById('hero-type-badge').textContent = absoluteUpcoming.type === 'holiday' ? 'پشووی فەرمی' : 'بۆنەی نیشتمانی';
-            document.getElementById('hero-date-badge').textContent = `ڕۆژی ${absoluteUpcoming.dayTarget}/${absoluteUpcoming.m} ی ٢٠٢٦`;
+            const targetDate = new Date(currentYr, absoluteUpcoming.m - 1, absoluteUpcoming.dayTarget);  const weekdays = [     "یەکشەممە",     "دووشەممە",     "سێشەممە",     "چوارشەممە",     "پێنجشەممە",     "هەینی",     "شەممە" ];  const weekdayName = weekdays[targetDate.getDay()];  document.getElementById('hero-date-badge').textContent = `${weekdayName}: ${absoluteUpcoming.dayTarget}/${absoluteUpcoming.m}/${currentYr}`;
 
             const targetTime = new Date(currentYr, absoluteUpcoming.m - 1, absoluteUpcoming.dayTarget, 0, 0, 0).getTime();
             
