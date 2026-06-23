@@ -642,42 +642,45 @@
         50% { transform: translateY(-6px) rotateX(-0.5deg); }
     }
 
-    /* Moving RGB Cyber LED Border Animation Around the Window */
+    /* Thicker, Wider Moving RGB Cyber LED Tube Border Animation */
     .led-border-window {
         position: relative;
         overflow: hidden;
+        /* Expanded ambient neon glow projection radiating outwards from the thick border */
+        box-shadow: 0 0 25px rgba(59, 130, 246, 0.35), 0 0 50px rgba(236, 72, 153, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.1);
     }
     .led-border-window::before {
         content: '';
         position: absolute;
         top: -50%; left: -50%; width: 200%; height: 200%;
-        background: conic-gradient(from 0deg, transparent 20%, #3b82f6, #8b5cf6, #ec4899, transparent 80%);
-        animation: rotateLED 5s linear infinite;
+        background: conic-gradient(from 0deg, transparent 15%, #3b82f6, #8b5cf6, #ec4899, #22d3ee, transparent 85%);
+        animation: rotateLED 4.5s linear infinite;
         z-index: 0;
     }
     .led-border-inner {
         position: relative;
         z-index: 1;
-        margin: 2px; /* Pulls content inside to expose the sharp LED stroke line */
+        /* Adjusted margin size to establish a thick 5px wide LED track frame */
+        margin: 5px; 
     }
     @keyframes rotateLED {
         100% { transform: rotate(360deg); }
     }
 
-    /* Premium interactivity modifiers for App Cards */
+    /* Interactive modifiers for App Cards */
     .app-card {
         cursor: pointer;
         transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
     }
     .app-card.is-pinned-card {
-        border-color: rgba(245, 158, 11, 0.45) !important;
-        box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.1), inset 0 1px 0 0 rgba(255,255,255,0.05);
+        border-color: rgba(245, 158, 11, 0.5) !important;
+        box-shadow: 0 12px 25px -5px rgba(245, 158, 11, 0.15), inset 0 1px 0 0 rgba(255,255,255,0.05);
     }
 </style>
 
 <script>
     (function() {
-        // Handle persistent storage for favorited/pinned apps
+        // Handle persistent storage state for favorite applications
         let pinnedApps = JSON.parse(localStorage.getItem('uor_pinned_apps') || '[]');
 
         function initClockAndPins() {
@@ -686,12 +689,11 @@
             if (mainEl && !document.getElementById('premium-led-clock-container')) {
                 const clockContainer = document.createElement('div');
                 clockContainer.id = 'premium-led-clock-container';
-                // Extended width to max-w-5xl to blend perfectly with the rest of your app container layout
                 clockContainer.className = "perspective-container w-full max-w-5xl mx-auto mb-2 relative z-20 px-1";
                 
                 clockContainer.innerHTML = `
-                    <div class="perspective-card led-border-window rounded-3xl bg-slate-950/40 p-[2px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)] dark:shadow-[0_40px_80px_-15px_rgba(0,0,0,0.8)]">
-                        <div class="led-border-inner flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-4 rounded-[22px] bg-white/85 dark:bg-slate-900/90 border border-white/20 dark:border-slate-800/80 backdrop-blur-3xl">
+                    <div class="perspective-card led-border-window rounded-3xl bg-slate-950/60 p-[5px]">
+                        <div class="led-border-inner flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-4 rounded-[20px] bg-white/90 dark:bg-slate-900/95 border border-white/20 dark:border-slate-800/80 backdrop-blur-3xl">
                             
                             <div class="flex items-center gap-3 text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm tracking-wide order-1">
                                 <div class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_12px_#3b82f6] animate-pulse"></div>
@@ -713,11 +715,11 @@
                     </div>
                 `;
                 
-                // Mount precisely below header, above search element
+                // Insert directly beneath your department's sticky top header banner
                 mainEl.insertBefore(clockContainer, mainEl.firstChild);
             }
 
-            // Real-time Clock loop calculation
+            // Real-time Clock interval loop
             function updateClockLoop() {
                 const dateEl = document.getElementById('live-date');
                 const timeEl = document.getElementById('live-time');
@@ -730,13 +732,13 @@
             setInterval(updateClockLoop, 1000);
             updateClockLoop();
 
-            // Override global render sequence to support dynamic sorting based on pinned status
+            // Override global render system to integrate structural favorite pinning sort mechanics
             window.renderApps = function() {
                 const container = document.getElementById('apps-container');
                 if (!container) return;
                 container.innerHTML = '';
 
-                // Sort algorithm: Pinned items take total visual precedence and sort to top
+                // Sorting mechanism: Pinned app indices occupy layout priority positions
                 const sortedData = [...appsData].sort((a, b) => {
                     const aPinned = pinnedApps.includes(a.id) ? 1 : 0;
                     const bPinned = pinnedApps.includes(b.id) ? 1 : 0;
@@ -754,7 +756,6 @@
                     card.setAttribute('data-name-en', app.titleEn.toLowerCase());
                     card.setAttribute('data-name-ku', app.titleKu);
 
-                    // Inject structure with click-to-open logic and pin action overlays
                     card.innerHTML = `
                         <div class="absolute -top-12 -right-12 w-40 h-40 rounded-full blur-3xl transition-colors duration-500 pointer-events-none z-0 ${c.glow}"></div>
                         
@@ -799,9 +800,9 @@
                         </div>
                     `;
 
-                    // Card-wide wrapper listener for launching the app on full-body text click
+                    // Card-wide core trigger router (Allows clicking anywhere on Title/Description to launch app)
                     card.addEventListener('click', (e) => {
-                        if (e.target.closest('button')) return; // Avoid cross-triggering button parameters
+                        if (e.target.closest('button')) return; 
                         openApp(app.url);
                     });
 
@@ -811,7 +812,7 @@
                 if (window.lucide) window.lucide.createIcons();
             };
 
-            // Favorite Pin State Switcher
+            // Pin State Sync Engine
             window.toggleAppPin = function(appId, event) {
                 if (event) {
                     event.stopPropagation();
@@ -827,13 +828,12 @@
                 }
                 
                 localStorage.setItem('uor_pinned_apps', JSON.stringify(pinnedApps));
-                renderApps(); // Seamless instantaneous resort re-render
+                renderApps(); // Instant dashboard grid animation repositioning
             };
 
             if (window.lucide) window.lucide.createIcons();
         }
 
-        // Initialize execution setup safely across state cycles
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initClockAndPins);
         } else {
