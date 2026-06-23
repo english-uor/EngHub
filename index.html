@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#050B14" id="theme-color-meta">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="EngHub">
+    <meta name="apple-mobile-web-app-title" content="Eng Dept">
     
     <link rel="icon" type="image/png" href="Icon23.png">
     <link rel="apple-touch-icon" href="Icon23.png">
@@ -245,21 +245,17 @@
                 <div class="w-11 h-11 rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200/50 dark:border-slate-700/50 flex-shrink-0">
                     <img src="Icon23.png" alt="Dept Logo" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%232563eb\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M22 10v6M2 10l10-5 10 5-10 5z\'/><path d=\'M6 12v5c3 3 9 3 12 0v-5\'/></svg>'">
                 </div>
-                <div class="flex items-center gap-2">
-
-    <button
-        id="installBtn"
-        onclick="installApp()"
-        class="hidden w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center shadow-sm border border-brand-500/50">
-        <i data-lucide="download" class="w-5 h-5"></i>
-    </button>
-
-    <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-slate-100/80 dark:bg-slate-800/80 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm border border-slate-200/50 dark:border-slate-700/50">
-        <i data-lucide="moon" id="theme-icon-moon" class="w-5 h-5 hidden dark:block"></i>
-        <i data-lucide="sun" id="theme-icon-sun" class="w-5 h-5 block dark:hidden"></i>
-    </button>
-
-</div>
+                <div class="flex flex-col">
+                    <h1 class="text-[14px] font-extrabold leading-tight tracking-tight dark:text-white">University of Raparin</h1>
+                    <h2 class="text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-tight mt-0.5">College of Basic Education</h2>
+                    <h3 class="text-[11px] font-bold text-brand-600 dark:text-brand-400 leading-tight mt-0.5">English Language Dept</h3>
+                </div>
+            </div>
+            <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-slate-100/80 dark:bg-slate-800/80 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm border border-slate-200/50 dark:border-slate-700/50">
+                <i data-lucide="moon" id="theme-icon-moon" class="w-5 h-5 hidden dark:block"></i>
+                <i data-lucide="sun" id="theme-icon-sun" class="w-5 h-5 block dark:hidden"></i>
+            </button>
+        </div>
     </header>
 
     <main class="flex-grow px-4 pb-12 max-w-5xl mx-auto w-full flex flex-col gap-8 pt-6">
@@ -435,32 +431,6 @@
     }
 
     // ── Initialization ──────────────────────────────────────────────────────────
-    let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-
-    const btn = document.getElementById('installBtn');
-    if(btn) btn.classList.remove('hidden');
-});
-
-async function installApp() {
-    if(!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-
-    const { outcome } = await deferredPrompt.userChoice;
-
-    if(outcome === 'accepted'){
-        showToast('App Installed');
-    }
-
-    deferredPrompt = null;
-
-    const btn = document.getElementById('installBtn');
-    if(btn) btn.classList.add('hidden');
-}
     document.addEventListener('DOMContentLoaded', () => {
         initTheme();
         lucide.createIcons();
@@ -699,4 +669,4 @@ async function installApp() {
     }
 </script>
 </body>
-</html>F
+</html>
