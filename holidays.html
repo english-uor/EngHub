@@ -195,11 +195,11 @@
             </div>
 
             <!-- Time Horizon Quick Filters -->
-            <div class="grid grid-cols-4 gap-1.5 p-1 bg-white/60 dark:bg-slate-900/40 backdrop-blur-md rounded-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none transition-colors duration-500">
+            <div class="grid grid-cols-4 gap-1.5 p-1 bg-white/60 dark:bg-slate-900/40 backdrop-blur-md rounded-xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none transition-colors duration-500" dir="rtl">
+                <button id="filter-week" onclick="switchFilter('week')" class="py-2.5 text-[10px] sm:text-xs font-black font-kurdish rounded-lg transition-all active-pill">ئەم هەفتەیە</button>
                 <button id="filter-day" onclick="switchFilter('day')" class="py-2.5 text-[10px] sm:text-xs font-black font-kurdish rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">ئەمڕۆ</button>
-                <button id="filter-week" onclick="switchFilter('week')" class="py-2.5 text-[10px] sm:text-xs font-black font-kurdish rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">ئەم هەفتەیە</button>
                 <button id="filter-month" onclick="switchFilter('month')" class="py-2.5 text-[10px] sm:text-xs font-black font-kurdish rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">ئەم مانگە</button>
-                <button id="filter-year" onclick="switchFilter('year')" class="py-2.5 text-[10px] sm:text-xs font-black font-kurdish rounded-lg transition-all active-pill">ئەمساڵ</button>
+                <button id="filter-year" onclick="switchFilter('year')" class="py-2.5 text-[10px] sm:text-xs font-black font-kurdish rounded-lg transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">ئەمساڵ</button>
             </div>
         </section>
 
@@ -237,6 +237,7 @@
         { type: 'holiday', m: 6, d: [25], text: "ڕۆژی عاشورا*", dateStr: "٦/٢٥", icon: "activity", theme: "red" },
         { type: 'holiday', m: 7, d: [12], text: "جەژنی نووسەر دیل (بۆ ئاشوورییەکان) - یەک ڕۆژ پشوو", dateStr: "٧/١٢", icon: "pen-tool", theme: "sky" },
         { type: 'holiday', m: 7, d: [14], text: "شۆڕشی (١٤) ی تەمووزی ١٩٥٨", dateStr: "٧/١٤", icon: "swords", theme: "amber" },
+        { type: 'holiday', m: 7, d: [28, 29, 30, 31], text: "جەژنی نەورۆز", dateStr: "٢٨-٣١ / ٧", icon: "sun-dim", theme: "orange" },
         { type: 'holiday', m: 8, d: [25], text: "یادی لەدایكبوونی پێغەمبەری مەزن (د.خ)*", dateStr: "٨/٢٥", icon: "book-open", theme: "indigo" },
         { type: 'holiday', m: 10, d: [6, 7, 8, 9, 10, 11, 12], text: "جەژنی جەمایێ (بۆ ئێزدییەکان)", dateStr: "١٠/٦-١٢", icon: "users", theme: "emerald" },
         { type: 'holiday', m: 12, d: [18], text: "جەژنی ڕۆژیێن ئێزی (بۆ ئێزدییەکان)", dateStr: "١٢/١٨", icon: "flame", theme: "yellow" },
@@ -283,7 +284,7 @@
     };
 
     let activeType = 'holiday';
-    let activeFilter = 'year';
+    let activeFilter = 'week';
     let searchQuery = '';
     let countdownInterval = null;
 
