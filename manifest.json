@@ -1,0 +1,25 @@
+{
+  "name": "English Department Apps Hub",
+  "short_name": "Eng Dept",
+  "description": "Official Apps Hub for the UoR English Language Department",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#050B14",
+  "theme_color": "#050B14",
+  "categories": ["education", "utilities"],
+  "icons": [
+    {
+      "src": "Icon23.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "Icon23.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
