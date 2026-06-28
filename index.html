@@ -1,2264 +1,557 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="dark">
 <head>
-  <base target="_top">
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>University of Raparin Portal</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
-    :root{
-      --bg:#f4f7fb;
-      --card:#ffffff;
-      --ink:#132238;
-      --muted:#6f7d90;
-      --line:#dfe7f1;
-      --brand:#155eef;
-      --brand2:#0f3fb3;
-      --ok:#067647;
-      --warn:#b54708;
-      --bad:#b42318;
-      --info:#175cd3;
-      --chip:#eef4ff;
-      --shadow:0 10px 30px rgba(16,24,40,.08);
-      --radius:18px;
-    }
-
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background:linear-gradient(180deg,#eef4ff 0%, var(--bg) 240px);
-      color:var(--ink);
-    }
-
-    .hidden{display:none!important}
-
-    .shell{
-      max-width:1280px;
-      margin:0 auto;
-      padding:24px;
-    }
-
-    .login-page{
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      background:linear-gradient(150deg,#0d1f3c 0%,#143060 55%,#0d2550 100%);
-      position:relative;
-      overflow:hidden;
-    }
-    .login-page::before{
-      content:'';position:absolute;
-      width:600px;height:600px;border-radius:50%;
-      background:radial-gradient(circle,rgba(21,94,239,.18) 0%,transparent 70%);
-      top:-150px;right:-150px;pointer-events:none;
-    }
-    .login-page::after{
-      content:'';position:absolute;
-      width:500px;height:500px;border-radius:50%;
-      background:radial-gradient(circle,rgba(21,94,239,.12) 0%,transparent 70%);
-      bottom:-100px;left:-100px;pointer-events:none;
-    }
-    .login-topbar{
-      display:flex;align-items:center;gap:12px;
-      padding:14px 32px;
-      background:rgba(255,255,255,.06);
-      border-bottom:1px solid rgba(255,255,255,.10);
-      backdrop-filter:blur(12px);
-      position:relative;z-index:1;
-    }
-    .login-topbar-icon{
-      width:34px;height:34px;border-radius:9px;
-      background:linear-gradient(135deg,#155eef,#0f3fb3);
-      display:flex;align-items:center;justify-content:center;flex-shrink:0;
-    }
-    .login-topbar-icon svg{width:18px;height:18px;}
-    .login-topbar-title{
-      color:#fff;font-weight:800;font-size:14px;letter-spacing:.2px;line-height:1.3;
-    }
-    .login-topbar-title span{
-      display:block;font-size:11px;font-weight:500;
-      color:rgba(255,255,255,.50);margin-top:2px;
-    }
-    .login-center{
-      flex:1;display:flex;align-items:center;justify-content:center;
-      padding:32px 24px;position:relative;z-index:1;
-    }
-    .login-card{
-      width:min(420px,100%);
-      background:#fff;border-radius:24px;
-      box-shadow:0 32px 80px rgba(0,0,0,.40);
-      padding:36px 32px;text-align:center;
-    }
-    .login-logo-wrap{
-      width:90px;height:90px;border-radius:50%;
-      border:2px dashed #d0dce8;
-      display:flex;align-items:center;justify-content:center;
-      margin:0 auto 20px;
-      background:#f4f7fb;color:#a0b0c4;
-      font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;
-    }
-    .login-uni{font-size:17px;font-weight:800;color:#132238;margin-bottom:3px;}
-    .login-dept{font-size:13px;color:#475467;font-weight:600;margin-bottom:2px;}
-    .login-college{font-size:12px;color:#6f7d90;margin-bottom:12px;}
-    .login-meta-row{
-      display:inline-flex;align-items:center;gap:8px;
-      background:#eef4ff;border:1px solid #c7d7fe;
-      border-radius:999px;padding:5px 14px;margin-bottom:26px;
-    }
-    .login-meta-row span{font-size:12px;font-weight:700;color:#175cd3;}
-    .login-meta-row .dot{width:3px;height:3px;border-radius:50%;background:#93aee8;}
-    .login-divider{height:1px;background:#edf2f7;margin-bottom:24px;}
-    .login-prompt{font-size:13px;color:#6f7d90;font-weight:600;margin-bottom:14px;letter-spacing:.1px;}
-    .pin-input{
-      width:100%;border:2px solid #dfe7f1;border-radius:14px;
-      padding:14px 16px;font-size:22px;font-weight:700;
-      text-align:center;letter-spacing:8px;color:#132238;
-      outline:none;transition:.2s ease;margin-bottom:12px;background:#fcfcfd;
-    }
-    .pin-input:focus{
-      border-color:#155eef;background:#fff;
-      box-shadow:0 0 0 4px rgba(21,94,239,.10);
-    }
-    .btn-login-main{
-      width:100%;padding:14px;
-      background:linear-gradient(135deg,#155eef,#0f3fb3);
-      color:#fff;border:0;border-radius:14px;
-      font-size:15px;font-weight:800;cursor:pointer;
-      transition:.2s ease;letter-spacing:.2px;
-    }
-    .btn-login-main:hover{
-      transform:translateY(-1px);
-      box-shadow:0 8px 24px rgba(21,94,239,.35);
-    }
-
-    .input-row{
-      display:grid;
-      gap:12px;
-      margin-bottom:14px;
-    }
-
-    label{
-      font-weight:700;
-      font-size:14px;
-    }
-
-    input, select, textarea, button{
-      font:inherit;
-    }
-
-    input, select, textarea{
-      width:100%;
-      border:1px solid #cfd8e3;
-      background:#fff;
-      color:var(--ink);
-      border-radius:14px;
-      padding:13px 14px;
-      outline:none;
-      transition:.2s ease;
-    }
-
-    input:focus, select:focus, textarea:focus{
-      border-color:var(--brand);
-      box-shadow:0 0 0 4px rgba(21,94,239,.10);
-    }
-
-    textarea{
-      min-height:110px;
-      resize:vertical;
-    }
-
-    .btn{
-      border:0;
-      border-radius:14px;
-      padding:12px 16px;
-      cursor:pointer;
-      transition:.2s ease;
-      font-weight:700;
-    }
-
-    .btn-primary{
-      background:linear-gradient(135deg,var(--brand),var(--brand2));
-      color:#fff;
-    }
-
-    .btn-primary:hover{transform:translateY(-1px)}
-    .btn-secondary{
-      background:#fff;
-      color:var(--ink);
-      border:1px solid #cfd8e3;
-    }
-    .btn-secondary:hover{background:#f8fafc}
-    .btn-danger{
-      background:#fee4e2;
-      color:#b42318;
-      border:1px solid #fecdca;
-    }
-    .btn-sm{
-      padding:8px 12px;
-      font-size:13px;
-      border-radius:12px;
-    }
-
-    .status-box{
-      margin-top:12px;
-      padding:12px 14px;
-      border-radius:14px;
-      display:none;
-      font-size:14px;
-      line-height:1.5;
-    }
-    .status-box.show{display:block}
-    .status-info{background:#eef4ff;color:#175cd3;border:1px solid #c7d7fe}
-    .status-error{background:#fef3f2;color:#b42318;border:1px solid #fecdca}
-    .status-success{background:#ecfdf3;color:#067647;border:1px solid #abefc6}
-
-    .app-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:16px;
-      margin-bottom:18px;
-    }
-
-    .app-head h2{
-      margin:0 0 6px 0;
-      font-size:28px;
-    }
-
-    .subtitle{
-      color:var(--muted);
-      margin:0;
-      line-height:1.5;
-    }
-
-    .head-actions{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .role-chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      background:var(--chip);
-      color:var(--brand2);
-      border:1px solid #cfe0ff;
-      padding:10px 14px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:800;
-    }
-
-    .tabbar{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-bottom:18px;
-    }
-
-    .tab-btn{
-      border:1px solid #d9e2ec;
-      background:#fff;
-      color:#334155;
-      padding:11px 14px;
-      border-radius:999px;
-      cursor:pointer;
-      font-weight:700;
-    }
-
-    .tab-btn.active{
-      background:linear-gradient(135deg,var(--brand),var(--brand2));
-      color:#fff;
-      border-color:transparent;
-    }
-
-    .grid{
-      display:grid;
-      gap:18px;
-    }
-
-    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:18px;
-    }
-
-    .card h3{
-      margin:0 0 14px 0;
-      font-size:18px;
-    }
-
-    .metric{
-      padding:16px;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:#fbfdff;
-    }
-
-    .metric .k{
-      color:var(--muted);
-      font-size:13px;
-      margin-bottom:8px;
-      font-weight:700;
-    }
-
-    .metric .v{
-      font-size:28px;
-      font-weight:900;
-      line-height:1;
-    }
-
-    .field-grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:12px;
-    }
-
-    .field{
-      padding:14px;
-      border:1px solid var(--line);
-      border-radius:16px;
-      background:#fbfdff;
-    }
-
-    .field .k{
-      font-size:12px;
-      color:var(--muted);
-      font-weight:700;
-      margin-bottom:5px;
-      text-transform:uppercase;
-      letter-spacing:.3px;
-    }
-
-    .field .v{
-      font-size:14px;
-      line-height:1.5;
-      font-weight:700;
-      word-break:break-word;
-    }
-
-    .semester-card{
-      border:1px solid var(--line);
-      border-radius:18px;
-      overflow:hidden;
-      background:#fff;
-    }
-
-    .semester-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      padding:14px 16px;
-      background:#f8fbff;
-      border-bottom:1px solid var(--line);
-    }
-
-    .semester-title{
-      font-weight:800;
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      border-radius:999px;
-      padding:6px 10px;
-      font-size:12px;
-      font-weight:800;
-      white-space:nowrap;
-    }
-
-    .b-ok{background:#ecfdf3;color:#067647;border:1px solid #abefc6}
-    .b-warn{background:#fff7ed;color:#b54708;border:1px solid #fed7aa}
-    .b-bad{background:#fef3f2;color:#b42318;border:1px solid #fecdca}
-    .b-info{background:#eef4ff;color:#175cd3;border:1px solid #c7d7fe}
-    .b-neutral{background:#f8fafc;color:#475467;border:1px solid #e4e7ec}
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:14px;
-    }
-
-    th, td{
-      border-bottom:1px solid #edf2f7;
-      padding:12px 10px;
-      text-align:left;
-      vertical-align:top;
-    }
-
-    th{
-      color:#475467;
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:.4px;
-      background:#fcfdff;
-    }
-
-    .table-wrap{
-      overflow:auto;
-      border:1px solid var(--line);
-      border-radius:16px;
-    }
-
-    .muted{color:var(--muted)}
-    .note{
-      margin-top:12px;
-      padding:12px 14px;
-      border-radius:14px;
-      background:#f8fafc;
-      color:#475467;
-      border:1px solid #e4e7ec;
-      line-height:1.55;
-      font-size:14px;
-    }
-
-    .stack{display:grid;gap:12px}
-    .row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-    }
-
-    .spacer{height:6px}
-
-    .ann{
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:14px 16px;
-      background:#fbfdff;
-    }
-
-    .ann h4{
-      margin:0 0 6px 0;
-      font-size:16px;
-    }
-
-    .ann p{
-      margin:0;
-      color:#475467;
-      line-height:1.6;
-    }
-
-    .course-card{
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:16px;
-      background:#fff;
-    }
-
-    .course-top{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:flex-start;
-      margin-bottom:10px;
-    }
-
-    .course-title{
-      font-weight:900;
-      line-height:1.35;
-      margin-bottom:4px;
-    }
-
-    .toolbar{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:end;
-      margin-bottom:14px;
-    }
-
-    .toolbar .grow{
-      flex:1 1 180px;
-      min-width:180px;
-    }
-
-    .empty{
-      padding:18px;
-      border:1px dashed #cbd5e1;
-      border-radius:16px;
-      color:#64748b;
-      background:#fff;
-    }
-
-    .danger-text{color:var(--bad);font-weight:800}
-    .warn-text{color:var(--warn);font-weight:800}
-    .ok-text{color:var(--ok);font-weight:800}
-
-    .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(15,23,42,.52);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      z-index:999;
-    }
-
-    .modal.show{display:flex}
-    .modal-card{
-      width:min(760px,100%);
-      background:#fff;
-      border-radius:24px;
-      border:1px solid var(--line);
-      box-shadow:var(--shadow);
-      padding:22px;
-      max-height:90vh;
-      overflow:auto;
-    }
-
-    .modal-head{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:center;
-      margin-bottom:14px;
-    }
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:5px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:800;
-      background:#f8fafc;
-      border:1px solid #e4e7ec;
-      color:#475467;
-    }
-
-    @media (max-width:960px){
-      .grid-4,.grid-3,.grid-2,.field-grid{grid-template-columns:1fr}
-      .app-head{flex-direction:column}
-      .head-actions{width:100%}
-      .portal-wrap{gap:0;width:100%}
-      .portal-main{flex:1;min-width:0;width:100%;margin:0;padding:0}
-      .portal-sidenav{display:none}
-      .modal{padding:0}
-      .modal-card{width:100%;height:100vh;max-height:100vh;border-radius:0}
-      
-      /* Mobile Matrix Layout Enhancements */
-      .portal-wrap { gap: 0; }
-      .portal-main { width: 100%; min-width: 100%; margin: 0; padding: 0; }
-      
-      /* Full-Screen Details Overlay */
-      .modal { padding: 0; }
-      .modal-card { 
-        width: 100%; 
-        height: 100vh; 
-        max-height: 100vh; 
-        border-radius: 0; 
-        border: none; 
-        margin: 0; 
-        display: flex; 
-        flex-direction: column;
-      }
-    }
-
-    .portal-wrap{display:flex;align-items:flex-start;gap:20px;}
-    .portal-main{flex:1;min-width:0;}
-    .portal-sidenav{
-      width:195px;flex-shrink:0;position:sticky;top:20px;
-      background:var(--card);border:1px solid var(--line);
-      border-radius:var(--radius);box-shadow:var(--shadow);
-      padding:10px;display:flex;flex-direction:column;gap:3px;
-    }
-    .sidenav-label{
-      font-size:11px;font-weight:800;color:var(--muted);
-      text-transform:uppercase;letter-spacing:.5px;
-      padding:6px 10px 10px;border-bottom:1px solid var(--line);margin-bottom:4px;
-    }
-    .sidenav-btn{
-      display:flex;align-items:center;gap:9px;width:100%;
-      padding:11px 13px;border:none;border-radius:12px;
-      background:transparent;color:#334155;font-weight:600;
-      font-size:13px;cursor:pointer;text-align:left;
-      transition:.15s ease;line-height:1;
-    }
-    .sidenav-btn:hover{background:#eef4ff;color:var(--brand);}
-    .sidenav-btn.active{
-      background:linear-gradient(135deg,var(--brand),var(--brand2));
-      color:#fff;box-shadow:0 4px 14px rgba(21,94,239,.28);
-    }
-    @media(max-width:960px){
-      .portal-wrap{flex-direction:column-reverse;}
-      .portal-sidenav{width:100%;position:static;flex-direction:row;flex-wrap:wrap;gap:6px;}
-      .sidenav-label{display:none;}
-      .sidenav-btn{width:auto;flex:1 1 auto;}
-    }
-
-    .year-group{border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--yc-border);margin-bottom:6px;}
-    .year-head-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;font-weight:800;font-size:15px;color:#fff;background:var(--yc-main);}
-    .y1{--yc-main:#155eef;--yc-border:#93aee8;--yc-strip:#eef4ff;}
-    .y2{--yc-main:#067647;--yc-border:#8ecfad;--yc-strip:#ecfdf3;}
-    .y3{--yc-main:#6941c6;--yc-border:#c4b5fd;--yc-strip:#f4f3ff;}
-    .y4{--yc-main:#b54708;--yc-border:#fbb483;--yc-strip:#fff7ed;}
-    .acc-sem{border-top:1px solid rgba(0,0,0,.07);}
-    .acc-sem:first-child{border-top:none;}
-    .acc-head{
-      width:100%;display:flex;justify-content:space-between;align-items:center;
-      padding:12px 16px;border:none;cursor:pointer;font-weight:700;font-size:14px;
-      background:var(--yc-strip);color:#334155;transition:.15s ease;text-align:left;
-    }
-    .acc-head:hover{filter:brightness(.97);}
-    .acc-chevron{transition:transform .25s ease;flex-shrink:0;}
-    .acc-head.open .acc-chevron{transform:rotate(180deg);}
-    .acc-body{display:none;}
-    .acc-body.open{display:block;}
-    .fail-row{background:#fff5f5!important;}
-    .fail-row td{color:#b42318;font-weight:600;}
-
-    /* Profile redesign */
-    .profile-hdr{
-      background:linear-gradient(135deg,#155eef 0%,#0f3fb3 100%);
-      border-radius:var(--radius);padding:20px 22px 18px;color:#fff;margin-bottom:14px;
-    }
-    .profile-hdr-inst{
-      font-size:11px;font-weight:700;opacity:.7;
-      text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;line-height:1.7;
-    }
-    .profile-hdr-div{height:1px;background:rgba(255,255,255,.2);margin:10px 0;}
-    .profile-hdr-row{display:flex;align-items:center;gap:14px;}
-    .profile-avatar{
-      width:48px;height:48px;border-radius:50%;flex-shrink:0;
-      background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.35);
-      display:flex;align-items:center;justify-content:center;
-      font-size:17px;font-weight:900;color:#fff;
-    }
-    .profile-hdr-name{font-size:17px;font-weight:800;line-height:1.2;}
-    .profile-hdr-meta{font-size:12px;opacity:.72;margin-top:3px;}
-    .profile-hdr-wm{font-size:22px;font-weight:900;opacity:.12;text-align:right;flex:1;white-space:nowrap;}
-    .pcg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
-    .pf{padding:11px 13px;border:1px solid var(--line);border-radius:13px;background:#fbfdff;}
-    .pf .k{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
-    .pf .v{font-size:13px;font-weight:700;color:var(--ink);line-height:1.4;word-break:break-word;}
-    @media(max-width:700px){.pcg{grid-template-columns:repeat(2,minmax(0,1fr));}}
-
-    /* Matrix stats row */
-    .msr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px;}
-    .ms{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:13px;border:1px solid var(--line);background:#fff;}
-    .ms-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-    .ms .lbl{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.3px;}
-    .ms .cnt{font-size:20px;font-weight:900;line-height:1;}
-    @media(max-width:540px){.msr{grid-template-columns:repeat(2,minmax(0,1fr));}}
-
-    /* Year status classes */
-    .yg-done{--yc-main:#067647;--yc-border:#abefc6;--yc-strip:#ecfdf3;}
-    .yg-now{--yc-main:#155eef;--yc-border:#93aee8;--yc-strip:#eef4ff;}
-    .yg-next{--yc-main:#475467;--yc-border:#d0dce8;--yc-strip:#f8fafc;}
-    .yg-warn{--yc-main:#b54708;--yc-border:#fbb483;--yc-strip:#fff7ed;}
-    .sem-pill{
-      display:inline-flex;align-items:center;gap:4px;
-      border-radius:999px;padding:3px 9px;font-size:11px;font-weight:700;
-    }
-  </style>
-</head>
-<body>
-
-  <div id="loginView" class="login-page">
-    <div class="login-topbar">
-      <div class="login-topbar-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
-        </svg>
-      </div>
-      <div class="login-topbar-title">
-        English Language Dept. – General Automation System
-        <span>University of Raparin</span>
-      </div>
-    </div>
-
-    <div class="login-center">
-      <div class="login-card">
-        
-        <div class="login-uni"    id="loginUni">University of Raparin</div>
-        <div class="login-dept"   id="loginDept">English Language Department</div>
-        <div class="login-college" id="loginCollege">College of Basic Education</div>
-        <div class="login-meta-row">
-          <span id="loginSemester">Fall</span>
-          <div class="dot"></div>
-          <span id="loginAcademicYear">2026-2027</span>
-        </div>
-        <div class="login-divider"></div>
-        <p class="login-prompt">Please enter your PIN to login</p>
-        <input id="loginCode" class="pin-input" type="password" placeholder="• • • • • •" autocomplete="off">
-        <button class="btn-login-main" onclick="handleLogin()">Login</button>
-        <div style="margin-top:14px;display:flex;gap:8px;justify-content:center">
-          <button class="btn btn-secondary btn-sm" onclick="setLang('en')" id="langEn">English</button>
-          <button class="btn btn-secondary btn-sm" onclick="setLang('ku')" id="langKu">کوردی</button>
-        </div>
-        <div id="loginStatus" class="status-box status-info" style="margin-top:14px;text-align:left"></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="appView" class="shell hidden">
-    <div id="announcementBanner" class="hidden" style="margin-bottom:18px;"></div>
-    <div class="app-head">
-      <div>
-        <h2 id="appTitle">Portal</h2>
-        <p id="appSubtitle" class="subtitle">University of Raparin</p>
-      </div>
-      <div class="head-actions">
-        <div id="roleChip" class="role-chip">Role</div>
-        <button class="btn btn-secondary btn-sm" onclick="setLang('en')">EN</button>
-        <button class="btn btn-secondary btn-sm" onclick="setLang('ku')">KU</button>
-        <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
-      </div>
-    </div>
-
-    <div id="studentNav" style="display:none!important"></div>
-
-    <div id="teacherNav" class="tabbar hidden">
-      <button class="tab-btn active" data-scope="teacher" data-target="tp-profile">Teacher Profile</button>
-      <button class="tab-btn" data-scope="teacher" data-target="tp-courses">My Courses</button>
-      <button class="tab-btn" data-scope="teacher" data-target="tp-attendance">Attendance Review</button>
-      <button class="tab-btn" data-scope="teacher" data-target="tp-schedule">Exam & Lecture Schedule</button>
-      <button class="tab-btn" data-scope="teacher" data-target="tp-announcements">Department Announcements</button>
-    </div>
-
-    <div id="studentPanel" class="portal-wrap hidden">
-      <div class="portal-main stack">
-
-      <section id="sp-profile" class="tab-panel" data-scope="student">
-        <div id="studentProfileFields"></div>
-      </section>
-
-      <section id="sp-matrix" class="tab-panel hidden" data-scope="student">
-        <div class="msr">
-          <div class="ms">
-            <div class="ms-ico" style="background:#ecfdf3">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#067647" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <div><div class="lbl">Pass</div><div id="metricPass" class="cnt ok-text">0</div></div>
-          </div>
-          <div class="ms">
-            <div class="ms-ico" style="background:#fef3f2">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b42318" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </div>
-            <div><div class="lbl">Fail</div><div id="metricFail" class="cnt danger-text">0</div></div>
-          </div>
-          <div class="ms">
-            <div class="ms-ico" style="background:#fff7ed">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b54708" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div><div class="lbl">Postponed</div><div id="metricPostponed" class="cnt warn-text">0</div></div>
-          </div>
-          <div class="ms">
-            <div class="ms-ico" style="background:#eef4ff">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#175cd3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            </div>
-            <div><div class="lbl">Upcoming</div><div id="metricUpcoming" class="cnt" style="color:#175cd3">0</div></div>
-          </div>
-        </div>
-        <div id="semesterWrap" class="stack"></div>
-      </section>
-
-      <section id="sp-attendance" class="tab-panel hidden" data-scope="student">
-        <div class="card">
-          <h3>Attendance Summary</h3>
-          <div id="studentAttendanceWrap"></div>
-        </div>
-      </section>
-
-      <section id="sp-announcements" class="tab-panel hidden" data-scope="student">
-        <div class="card">
-          <h3>Announcements</h3>
-          <div id="studentAnnouncementsWrap" class="stack"></div>
-        </div>
-      </section>
-
-      <section id="sp-postponement" class="tab-panel hidden" data-scope="student">
-        <div class="grid grid-2">
-          <div class="card">
-            <h3>Postponement Request</h3>
-            <div class="stack">
-              <div>
-                <label for="postYear">Academic Year</label>
-                <input id="postYear" type="text" readonly style="background:#f8fafc;color:#475467;cursor:not-allowed;">
-              </div>
-              <div>
-                <label for="postKind">Type</label>
-                <select id="postKind" onchange="onPostKindChange()">
-                  <option value="">Select Type</option>
-                  <option value="study_year">Postpone Study Year</option>
-                  <option value="failed_exam">Postpone Failed Exam</option>
-                </select>
-              </div>
-              <div id="postSemWrap" class="hidden">
-                <label for="postSem">Semester</label>
-                <select id="postSem">
-                  <option value="">Select</option>
-                  <option value="Full Year">Full Year</option>
-                  <option value="Semester 1">Semester 1</option>
-                  <option value="Semester 2">Semester 2</option>
-                </select>
-              </div>
-              <div id="postFailedWrap" class="hidden stack">
-                <div>
-                  <label for="postFailedSubject">Failed Subject</label>
-                  <select id="postFailedSubject">
-                    <option value="">Select Subject</option>
-                  </select>
-                </div>
-                <div style="margin-top:10px;">
-                  <label for="postAttempt">Attempt</label>
-                  <select id="postAttempt">
-                    <option value="">Select Attempt</option>
-                    <option value="First Attempt">First Attempt</option>
-                    <option value="Second Attempt">Second Attempt</option>
-                    <option value="Both Attempts">Both Attempts</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label for="postReason">Reason</label>
-                <textarea id="postReason" placeholder="Optional note for your own record."></textarea>
-              </div>
-              <div class="row">
-                <button class="btn btn-primary" onclick="submitPostponementRequest()">Submit</button>
-              </div>
-              <div id="postponeStatus" class="status-box status-info"></div>
-            </div>
-          </div>
-
-          <div class="card">
-            <h3>My Requests</h3>
-            <div id="studentPostponementsWrap"></div>
-          </div>
-        </div>
-      </section>
-
-    </div>
-      <div id="studentSidenav" class="portal-sidenav">
-        <div class="sidenav-label">Navigation</div>
-        <button class="tab-btn sidenav-btn active" data-scope="student" data-target="sp-profile">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Personal Info
-        </button>
-        <button class="tab-btn sidenav-btn" data-scope="student" data-target="sp-matrix">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Academic Matrix
-        </button>
-        <button class="tab-btn sidenav-btn" data-scope="student" data-target="sp-attendance">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Attendance
-        </button>
-        <button class="tab-btn sidenav-btn" data-scope="student" data-target="sp-announcements">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          Announcements
-        </button>
-        <button class="tab-btn sidenav-btn" data-scope="student" data-target="sp-postponement">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Postponement
-        </button>
-      </div>
-    </div>
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Enghub</title>
     
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#050B14" id="theme-color-meta">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Enghub">
+    
+    <link rel="icon" type="image/png" href="Icon23.png">
+    <link rel="apple-touch-icon" href="Icon23.png">
 
-    <div id="teacherPanel" class="stack hidden">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+                        kurdish: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif', 'Arial'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+                        'glass-dark': '0 4px 30px rgba(0, 0, 0, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
 
-      <section id="tp-profile" class="tab-panel" data-scope="teacher">
-        <div id="teacherProfileFields"></div>
-      </section>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-      <section id="tp-courses" class="tab-panel hidden" data-scope="teacher">
-        <div class="card">
-          <h3>My Courses</h3>
-          <div id="teacherCoursesWrap" class="stack"></div>
-        </div>
+    <style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
 
-        <div id="rosterSection" class="card hidden">
-          <div class="row" style="justify-content:space-between">
-            <h3 id="rosterTitle" style="margin:0">Student Roster</h3>
-            <div class="row">
-              <button class="btn btn-secondary btn-sm" onclick="closeRoster()">Close</button>
-            </div>
-          </div>
+        .glass-header {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .dark .glass-header {
+            background: rgba(11, 17, 33, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
-          <div class="toolbar" style="margin-top:14px">
-            <div class="grow">
-              <label for="filterGroup">Group</label>
-              <select id="filterGroup" onchange="renderCurrentRoster()">
-                <option value="">All Groups</option>
-                <option value="A">Group A</option>
-                <option value="B">Group B</option>
-              </select>
-            </div>
-            <div class="grow">
-              <label for="filterLoad">Type</label>
-              <select id="filterLoad" onchange="renderCurrentRoster()">
-                <option value="">Regular + Overloaded</option>
-                <option value="regular">Regular</option>
-                <option value="overloaded">Overloaded</option>
-              </select>
-            </div>
-          </div>
+        .search-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .dark .search-glass {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.05);
+        }
 
-          <div class="row" style="margin-bottom:12px">
-            <button class="btn btn-primary btn-sm" onclick="exportRosterExcel()">Export Excel (.xlsx)</button>
-            <button class="btn btn-secondary btn-sm" onclick="exportRosterWord()">Export Word (.docx)</button>
-          </div>
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .toast-enter { animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        
+        @keyframes cardPop { from { opacity: 0; transform: scale(0.94) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .animate-card { animation: cardPop 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 
-          <div id="rosterTableWrap"></div>
-        </div>
-      </section>
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 12s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
 
-      <section id="tp-attendance" class="tab-panel hidden" data-scope="teacher">
-        <div class="card">
-          <h3>Attendance Review</h3>
+        @keyframes progress { 0% { width: 0%; opacity: 0; } 10% { opacity: 1; } 100% { width: 100%; opacity: 1; } }
+        .animate-progress { animation: progress 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+        .delay-500 { animation-delay: 0.5s; }
+        .delay-1000 { animation-delay: 1.0s; }
+        .delay-1500 { animation-delay: 1.5s; }
 
-          <div class="row" style="margin-bottom:12px">
-            <button class="btn btn-primary btn-sm" onclick="sortAttendance('high')">Highest % → Lowest</button>
-            <button class="btn btn-secondary btn-sm" onclick="sortAttendance('low')">Lowest % → Highest</button>
-            <button class="btn btn-secondary btn-sm" onclick="resetAttendanceFilter()">Reset</button>
-            <button class="btn btn-primary btn-sm" onclick="exportAttendanceExcel()">Export Excel (.xlsx)</button>
-            <button class="btn btn-secondary btn-sm" onclick="exportAttendanceWord()">Export Word (.docx)</button>
-          </div>
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(37, 99, 235, 0.2), inset 0 0 10px rgba(255,255,255,0.5); }
+            50% { box-shadow: 0 0 40px rgba(37, 99, 235, 0.5), inset 0 0 20px rgba(255,255,255,0.8); }
+        }
+        .dark .animate-logo-glow { animation: pulse-glow 2s ease-in-out infinite; }
 
-          <div id="teacherAttendanceWrap"></div>
-        </div>
-      </section>
+        #apps-container:hover .app-card::after { opacity: 1; }
+        .app-card::after {
+            content: ""; position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity 0.4s ease;
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.25), transparent 40%); z-index: 2; pointer-events: none;
+        }
+        .dark .app-card::after { background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.08), transparent 40%); }
+        .dark body { background-color: #050B14; }
 
-      <section id="tp-schedule" class="tab-panel hidden" data-scope="teacher">
-        <div class="card">
-          <h3>Exam &amp; Lecture Schedule</h3>
-          <div class="row" style="margin-bottom:16px;">
-            <button class="btn btn-primary btn-sm" id="schedLectureBtn" onclick="switchScheduleView('lecture')">Lecture Schedule</button>
-            <button class="btn btn-secondary btn-sm" id="schedExamBtn" onclick="switchScheduleView('exam')">Exams</button>
-          </div>
-          <div id="teacherLectureWrap"></div>
-          <div id="teacherExamWrap" class="hidden"></div>
-        </div>
-      </section>
+        /* LED CLOCK PREMIUM CONFIGS */
+        .perspective-container { perspective: 1200px; }
+        .perspective-card { transform-style: preserve-3d; animation: floatWindow 6s ease-in-out infinite; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .perspective-card:hover { transform: rotateX(3deg) rotateY(-1deg) scale(1.005); }
+        @keyframes floatWindow { 0%, 100% { transform: translateY(0px) rotateX(0.5deg); } 50% { transform: translateY(-6px) rotateX(-0.5deg); } }
+        .led-border-window { position: relative; overflow: hidden; box-shadow: 0 0 25px rgba(59, 130, 246, 0.35), 0 0 50px rgba(236, 72, 153, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.1); }
+        .led-border-window::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(from 0deg, transparent 15%, #3b82f6, #8b5cf6, #ec4899, #22d3ee, transparent 85%); animation: rotateLED 4.5s linear infinite; z-index: 0;
+        }
+        .led-border-inner { position: relative; z-index: 1; margin: 5px; }
+        @keyframes rotateLED { 100% { transform: rotate(360deg); } }
+        .app-card { cursor: pointer; transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) !important; }
+        .app-card.is-pinned-card { border-color: rgba(245, 158, 11, 0.5) !important; box-shadow: 0 12px 25px -5px rgba(245, 158, 11, 0.15), inset 0 1px 0 0 rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-500 select-none overflow-hidden relative">
 
-      <section id="tp-announcements" class="tab-panel hidden" data-scope="teacher">
-        <div class="card">
-          <h3>Department Announcements</h3>
-          <div id="teacherAnnouncementsWrap" class="stack"></div>
-        </div>
-      </section>
-
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none transition-opacity duration-1000">
+        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-300/30 dark:bg-blue-600/10 blur-[100px] animate-blob"></div>
+        <div class="absolute top-[20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-300/30 dark:bg-indigo-600/10 blur-[100px] animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-[-10%] left-[10%] w-[60%] h-[60%] rounded-full bg-cyan-300/30 dark:bg-cyan-900/20 blur-[120px] animate-blob animation-delay-4000"></div>
     </div>
 
-  </div>
-
-  <div id="subjectModal" class="modal">
-    <div class="modal-card">
-      <div class="modal-head" style="position: relative; padding-right: 40px; display: flex; align-items: center;">
-        <h3 id="subjectModalTitle" style="margin:0">Subject Details</h3>
-        <button onclick="closeSubjectModal()" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 28px; line-height: 1; cursor: pointer; color: #64748b; padding: 0;">&times;</button>
-      </div>
-      <div id="subjectModalBody"></div>
+    <div id="splash-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white/80 dark:bg-[#050B14]/90 backdrop-blur-3xl transition-all duration-1000 px-6 text-center">
+        <div class="relative flex flex-col items-center max-w-lg">
+            <div class="w-24 h-24 rounded-[2rem] overflow-hidden bg-white border-2 border-white dark:border-slate-800 shadow-2xl mb-6 animate-logo-glow opacity-0 animate-fade-in-up">
+                <img src="Icon23.png" alt="Dept Logo" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%232563eb\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M22 10v6M2 10l10-5 10 5-10 5z\'/><path d=\'M6 12v5c3 3 9 3 12 0v-5\'/></svg>'">
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight opacity-0 animate-fade-in-up delay-500">University of Raparin</h1>
+            <div class="mt-8 space-y-4 opacity-0 animate-fade-in-up delay-1000">
+                <p class="text-sm md:text-base text-slate-600 dark:text-slate-300 font-medium leading-relaxed px-4">Welcome to the Official Digital Services Platform of the English Language Department.</p>
+                <div class="w-12 h-[1px] bg-slate-300 dark:bg-slate-700 mx-auto"></div>
+                <p class="text-sm md:text-base text-slate-600 dark:text-slate-300 font-kurdish leading-relaxed px-4" dir="rtl">بەخێربێن بۆ پلاتفۆرمی فەرمی خزمەتگوزارییە دیجیتاڵییەکانی بەشی زمانی ئینگلیزی.</p>
+            </div>
+            <div class="mt-12 w-56 h-1.5 bg-slate-200/50 dark:bg-slate-800/50 rounded-full overflow-hidden shadow-inner opacity-0 animate-fade-in-up delay-1500">
+                <div class="h-full bg-gradient-to-r from-brand-400 to-indigo-500 rounded-full animate-progress"></div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    // ==========================================
-    // GITHUB PAGES CONFIGURATION
-    // ==========================================
-    // REPLACE THIS URL WITH YOUR DEPLOYED APPS SCRIPT WEB APP URL
-    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzCq2ec8rwqZccLQCk9Y43aY_-ShJOrv7TjOKGg_Xpr370d6W68yFQ4w3EUmP2-HwAt_Q/exec';
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden">
+        <div class="bg-slate-900/90 dark:bg-white/90 backdrop-blur-xl border border-white/10 text-white dark:text-slate-900 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 font-medium text-sm">
+            <i data-lucide="check-circle-2" class="w-5 h-5 text-green-400 dark:text-green-500"></i>
+            <span id="toast-msg">Action successful</span>
+        </div>
+    </div>
 
-    /**
-     * Replaces google.script.run for GitHub Pages.
-     * Communicates securely via Fetch POST with the text/plain payload workaround 
-     * to prevent CORS preflight blockages by Google Apps Script.
-     */
-    async function callBackend(action, parameters = {}) {
-      try {
-        const response = await fetch(GAS_WEB_APP_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action, parameters })
-        });
-        const result = await response.json();
-        if (result.error) throw new Error(result.error);
-        return result.data;
-      } catch (error) {
-        console.error(`Error executing ${action}:`, error);
-        throw error;
-      }
+    <header class="sticky top-0 z-40 glass-header">
+        <div class="px-4 py-3.5 flex justify-between items-center max-w-5xl mx-auto w-full">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl overflow-hidden shadow-sm bg-white border border-slate-200/50 dark:border-slate-700/50 flex-shrink-0">
+                    <img src="Icon23.png" alt="Dept Logo" class="w-full h-full object-cover" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%232563eb\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M22 10v6M2 10l10-5 10 5-10 5z\'/><path d=\'M6 12v5c3 3 9 3 12 0v-5\'/></svg>'">
+                </div>
+                <div class="flex flex-col">
+                    <h1 class="text-[14px] font-extrabold leading-tight tracking-tight dark:text-white">University of Raparin</h1>
+                    <h2 class="text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-tight mt-0.5">College of Basic Education</h2>
+                    <h3 class="text-[11px] font-bold text-brand-600 dark:text-brand-400 leading-tight mt-0.5">English Language Dept</h3>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button id="installBtn" onclick="installApp()" class="hidden w-10 h-10 rounded-full bg-brand-600 hover:bg-brand-500 text-white flex items-center justify-center transition-all active:scale-90 shadow-sm border border-brand-500/30">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                </button>
+                
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-slate-100/80 dark:bg-slate-800/80 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 shadow-sm border border-slate-200/50 dark:border-slate-700/50">
+                    <i data-lucide="moon" id="theme-icon-moon" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="sun" id="theme-icon-sun" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow px-4 pb-12 max-w-5xl mx-auto w-full flex flex-col gap-8 pt-6">
+        <section class="relative z-10">
+            <div class="relative group max-w-2xl mx-auto">
+                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="w-5 h-5 text-slate-400 dark:text-slate-500 group-focus-within:text-brand-500 dark:group-focus-within:text-brand-400 transition-colors"></i>
+                </div>
+                <input type="text" id="search-input" placeholder="Search applications / گەڕان..." 
+                    class="block w-full pl-13 pr-6 py-4 search-glass border border-slate-200/60 dark:border-slate-700/60 rounded-3xl text-base font-medium shadow-lg focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 dark:focus:ring-brand-400/50 dark:focus:border-brand-400 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-white"
+                    onkeyup="filterApps()">
+                <div class="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
+                     <span class="hidden sm:flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700">⌘K</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="apps-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5 lg:gap-6 pb-6 relative">
+            </section>
+    </main>
+
+    <footer class="mt-auto py-8 text-center text-[11px] sm:text-xs text-slate-400 dark:text-slate-500 font-medium relative z-10 border-t border-slate-200/50 dark:border-slate-800/50 space-y-1">
+        <p>© 2026 University of Raparin</p>
+        <p>College of Basic Education • English Language Department</p>
+        <p class="text-[10px] opacity-75">Version 1.0.0</p>
+    </footer>
+
+<script>
+    const appsData = [         {             id: 101, titleEn: "English General Info", titleKu: "زانیاری خوێندکاران و ستاف", desc: "General department information and staff directory.", icon: "info", url: "https://english-uor.github.io/General/",             colors: {                 cardStyle: "bg-pink-100/70 border-pink-300 hover:border-pink-500 dark:bg-pink-950/40 dark:border-pink-800/50 dark:hover:bg-pink-900/60 dark:hover:border-pink-500/70",                 glow: "bg-pink-500/30 dark:bg-pink-500/40 group-hover:bg-pink-400/60",                 iconBox: "bg-white dark:bg-pink-900/60 border-pink-200 dark:border-pink-700/50",                 icon: "text-pink-600 dark:text-pink-400", title: "text-pink-900 dark:text-pink-100", subtitle: "text-pink-700 dark:text-pink-300/90", desc: "text-pink-800 dark:text-pink-200/80", divider: "border-pink-200/80 dark:border-pink-800/60",                 btnBox: "bg-pink-200/60 dark:bg-pink-900/40 group-hover/btn:bg-pink-300 dark:group-hover/btn:bg-pink-700/80 border-transparent dark:border-pink-800/30", btnText: "text-pink-700 dark:text-pink-300 group-hover/btn:text-pink-900 dark:group-hover/btn:text-pink-100"             }         },         {             id: 102, titleEn: "Student and Teachers Portal", titleKu: "پۆرتاڵی خوێندکار و مامۆستا", desc: "Access the academic portal for grades and rosters.", icon: "graduation-cap", url: "https://english-uor.github.io/Teacher-Student/",             colors: {                 cardStyle: "bg-white/70 border-white/60 hover:border-slate-400 dark:bg-slate-900/30 dark:border-slate-800/40 dark:hover:bg-slate-800/50 dark:hover:border-slate-500/60",                 glow: "bg-slate-500/20 dark:bg-slate-500/30 group-hover:bg-slate-400/40",                 iconBox: "bg-white dark:bg-slate-800/60 border-slate-100 dark:border-slate-700/50",                 icon: "text-slate-600 dark:text-slate-400", title: "text-slate-800 dark:text-slate-50", subtitle: "text-slate-500 dark:text-slate-300/80", desc: "text-slate-600 dark:text-slate-100/70", divider: "border-slate-200/60 dark:border-slate-800/50",                 btnBox: "bg-slate-100/80 dark:bg-slate-800/40 group-hover/btn:bg-slate-200 dark:group-hover/btn:bg-slate-700/80 border-transparent dark:border-slate-800/30", btnText: "text-slate-600 dark:text-slate-300 group-hover/btn:text-slate-900 dark:group-hover/btn:text-slate-100"             }         },
+        {
+            id: 1, titleEn: "Attendance Portal", titleKu: "پۆڕتاڵی ئامادەبوون (غیابات)", desc: "Manage attendance and absence records.", icon: "calendar-check", url: "https://english-uor.github.io/attendance/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-rose-300 dark:bg-rose-950/30 dark:border-rose-800/40 dark:hover:bg-rose-900/50 dark:hover:border-rose-500/60",
+                glow: "bg-rose-500/20 dark:bg-rose-500/30 group-hover:bg-rose-400/40",
+                iconBox: "bg-white dark:bg-rose-900/60 border-slate-100 dark:border-rose-700/50",
+                icon: "text-rose-500 dark:text-rose-400", title: "text-slate-800 dark:text-rose-50", subtitle: "text-slate-500 dark:text-rose-300/80", desc: "text-slate-600 dark:text-rose-100/70", divider: "border-slate-200/60 dark:border-rose-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-rose-900/40 group-hover/btn:bg-rose-100 dark:group-hover/btn:bg-rose-700/80 border-transparent dark:border-rose-800/30", btnText: "text-slate-600 dark:text-rose-300 group-hover/btn:text-rose-600 dark:group-hover/btn:text-rose-100"
+            }
+        },
+        {
+            id: 2, titleEn: "Research Library", titleKu: "کتێبخانەی توێژینەوە", desc: "Access departmental research resources.", icon: "library", url: "https://english-uor.github.io/Library/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-emerald-300 dark:bg-emerald-950/30 dark:border-emerald-800/40 dark:hover:bg-emerald-900/50 dark:hover:border-emerald-500/60",
+                glow: "bg-emerald-500/20 dark:bg-emerald-500/30 group-hover:bg-emerald-400/40",
+                iconBox: "bg-white dark:bg-emerald-900/60 border-slate-100 dark:border-emerald-700/50",
+                icon: "text-emerald-500 dark:text-emerald-400", title: "text-slate-800 dark:text-emerald-50", subtitle: "text-slate-500 dark:text-emerald-300/80", desc: "text-slate-600 dark:text-emerald-100/70", divider: "border-slate-200/60 dark:border-emerald-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-emerald-900/40 group-hover/btn:bg-emerald-100 dark:group-hover/btn:bg-emerald-700/80 border-transparent dark:border-emerald-800/30", btnText: "text-slate-600 dark:text-emerald-300 group-hover/btn:text-emerald-600 dark:group-hover/btn:text-emerald-100"
+            }
+        },
+        {
+            id: 3, titleEn: "Trainer Evaluation (Q4)", titleKu: "هەڵسەنگاندنی ڕاهێنەران (ق٤)", desc: "Training evaluation system.", icon: "award", url: "https://english-uor.github.io/Training/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-amber-300 dark:bg-amber-950/30 dark:border-amber-800/40 dark:hover:bg-amber-900/50 dark:hover:border-amber-500/60",
+                glow: "bg-amber-500/20 dark:bg-amber-500/30 group-hover:bg-amber-400/40",
+                iconBox: "bg-white dark:bg-amber-900/60 border-slate-100 dark:border-amber-700/50",
+                icon: "text-amber-500 dark:text-amber-400", title: "text-slate-800 dark:text-amber-50", subtitle: "text-slate-500 dark:text-amber-300/80", desc: "text-slate-600 dark:text-amber-100/70", divider: "border-slate-200/60 dark:border-amber-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-amber-900/40 group-hover/btn:bg-amber-100 dark:group-hover/btn:bg-amber-700/80 border-transparent dark:border-amber-800/30", btnText: "text-slate-600 dark:text-amber-300 group-hover/btn:text-amber-600 dark:group-hover/btn:text-amber-100"
+            }
+        },
+        {
+            id: 4, titleEn: "Research Evaluation", titleKu: "هەڵسەنگاندنی توێژینەوە", desc: "Evaluate research projects.", icon: "microscope", url: "https://english-uor.github.io/research-evaluation/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-purple-300 dark:bg-purple-950/30 dark:border-purple-800/40 dark:hover:bg-purple-900/50 dark:hover:border-purple-500/60",
+                glow: "bg-purple-500/20 dark:bg-purple-500/30 group-hover:bg-purple-400/40",
+                iconBox: "bg-white dark:bg-purple-900/60 border-slate-100 dark:border-purple-700/50",
+                icon: "text-purple-500 dark:text-purple-400", title: "text-slate-800 dark:text-purple-50", subtitle: "text-slate-500 dark:text-purple-300/80", desc: "text-slate-600 dark:text-purple-100/70", divider: "border-slate-200/60 dark:border-purple-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-purple-900/40 group-hover/btn:bg-purple-100 dark:group-hover/btn:bg-purple-700/80 border-transparent dark:border-purple-800/30", btnText: "text-slate-600 dark:text-purple-300 group-hover/btn:text-purple-600 dark:group-hover/btn:text-purple-100"
+            }
+        },
+        {
+            id: 5, titleEn: "Research Topic Selection", titleKu: "دیاریکردنی توێژینەوە (خوێندکار)", desc: "Students select research topics.", icon: "list-checks", url: "https://english-uor.github.io/Topic-distribution/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-cyan-300 dark:bg-cyan-950/30 dark:border-cyan-800/40 dark:hover:bg-cyan-900/50 dark:hover:border-cyan-500/60",
+                glow: "bg-cyan-500/20 dark:bg-cyan-500/30 group-hover:bg-cyan-400/40",
+                iconBox: "bg-white dark:bg-cyan-900/60 border-slate-100 dark:border-cyan-700/50",
+                icon: "text-cyan-500 dark:text-cyan-400", title: "text-slate-800 dark:text-cyan-50", subtitle: "text-slate-500 dark:text-cyan-300/80", desc: "text-slate-600 dark:text-cyan-100/70", divider: "border-slate-200/60 dark:border-cyan-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-cyan-900/40 group-hover/btn:bg-cyan-100 dark:group-hover/btn:bg-cyan-700/80 border-transparent dark:border-cyan-800/30", btnText: "text-slate-600 dark:text-cyan-300 group-hover/btn:text-cyan-600 dark:group-hover/btn:text-cyan-100"
+            }
+        },
+        {
+            id: 6, titleEn: "Course Distribution", titleKu: "دابەشکردنی وانەکان", desc: "Course allocation and scheduling.", icon: "layout-template", url: "https://english-uor.github.io/english.subjects/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-blue-300 dark:bg-blue-950/30 dark:border-blue-800/40 dark:hover:bg-blue-900/50 dark:hover:border-blue-500/60",
+                glow: "bg-blue-500/20 dark:bg-blue-500/30 group-hover:bg-blue-400/40",
+                iconBox: "bg-white dark:bg-blue-900/60 border-slate-100 dark:border-blue-700/50",
+                icon: "text-blue-500 dark:text-blue-400", title: "text-slate-800 dark:text-blue-50", subtitle: "text-slate-500 dark:text-blue-300/80", desc: "text-slate-600 dark:text-blue-100/70", divider: "border-slate-200/60 dark:border-blue-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-blue-900/40 group-hover/btn:bg-blue-100 dark:group-hover/btn:bg-blue-700/80 border-transparent dark:border-blue-800/30", btnText: "text-slate-600 dark:text-blue-300 group-hover/btn:text-blue-600 dark:group-hover/btn:text-blue-100"
+            }
+        },
+        {
+            id: 7, titleEn: "Forms Center", titleKu: "فۆڕمەکان", desc: "Department forms and documents.", icon: "file-text", url: "https://english-uor.github.io/Forms/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-violet-300 dark:bg-violet-950/30 dark:border-violet-800/40 dark:hover:bg-violet-900/50 dark:hover:border-violet-500/60",
+                glow: "bg-violet-500/20 dark:bg-violet-500/30 group-hover:bg-violet-400/40",
+                iconBox: "bg-white dark:bg-violet-900/60 border-slate-100 dark:border-violet-700/50",
+                icon: "text-violet-500 dark:text-violet-400", title: "text-slate-800 dark:text-violet-50", subtitle: "text-slate-500 dark:text-violet-300/80", desc: "text-slate-600 dark:text-violet-100/70", divider: "border-slate-200/60 dark:border-violet-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-violet-900/40 group-hover/btn:bg-violet-100 dark:group-hover/btn:bg-violet-700/80 border-transparent dark:border-violet-800/30", btnText: "text-slate-600 dark:text-violet-300 group-hover/btn:text-violet-600 dark:group-hover/btn:text-violet-100"
+            }
+        },
+        {
+            id: 8, titleEn: "Holidays & Occasions", titleKu: "پشوو و بۆنە فەرمییەکان", desc: "Official calendar, holidays, and national commemorative occasions.", icon: "calendar-days", url: "holidays.html",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-indigo-300 dark:bg-indigo-950/30 dark:border-indigo-800/40 dark:hover:bg-indigo-900/50 dark:hover:border-indigo-500/60",
+                glow: "bg-indigo-500/20 dark:bg-indigo-500/30 group-hover:bg-indigo-400/40",
+                iconBox: "bg-white dark:bg-indigo-900/60 border-slate-100 dark:border-indigo-700/50",
+                icon: "text-indigo-500 dark:text-indigo-400", title: "text-slate-800 dark:text-indigo-50", subtitle: "text-slate-500 dark:text-indigo-300/80", desc: "text-slate-600 dark:text-indigo-100/70", divider: "border-slate-200/60 dark:border-indigo-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-indigo-900/40 group-hover/btn:bg-indigo-100 dark:group-hover/btn:bg-indigo-700/80 border-transparent dark:border-indigo-800/30", btnText: "text-slate-600 dark:text-indigo-300 group-hover/btn:text-indigo-600 dark:group-hover/btn:text-indigo-100"
+            }
+        }
+    ];
+
+    let pinnedApps = JSON.parse(localStorage.getItem('uor_pinned_apps') || '[]');
+    let deferredPrompt;
+
+    // Monitor Chrome Native Installer Lifecycle Events
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const btn = document.getElementById('installBtn');
+        if(btn) btn.classList.remove('hidden');
+    });
+
+    async function installApp() {
+        if(!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if(outcome === 'accepted'){
+            showToast('App Installed 🎉');
+        }
+        deferredPrompt = null;
+        const btn = document.getElementById('installBtn');
+        if(btn) btn.classList.add('hidden');
     }
 
-    const state = {
-      role: null,
-      code: '',
-      loginData: null,
-      studentBundle: null,
-      teacherDashboard: null,
-      teacherAttendance: null,
-      teacherMeta: null,
-      currentRosterCourse: null,
-      attendanceView: []
-    };
-
-    const ABSENCE_RISK_LIMIT = 10;
-
-    // Language support
-    let currentLang = 'en';
-    const translations = {
-      en: {
-        uni: 'University of Raparin',
-        dept: 'English Language Department',
-        college: 'College of Basic Education',
-        loginPrompt: 'Please enter your PIN to login',
-        loginBtn: 'Login',
-        logout: 'Logout',
-        studentPortal: 'Student Portal',
-        teacherPortal: 'Teacher Portal',
-        teacherPanel: "Teachers' Panel",
-        studentPortalTitle: 'Raparin Student Portal'
-      },
-      ku: {
-        uni: 'زانکۆی ڕاپەڕین',
-        dept: 'بەشی زمانی ئینگلیزی',
-        college: 'کۆلێژی پەروەردەی بنەڕەت',
-        loginPrompt: 'تکایە ژمارەی نهێنی بنووسە بۆ چوونەژوورەوە',
-        loginBtn: 'چوونەژوورەوە',
-        logout: 'دەرچوون',
-        studentPortal: 'پۆرتاڵی خوێندکار',
-        teacherPortal: 'پۆرتاڵی مامۆستا',
-        teacherPanel: 'پانێڵی مامۆستایان',
-        studentPortalTitle: 'پۆرتاڵی خوێندکاری ڕاپەڕین'
-      }
-    };
-
-    function setLang(lang){
-      currentLang = lang;
-      const t = translations[lang] || translations.en;
-      $('loginUni').textContent = t.uni;
-      $('loginDept').textContent = t.dept;
-      $('loginCollege').textContent = t.college;
-      document.querySelector('.login-prompt').textContent = t.loginPrompt;
-      document.querySelector('.btn-login-main').textContent = t.loginBtn;
-      const logoutBtn = document.querySelector('.head-actions .btn-danger');
-      if(logoutBtn) logoutBtn.textContent = t.logout;
-      // Update titles if already logged in
-      if(state.role === 'student'){
-        $('appTitle').textContent = t.studentPortalTitle;
-        $('roleChip').textContent = t.studentPortal;
-      } else if(state.role === 'teacher'){
-        $('appTitle').textContent = t.teacherPanel;
-        $('roleChip').textContent = t.teacherPortal;
-      }
-      // Highlight active button
-      $('langEn').style.opacity = lang==='en' ? '1' : '0.6';
-      $('langKu').style.opacity = lang==='ku' ? '1' : '0.6';
-      localStorage.setItem('portalLang', lang);
+    // Accurate Kurdish Solar Calendar Algorithm
+    function getKurdishSolarDate(date) {
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const kurdishMonths = ["خاکەلێوە", "بانەمەڕ", "جۆزەردان", "پووشپەڕ", "گەلاوێژ", "خەرمانان", "ڕەزبەر", "گەڵاڕێزان", "سەرماوەز", "بەفرانبار", "ڕێبەندان", "ڕەشەمێ"];
+        const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+        const gregDays = [0, 31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        
+        let daysSinceJan1 = 0;
+        for(let i = 1; i < month; i++) daysSinceJan1 += gregDays[i];
+        daysSinceJan1 += day;
+        
+        const march21Day = 31 + (isLeap ? 29 : 28) + 21;
+        let kurdishYear = year + 700;
+        let daysIntoKurdishYear = daysSinceJan1 - march21Day + 1;
+        
+        if (daysIntoKurdishYear <= 0) {
+            kurdishYear -= 1;
+            const prevYearLeap = ((year-1) % 4 === 0 && (year-1) % 100 !== 0) || ((year-1) % 400 === 0);
+            daysIntoKurdishYear += prevYearLeap ? 366 : 365;
+        }
+        
+        let kMonth = 0; let kDay = daysIntoKurdishYear;
+        for (let i = 0; i < 12; i++) {
+            let mDays = i < 6 ? 31 : 30;
+            if (i === 11) mDays = isLeap ? 30 : 29;
+            if (kDay <= mDays) { kMonth = i; break; }
+            kDay -= mDays;
+        }
+        const toKurdishNumerals = (num) => String(num).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+        return `${toKurdishNumerals(kDay)}ی ${kurdishMonths[kMonth]}ی ${toKurdishNumerals(kurdishYear)}`;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('loginCode').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleLogin();
-      });
+        initTheme();
+        lucide.createIcons();
+        registerProductionSW();
+        initPremiumClock();
 
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => activateTab(btn.dataset.scope, btn.dataset.target));
-      });
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('search-input').focus();
+            }
+        });
 
-      // Restore language
-      const saved = localStorage.getItem('portalLang');
-      if(saved) setLang(saved);
+        document.getElementById('apps-container').addEventListener('mousemove', e => {
+            for(const card of document.querySelectorAll('.app-card')) {
+                const rect = card.getBoundingClientRect(), x = e.clientX - rect.left, y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`); card.style.setProperty('--mouse-y', `${y}px`);
+            }
+        });
+
+        setTimeout(() => {
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0'; splash.style.transform = 'scale(1.05)';
+            setTimeout(() => { splash.style.display = 'none'; document.body.classList.remove('overflow-hidden'); renderApps(); }, 1000); 
+        }, 4000);
     });
 
-    function $(id){ return document.getElementById(id); }
+    function initPremiumClock() {
+        const mainEl = document.querySelector('main');
+        if (mainEl && !document.getElementById('premium-led-clock-container')) {
+            const clockContainer = document.createElement('div');
+            clockContainer.id = 'premium-led-clock-container';
+            clockContainer.className = "perspective-container w-full max-w-5xl mx-auto mb-2 relative z-20 px-1";
+            clockContainer.innerHTML = `
+                <div class="perspective-card led-border-window rounded-3xl bg-slate-950/60 p-[5px]">
+                    <div class="led-border-inner flex flex-col md:flex-row items-center justify-between gap-4 px-6 py-5 rounded-[20px] bg-white/90 dark:bg-slate-900/95 border border-white/20 dark:border-slate-800/80 backdrop-blur-3xl">
+                        <div class="flex flex-col gap-2 order-1 w-full md:w-auto text-center md:text-left">
+                            <div class="flex items-center justify-center md:justify-start gap-2.5 text-slate-800 dark:text-slate-100 font-extrabold text-sm sm:text-base md:text-[17px] tracking-wide">
+                                <div class="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_12px_#3b82f6] animate-pulse"></div>
+                                <i data-lucide="calendar" class="w-[18px] h-[18px] text-brand-500"></i>
+                                <span id="live-date">Loading date...</span>
+                            </div>
+                            <div class="flex items-center justify-center md:justify-start gap-2 text-slate-600 dark:text-slate-300 font-bold text-xs sm:text-sm font-kurdish pr-0 md:pl-6" dir="rtl">
+                                <span id="kurdish-day-label" class="opacity-75 font-medium">باردەکرێت...</span>
+                                <span id="kurdish-date" class="font-extrabold text-brand-600 dark:text-brand-400 text-sm sm:text-base"></span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/40 dark:border-slate-700/40 text-slate-500 dark:text-slate-400 font-medium text-[11px] sm:text-xs tracking-wider order-3 md:order-2 shadow-sm">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-rose-500 animate-bounce"></i>
+                            <span>Ranya, Kurdistan Region</span>
+                        </div>
+                        <div class="flex items-center gap-2.5 font-mono text-sm sm:text-base font-black bg-slate-950 text-cyan-400 dark:text-cyan-400 px-4 py-1.5 rounded-xl border border-slate-800 shadow-[inset_0_2px_10px_rgba(0,0,0,0.8),0_0_15px_rgba(34,211,238,0.25)] tracking-wider order-2 md:order-3">
+                            <i data-lucide="clock" class="w-4 h-4 text-cyan-400"></i>
+                            <span id="live-time">00:00:00 AM</span>
+                        </div>
+                    </div>
+                </div>`;
+            mainEl.insertBefore(clockContainer, mainEl.firstChild);
+        }
 
-    function setStatus(id, msg, type='info'){
-      const box = $(id);
-      box.className = 'status-box show ' + (type === 'error' ? 'status-error' : type === 'success' ? 'status-success' : 'status-info');
-      box.textContent = msg;
+        function updateClockLoop() {
+            const dateEl = document.getElementById('live-date'); const timeEl = document.getElementById('live-time'); const kurdishDateEl = document.getElementById('kurdish-date'); const kurdishDayEl = document.getElementById('kurdish-day-label');
+            if (!dateEl || !timeEl || !kurdishDateEl || !kurdishDayEl) return;
+            const now = new Date();
+            dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            timeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            kurdishDateEl.textContent = getKurdishSolarDate(now);
+            const kurdishDays = ["یەکشەممە", "دووشەممە", "سێشەممە", "چوارشەممە", "پێنجشەممە", "هەینی", "شەممە"];
+            kurdishDayEl.textContent = kurdishDays[now.getDay()] + ":";
+        }
+        setInterval(updateClockLoop, 1000); updateClockLoop();
     }
 
-    function clearStatus(id){
-      const box = $(id);
-      box.className = 'status-box status-info';
-      box.textContent = '';
-    }
+    function renderApps() {
+        const container = document.getElementById('apps-container');
+        if(!container) return; container.innerHTML = '';
 
-    function escapeHtml(str){
-      return String(str ?? '')
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#39;');
-    }
-
-    function logout(){
-      state.role = null;
-      state.code = '';
-      state.loginData = null;
-      state.studentBundle = null;
-      state.teacherDashboard = null;
-      state.teacherAttendance = null;
-      state.teacherMeta = null;
-      state.currentRosterCourse = null;
-      state.attendanceView = [];
-
-      $('appView').classList.add('hidden');
-      $('studentPanel').classList.add('hidden');
-      $('teacherPanel').classList.add('hidden');
-      $('studentNav').classList.add('hidden');
-      $('teacherNav').classList.add('hidden');
-      $('loginView').classList.remove('hidden');
-      $('loginCode').value = '';
-      clearStatus('loginStatus');
-    }
-
-    function activateTab(scope, targetId){
-      document.querySelectorAll(`.tab-panel[data-scope="${scope}"]`).forEach(p => p.classList.add('hidden'));
-      document.querySelectorAll(`.tab-btn[data-scope="${scope}"]`).forEach(b => b.classList.remove('active'));
-      document.getElementById(targetId).classList.remove('hidden');
-      document.querySelector(`.tab-btn[data-scope="${scope}"][data-target="${targetId}"]`).classList.add('active');
-    }
-
-    function handleLogin(){
-      const code = $('loginCode').value.trim();
-      if (!code){
-        setStatus('loginStatus', 'Please enter your login code.', 'error');
-        return;
-      }
-
-      setStatus('loginStatus', 'Checking your code...');
-      
-      callBackend('login', { code: code })
-        .then(onLoginSuccess)
-        .catch(err => setStatus('loginStatus', err.message || 'Login failed.', 'error'));
-    }
-
-    function onLoginSuccess(res){
-      const enteredCode = $('loginCode').value.trim();
-      
-      
-      if (!res || !res.role){
-        setStatus('loginStatus', 'Code not found in Student or Teacher directory.', 'error');
-        return;
-      }
-
-      state.role = res.role;
-      state.code = enteredCode;
-      state.loginData = res.data;
-
-      $('loginView').classList.add('hidden');
-      $('appView').classList.remove('hidden');
-
-      if (res.role === 'student'){
-        $('roleChip').textContent = 'Student Portal';
-        $('appTitle').textContent = 'Raparin Student Portal';
-        $('appSubtitle').textContent = 'Personal information, academic matrix, attendance, announcements, and postponement.';
-        $('studentNav').classList.remove('hidden');
-        $('studentPanel').classList.remove('hidden');
-        $('teacherNav').classList.add('hidden');
-        $('teacherPanel').classList.add('hidden');
-        activateTab('student', 'sp-profile');
-        loadStudentPortal();
-      } else {
-        $('roleChip').textContent = 'Teacher Portal';
-        $('appTitle').textContent = "Teachers' Panel";
-        $('appSubtitle').textContent = 'University of Raparin — College of Basic Education — English Language Department';
-        $('teacherNav').classList.remove('hidden');
-        $('teacherPanel').classList.remove('hidden');
-        $('studentNav').classList.add('hidden');
-        $('studentPanel').classList.add('hidden');
-        activateTab('teacher', 'tp-profile');
-        loadTeacherPortal();
-      }
-    }
-
-    // =========================
-    // STUDENT PORTAL
-    // =========================
-    function loadStudentPortal(){
-      renderStudentProfile(state.loginData);
-
-      callBackend('getStudentSubjects', { code: state.code })
-        .then(data => {
-          state.studentBundle = data;
-          renderAcademicMatrix(data);
-          populateFailedSubjects(data);
-        })
-        .catch(err => renderError('semesterWrap', err));
-
-      callBackend('getAttendance', { code: state.code })
-        .then(rows => renderStudentAttendance(rows || []))
-        .catch(err => renderError('studentAttendanceWrap', err));
-
-      callBackend('getAnnouncements', { code: state.code })
-        .then(rows => { renderAnnouncements('studentAnnouncementsWrap', rows || []); renderBanner(rows || []); })
-        .catch(err => renderError('studentAnnouncementsWrap', err));
-
-      callBackend('getPostponements', { code: state.code })
-        .then(rows => renderStudentPostponements(rows || []))
-        .catch(err => renderError('studentPostponementsWrap', err));
-
-      const configYear = $('loginAcademicYear').textContent.trim();
-      $('postYear').value = configYear || (new Date().getFullYear() + '-' + (new Date().getFullYear() + 1));
-    }
-
-    function renderStudentProfile(stu){
-      const initials = (stu.fullNameEnglish || stu.fullNameKurdish || '?')
-        .split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0,2);
-      const fields = [
-        ['Gender',           stu.gender],
-        ['Date of Birth',    stu.dob],
-        ['Blood Group',      stu.bloodGroup],
-        ['Student Phone',    stu.phone],
-        ['Parent Phone',     stu.parentPhone],
-        ['Group',            stu.group],
-        ['Dormitory',        stu.dormitory],
-        ['Stage',            stu.stage],
-        ['Study Type',       stu.studyType],
-        ['University Email', stu.email],
-        ['Admission Year',   stu.admissionYear],
-        ['Status',           stu.status || 'Active']
-      ];
-      $('studentProfileFields').innerHTML = `
-        <div class="profile-hdr">
-          <div class="profile-hdr-inst">
-            University of Raparin &nbsp;•&nbsp; College of Basic Education &nbsp;•&nbsp; English Language Department
-          </div>
-          <div class="profile-hdr-div"></div>
-          <div class="profile-hdr-row">
-            <div class="profile-avatar">${escapeHtml(initials)}</div>
-            <div>
-              <div class="profile-hdr-name">${escapeHtml(stu.fullNameKurdish || stu.fullNameEnglish || '-')}</div>
-              <div class="profile-hdr-meta">${escapeHtml(stu.fullNameEnglish || '')} &nbsp;•&nbsp; ${escapeHtml(stu.uniqueCode || '')}</div>
-            </div>
-            <div class="profile-hdr-wm">Student Portal</div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="pcg">
-            ${fields.map(([k,v]) => `
-              <div class="pf">
-                <div class="k">${escapeHtml(k)}</div>
-                <div class="v">${escapeHtml(v || '-')}</div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function renderAcademicMatrix(data){
-      const semesters = (data && data.semesters) ? data.semesters : [];
-      let pass = 0, fail = 0, postponed = 0, upcoming = 0;
-
-      semesters.forEach(sem => {
-        (sem.subjects || []).forEach(s => {
-          if (s.status === 'pass') pass++;
-          else if (s.status === 'fail' || s.status === 'reach_limit') fail++;
-          else if (s.status === 'postponed') postponed++;
-          else upcoming++;
+        const sortedData = [...appsData].sort((a, b) => {
+            const aPinned = pinnedApps.includes(a.id) ? 1 : 0; const bPinned = pinnedApps.includes(b.id) ? 1 : 0; return bPinned - aPinned;
         });
-      });
 
-      $('metricPass').textContent = pass;
-      $('metricFail').textContent = fail;
-      $('metricPostponed').textContent = postponed;
-      $('metricUpcoming').textContent = upcoming;
+        sortedData.forEach((app, index) => {
+            const isPinned = pinnedApps.includes(app.id); const delay = index * 0.06; const c = app.colors;
+            const card = document.createElement('div');
+            card.className = `app-card relative rounded-[2rem] p-6 lg:p-7 backdrop-blur-xl border shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300 animate-card flex flex-col justify-between h-full overflow-hidden group hover:-translate-y-1.5 hover:shadow-xl dark:hover:shadow-[0_20px_40px_rgb(0,0,0,0.5)] ${c.cardStyle} ${isPinned ? 'is-pinned-card' : ''}`;
+            card.style.animationDelay = `${delay}s`;
+            card.setAttribute('data-name-en', app.titleEn.toLowerCase()); card.setAttribute('data-name-ku', app.titleKu);
 
-      if (!semesters.length){
-        $('semesterWrap').innerHTML = '<div class="empty">No semester data found.</div>';
-        return;
-      }
-
-      const yearNames = {1:'First Year',2:'Second Year',3:'Third Year',4:'Fourth Year'};
-      const byYear = {};
-      semesters.forEach(sem => {
-        if (!byYear[sem.year]) byYear[sem.year] = [];
-        byYear[sem.year].push(sem);
-      });
-
-      $('semesterWrap').innerHTML = Object.keys(byYear).map(yr => {
-        const yNum        = parseInt(yr);
-        const yName       = yearNames[yNum] || ('Year ' + yNum);
-        const yData       = byYear[yr];
-        const hasCurrent  = yData.some(s => s.current);
-        const allFinished = yData.every(s => s.finished);
-      const hasAnyFail  = yData.some(s => (s.subjects||[]).some(x => x.status === 'fail' || x.status === 'reach_limit'));
-      const yCls   = hasAnyFail ? 'yg-warn'
-                   : allFinished ? 'yg-done'
-                   : hasCurrent  ? 'yg-now'
-                   :               'yg-next';
-      const yLabel = hasAnyFail ? 'Has Failures'
-                   : allFinished ? 'Completed'
-                   : hasCurrent  ? 'Current'
-                   :               'Upcoming';
-
-      const semRows = yData.map(sem => {
-        const semId   = 'acc-' + yr + '-' + sem.sem;
-const semName = sem.semLabel && sem.semLabel.indexOf('Fall') !== -1 ? 'Fall Semester' : 'Spring Semester';
-        const hasFail = (sem.subjects||[]).some(s => s.status === 'fail' || s.status === 'reach_limit');
-        const semSt   = hasFail ? 'warn'
-                      : sem.finished ? 'done'
-                      : sem.current  ? 'now'
-                      :                'next';
-          const pillCss = semSt === 'done' ? 'background:#ecfdf3;color:#067647;border:1px solid #abefc6'
-                        : semSt === 'now'  ? 'background:#eef4ff;color:#175cd3;border:1px solid #c7d7fe'
-                        : semSt === 'warn' ? 'background:#fff7ed;color:#b54708;border:1px solid #fed7aa'
-                        :                    'background:#f8fafc;color:#475467;border:1px solid #e4e7ec';
-          const pillTxt = semSt === 'done' ? 'Complete'
-                        : semSt === 'now'  ? 'In Progress'
-                        : semSt === 'warn' ? 'Has Failures'
-                        :                    'Upcoming';
-          return `
-            <div class="acc-sem">
-              <button class="acc-head" onclick="toggleSem('${semId}')">
-                <span style="display:flex;align-items:center;gap:10px">
-                  ${semName}
-                  <span class="sem-pill" style="${pillCss}">${pillTxt}</span>
-                </span>
-                <svg class="acc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-              </button>
-              <div id="${semId}" class="acc-body">
-                <div class="table-wrap" style="border-radius:0;border-left:none;border-right:none;border-bottom:none;">
-                  <table>
-                    <thead>
-                      <tr><th>Subject</th><th>Status</th><th>Details</th></tr>
-                    </thead>
-                    <tbody>
-                      ${(sem.subjects||[]).map(s => `
-                        <tr class="${s.status === 'fail' ? 'fail-row' : ''}">
-                          <td>${escapeHtml(s.name)}</td>
-                          <td>${renderStatusBadge(s.status)}</td>
-                          <td><button class="btn btn-secondary btn-sm" onclick="openSubjectDetails('${escapeHtml(s.code)}')">View Details</button></td>
-                        </tr>
-                      `).join('')}
-                    </tbody>
-                  </table>
+            card.innerHTML = `
+                <div class="absolute -top-12 -right-12 w-40 h-40 rounded-full blur-3xl transition-colors duration-500 pointer-events-none z-0 ${c.glow}"></div>
+                <button onclick="window.toggleAppPin(${app.id}, event)" class="absolute top-5 right-5 z-30 w-8 h-8 rounded-full flex items-center justify-center border backdrop-blur-md transition-all duration-300 active:scale-75 ${isPinned ? 'bg-amber-500/20 border-amber-500/60 text-amber-500 dark:text-amber-400' : 'bg-slate-500/10 border-slate-300/20 dark:border-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white'}">
+                    <i data-lucide="pin" class="w-3.5 h-3.5 ${isPinned ? 'fill-current rotate-45' : ''}"></i>
+                </button>
+                <div class="relative z-10 flex-grow">
+                    <div class="flex items-start gap-4 mb-5">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border group-hover:scale-105 transition-transform duration-300 ${c.iconBox}">
+                            <i data-lucide="${app.icon}" class="w-7 h-7 ${c.icon}"></i>
+                        </div>
+                        <div class="flex-grow pt-1.5 pr-6">
+                            <h3 class="font-bold text-[17px] leading-tight tracking-tight ${c.title}">${app.titleEn}</h3>
+                            <h4 class="font-bold text-[13px] mt-1.5 font-kurdish leading-tight ${c.subtitle}" dir="rtl">${app.titleKu}</h4>
+                        </div>
+                    </div>
+                    <p class="text-[14px] mb-8 leading-relaxed font-medium ${c.desc}">${app.desc}</p>
                 </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        return `
-          <div class="year-group ${yCls}">
-            <div class="year-head-bar">
-              <span>${yName}</span>
-              <span class="badge" style="background:rgba(255,255,255,.22);color:#fff;border-color:rgba(255,255,255,.3)">${yLabel}</span>
-            </div>
-            ${semRows}
-          </div>
-        `;
-      }).join('');
+                <div class="relative z-10 grid grid-cols-3 gap-3 mt-auto pt-5 border-t ${c.divider}">
+                    <button onclick="openApp('${app.url}')" class="flex flex-col items-center justify-center gap-2 py-2 rounded-xl transition-all active:scale-90 group/btn ${c.btnText}">
+                        <div class="p-2.5 rounded-full transition-colors border ${c.btnBox}"><i data-lucide="external-link" class="w-4 h-4"></i></div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Open</span>
+                    </button>
+                    <button onclick="copyToClipboard('${app.url}')" class="flex flex-col items-center justify-center gap-2 py-2 rounded-xl transition-all active:scale-90 group/btn ${c.btnText}">
+                        <div class="p-2.5 rounded-full transition-colors border ${c.btnBox}"><i data-lucide="copy" class="w-4 h-4"></i></div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Copy</span>
+                    </button>
+                    <button onclick="shareApp('${app.titleEn}', '${app.url}')" class="flex flex-col items-center justify-center gap-2 py-2 rounded-xl transition-all active:scale-90 group/btn ${c.btnText}">
+                        <div class="p-2.5 rounded-full transition-colors border ${c.btnBox}"><i data-lucide="share-2" class="w-4 h-4"></i></div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Share</span>
+                    </button>
+                </div>`;
+            
+            card.addEventListener('click', (e) => { if (e.target.closest('button')) return; openApp(app.url); });
+            container.appendChild(card);
+        });
+        lucide.createIcons();
     }
 
-    function renderStatusBadge(status){
-      if (status === 'pass') return '<span class="badge b-ok">Pass</span>';
-      if (status === 'fail') return '<span class="badge b-bad">Fail</span>';
-      if (status === 'postponed') return '<span class="badge b-warn">Postponed</span>';
-      return '<span class="badge b-info">Upcoming</span>';
-    }
+    window.toggleAppPin = function(appId, event) {
+        if (event) { event.stopPropagation(); event.preventDefault(); }
+        if (pinnedApps.includes(appId)) { pinnedApps = pinnedApps.filter(id => id !== appId); showToast("Removed from Favorites"); }
+        else { pinnedApps.push(appId); showToast("Added to Favorites ⭐"); }
+        localStorage.setItem('uor_pinned_apps', JSON.stringify(pinnedApps)); renderApps();
+    };
 
-    function openSubjectDetails(moduleCode){
-      $('subjectModal').classList.add('show');
-      $('subjectModalTitle').textContent = 'Subject Details';
-      $('subjectModalBody').innerHTML = `
-        <div style="text-align:center;padding:40px 0;color:var(--muted);font-size:14px;font-weight:600;">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px;opacity:.35"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Please wait till it opens…
-        </div>
-      `;
-
-      callBackend('getSubjectDetails', { code: state.code, moduleCode: moduleCode })
-        .then(data => {
-          if (!data){
-            $('subjectModalBody').innerHTML = '<div class="empty">No details found.</div>';
-            return;
-          }
-          $('subjectModalTitle').textContent = data.subject || data.name || 'Subject Details';
-          const maxFree = 4, maxInvoice = 8;
-          const maxAttempts = data.invoiceNumber ? maxInvoice : maxFree;
-          const remaining = Math.max(0, maxAttempts - (data.attempts || 0));
-          
-          const failures = (data.failures || []);
-          let yearsHtml = '';
-          if (failures.length) {
-            yearsHtml = '<div style="margin-top:16px;"><div style="font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Academic Years Attempted</div>' +
-              failures.map(f => 
-                '<div style="padding:10px 14px;background:#fef3f2;border:1px solid #fecdca;border-radius:10px;font-size:13px;margin-bottom:6px;">' +
-                  '<b style="color:#912018;">' + escapeHtml(f.academicYear || f.year || '') + '</b>' +
-                  ' &nbsp;·&nbsp; Year Logged Status: <b>' + escapeHtml(f.attempt1 || f.att1 || '') + '</b>' +
-                '</div>'
-              ).join('') + '</div>';
-          }
-          
-          let alertHtml = '';
-          if ((data.status === 'reach_limit' || data.status === 'reach > 4 attempt') && !data.invoiceNumber) {
-            alertHtml = '<div style="padding:12px 16px;background:#fef3f2;border:1px solid #fecdca;border-radius:12px;color:#b42318;font-weight:700;margin-top:14px;">⚠ Reached 4-attempt limit. Student must submit an Invoice ID to unlock 4 more attempts. Pre-Final is now forced to 0.</div>';
-          } else if (data.invoiceNumber) {
-            alertHtml = '<div style="padding:12px 16px;background:#ecfdf3;border:1px solid #abefc6;border-radius:12px;color:#067647;font-weight:700;margin-top:14px;">✔ Invoice <b>' + escapeHtml(data.invoiceNumber) + '</b> registered. Pre-Final forced to 0. ' + remaining + ' attempt(s) remaining out of 4 new invoice slots.</div>';
-          } else if (data.attempts > 0) {
-            alertHtml = '<div style="padding:12px 16px;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;color:#b54708;font-weight:700;margin-top:14px;">⚠ Failed. ' + (data.attempts || 0) + ' of 4 free attempts used. ' + remaining + ' free attempt(s) remaining.</div>';
-          }
-          
-          $('subjectModalBody').innerHTML = `
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:16px;">
-              <div><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;">Module Code</div><div style="font-weight:800;font-size:15px;">${escapeHtml(data.moduleCode || '')}</div></div>
-              <div><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;">Subject Name</div><div style="font-weight:800;font-size:15px;">${escapeHtml(data.subject || '')}</div></div>
-              <div><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;">Pre-Final Grade</div><div style="font-weight:800;font-size:15px;">${escapeHtml(data.preFinal || '0')}</div></div>
-              <div><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;">Attempts Used</div><div style="font-weight:800;font-size:15px;">${data.attempts || 0} / ${maxAttempts}</div></div>
-              <div><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;">Invoice Number</div><div style="font-weight:800;font-size:15px;">${escapeHtml(data.invoiceNumber || 'None')}</div></div>
-              <div><div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;">Current Status</div><div style="font-weight:800;font-size:15px;">${escapeHtml(data.status || '-')}</div></div>
-            </div>
-            ${alertHtml}
-            ${yearsHtml}
-          `;
-        })
-        .catch(err => {
-          $('subjectModalBody').innerHTML = `<div class="empty">${escapeHtml(err.message || 'Failed to load details.')}</div>`;
+    function filterApps() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        document.querySelectorAll('.app-card').forEach(card => {
+            card.style.display = (card.getAttribute('data-name-en').includes(query) || card.getAttribute('data-name-ku').includes(query)) ? 'flex' : 'none';
         });
     }
 
-    function toggleSem(id){
-      const body = document.getElementById(id);
-      const head = body.previousElementSibling;
-      body.classList.toggle('open');
-      head.classList.toggle('open');
-    }
-
-    function closeSubjectModal(){
-      $('subjectModal').classList.remove('show');
-    }
-
-    function renderStudentAttendance(rows){
-      if (!rows.length){
-        $('studentAttendanceWrap').innerHTML = '<div class="empty">No absence records found.</div>';
-        return;
-      }
-
-      const counts = {};
-      rows.forEach(r => counts[r.subject] = (counts[r.subject] || 0) + 1);
-
-      const summary = Object.keys(counts).map(sub => {
-        const n   = counts[sub];
-        const pct = n * 5;
-        const bg  = n >= 2 ? '#fef3f2' : '#fff7ed';
-        const bc  = n >= 2 ? '#fecdca' : '#fed7aa';
-        const clr = n >= 2 ? '#b42318' : '#b54708';
-        return `
-          <div class="field" style="background:${bg};border-color:${bc};">
-            <div class="k">${escapeHtml(sub)}</div>
-            <div class="v" style="color:${clr};">${n} absence(s) — <strong>${pct}%</strong></div>
-          </div>
-        `;
-      }).join('');
-
-      $('studentAttendanceWrap').innerHTML = `
-        <div class="field-grid">${summary}</div>
-        <div class="spacer"></div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th>Date</th>
-                <th>Reason</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows.map(r => `
-                <tr>
-                  <td>${escapeHtml(r.subject)}</td>
-                  <td>${escapeHtml(r.date || '-')}</td>
-                  <td>${escapeHtml(r.reason || '-')}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    
-    function renderBanner(rows){
-      const banner = $('announcementBanner');
-      if (!rows || !rows.length){
-        banner.classList.add('hidden');
-        banner.innerHTML = '';
-        return;
-      }
-      banner.classList.remove('hidden');
-      banner.innerHTML = rows.map(r => `
-        <div style="background:linear-gradient(135deg,#155eef,#0f3fb3);color:#fff;border-radius:16px;padding:14px 18px;margin-bottom:10px;box-shadow:0 8px 24px rgba(21,94,239,.25);display:flex;align-items:center;gap:12px;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:.9"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <div style="flex:1;">
-            <div style="font-weight:800;font-size:14px;margin-bottom:2px;">${escapeHtml(r.body || r.title)}</div>
-            <div style="font-size:12px;opacity:.85;">${r.toWhom ? 'To: ' + escapeHtml(r.toWhom) : ''} ${r.start && r.end ? ' • ' + escapeHtml(r.start) + ' to ' + escapeHtml(r.end) : ''}</div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-
-    function renderAnnouncements(targetId, rows){
-      if (!rows.length){
-        $(targetId).innerHTML = '<div class="empty">No announcements found.</div>';
-        return;
-      }
-
-      $(targetId).innerHTML = rows.map(r => `
-        <div class="ann">
-          <h4>${escapeHtml(r.title || 'Announcement')}</h4>
-          <p>${escapeHtml(r.body || '')}</p>
-        </div>
-      `).join('');
-    }
-
-    function onPostKindChange(){
-      const kind = $('postKind').value;
-      $('postSemWrap').classList.toggle('hidden', kind !== 'study_year');
-      $('postFailedWrap').classList.toggle('hidden', kind !== 'failed_exam');
-    }
-
-    function populateFailedSubjects(data){
-      const sel = $('postFailedSubject');
-      if (!sel) return;
-      const semesters = (data && data.semesters) ? data.semesters : [];
-      const failed = [];
-      semesters.forEach(sem => {
-        (sem.subjects || []).forEach(s => {
-          if (s.status === 'fail') failed.push(s);
-        });
-      });
-      sel.innerHTML = '<option value="">Select Subject</option>' +
-        failed.map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
-    }
-
-    function submitPostponementRequest(){
-      const academicYear = $('postYear').value.trim();
-      const kind = $('postKind').value;
-      const reason = $('postReason').value.trim();
-      let type = '';
-
-      if (kind === 'study_year'){
-        const sem = $('postSem').value;
-        if (!sem){ setStatus('postponeStatus', 'Please select a Semester.', 'error'); return; }
-        type = 'Study Year — ' + sem;
-      } else if (kind === 'failed_exam'){
-        const subject = $('postFailedSubject').value;
-        const attempt = $('postAttempt').value;
-        if (!subject || !attempt){ setStatus('postponeStatus', 'Please select a Failed Subject and Attempt.', 'error'); return; }
-        type = 'Failed Exam — ' + subject + ' — ' + attempt;
-      } else {
-        setStatus('postponeStatus', 'Please select a Type.', 'error');
-        return;
-      }
-
-      if (!academicYear){ setStatus('postponeStatus', 'Academic Year is missing.', 'error'); return; }
-
-      setStatus('postponeStatus', 'Submitting request...');
-      
-      callBackend('submitPostponement', { 
-        payload: {
-          code: state.code,
-          academicYear: academicYear,
-          type: type,
-          reason: reason
-        } 
-      })
-      .then(() => {
-        setStatus('postponeStatus', 'Postponement request submitted.', 'success');
-        $('postReason').value = '';
-        callBackend('getPostponements', { code: state.code })
-          .then(rows => renderStudentPostponements(rows || []));
-      })
-      .catch(err => setStatus('postponeStatus', err.message || 'Submission failed.', 'error'));
-    }
-
-    function renderPostponeStatusBadge(status){
-      const s = (status || 'Pending').toLowerCase().trim();
-      if (s === 'approved' || s === 'accepted') return '<span class="badge b-ok">Accepted</span>';
-      if (s === 'rejected' || s === 'denied')   return '<span class="badge b-bad">Rejected</span>';
-      return '<span class="badge b-warn">Pending</span>';
-    }
-
-    function renderStudentPostponements(rows){
-      if (!rows.length){
-        $('studentPostponementsWrap').innerHTML = '<div class="empty">No postponement requests yet.</div>';
-        return;
-      }
-
-      $('studentPostponementsWrap').innerHTML = `
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Academic Year</th>
-                <th>Type</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows.map(r => `
-                <tr>
-                  <td>${escapeHtml(r.year || '-')}</td>
-                  <td>${escapeHtml(r.type || '-')}</td>
-                  <td>${renderPostponeStatusBadge(r.status)}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    // =========================
-    // TEACHER PORTAL
-    // =========================
-    function loadTeacherPortal(){
-      callBackend('getTeacherDashboard', { code: state.code })
-        .then(res => {
-          if (!res || !res.ok){
-            renderError('teacherProfileFields', {message: (res && res.error) || 'Teacher dashboard failed.'});
-            return;
-          }
-          state.teacherDashboard = res;
-          renderTeacherProfile(res.teacher);
-          renderTeacherCourses(res.courses || []);
-        })
-        .catch(err => renderError('teacherProfileFields', err));
-
-      callBackend('getTeacherAttendance', { code: state.code })
-        .then(res => {
-          if (!res || !res.ok){
-            renderError('teacherAttendanceWrap', {message: (res && res.error) || 'Attendance failed.'});
-            return;
-          }
-          state.teacherAttendance = res;
-          state.attendanceView = buildAttendanceSummaryRows(res);
-          renderTeacherAttendance();
-        })
-        .catch(err => renderError('teacherAttendanceWrap', err));
-
-      callBackend('getTeacherScheduleAndAnnouncements', { code: state.code })
-        .then(res => {
-          if (!res || !res.ok){
-            renderError('teacherScheduleWrap', {message: (res && res.error) || 'Schedule load failed.'});
-            renderError('teacherAnnouncementsWrap', {message: (res && res.error) || 'Announcement load failed.'});
-            return;
-          }
-          state.teacherMeta = res;
-          renderTeacherSchedule(res.schedule || []);
-          renderAnnouncements('teacherAnnouncementsWrap', res.announcements || []); renderBanner(res.announcements || []);
-        })
-        .catch(err => {
-          renderError('teacherScheduleWrap', err);
-          renderError('teacherAnnouncementsWrap', err);
-        });
-    }
-
-    function renderTeacherProfile(t){
-      const initials = (t.name || '?').split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0,2);
-      $('teacherProfileFields').innerHTML = `
-        <div class="profile-hdr">
-          <div class="profile-hdr-inst">
-            University of Raparin &nbsp;•&nbsp; College of Basic Education &nbsp;•&nbsp; English Language Department
-          </div>
-          <div class="profile-hdr-div"></div>
-          <div class="profile-hdr-row">
-            <div class="profile-avatar">${escapeHtml(initials)}</div>
-            <div>
-              <div class="profile-hdr-name">${escapeHtml(t.name || '-')}</div>
-              <div class="profile-hdr-meta">${escapeHtml(t.title || '')} &nbsp;•&nbsp; ${escapeHtml(t.uniqueCode || '')}</div>
-            </div>
-            <div class="profile-hdr-wm">Teachers' Panel</div>
-          </div>
-        </div>
-        <div class="card">
-          <h3 style="margin-bottom:16px;">Teacher Profile Card</h3>
-          <div class="pcg">
-            <div class="pf"><div class="k">Name</div><div class="v">${escapeHtml(t.name || '-')}</div></div>
-            <div class="pf"><div class="k">Title</div><div class="v">${escapeHtml(t.title || '-')}</div></div>
-            <div class="pf"><div class="k">Email</div><div class="v">${escapeHtml(t.email || '-')}</div></div>
-            <div class="pf"><div class="k">Phone</div><div class="v">${escapeHtml(t.phone || '-')}</div></div>
-            <div class="pf"><div class="k">Birthday</div><div class="v">${escapeHtml(t.birthday || '-')}</div></div>
-            <div class="pf"><div class="k">Login ID</div><div class="v">${escapeHtml(t.uniqueCode || '-')}</div></div>
-            <div class="pf"><div class="k">Access Level</div><div class="v">Read-only</div></div>
-            <div class="pf" style="grid-column:1/-1"><div class="k">Assigned Subjects</div><div class="v">${escapeHtml((t.subjects || []).join(' • ') || '-')}</div></div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderTeacherCourses(courses){
-      if (!courses.length){
-        $('teacherCoursesWrap').innerHTML = '<div class="empty">No assigned subjects were found for this teacher.</div>';
-        return;
-      }
-
-      $('teacherCoursesWrap').innerHTML = courses.map((c, idx) => `
-        <div class="course-card">
-          <div class="course-top" style="cursor:pointer" onclick="openRoster(${idx})">
-            <div>
-              <div class="course-title">${escapeHtml(c.subjectName || 'Unnamed Subject')}</div>
-              <div class="muted">
-                ${escapeHtml(c.moduleCode || 'No module code match')}
-                ${c.syllabusInfo ? ' • Year ' + escapeHtml(c.syllabusInfo.year || '-') + ' • ' + escapeHtml(c.syllabusInfo.semester || '-') : ''}
-              </div>
-            </div>
-            <span class="badge b-info">${(c.students || []).length} student(s)</span>
-          </div>
-
-          <div class="row">
-            <button class="btn btn-primary btn-sm" onclick="openRoster(${idx})">View Students</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function openRoster(index){
-      const course = (state.teacherDashboard && state.teacherDashboard.courses) ? state.teacherDashboard.courses[index] : null;
-      state.currentRosterCourse = course;
-      $('rosterSection').classList.remove('hidden');
-      $('rosterTitle').textContent = `Student Roster — ${course ? (course.subjectName || '') : ''}`;
-      renderCurrentRoster();
-      activateTab('teacher', 'tp-courses');
-      window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
-    }
-
-    function closeRoster(){
-      $('rosterSection').classList.add('hidden');
-      state.currentRosterCourse = null;
-      $('rosterTableWrap').innerHTML = '';
-    }
-
-    function getFilteredRosterRows(){
-      const c = state.currentRosterCourse;
-      if (!c || !c.students) return [];
-
-      const g = $('filterGroup').value;
-      const t = $('filterLoad').value;
-
-      return c.students.filter(r => {
-        if (g && String(r.group || '').toUpperCase() !== g) return false;
-        if (t === 'regular' && r.isOverload) return false;
-        if (t === 'overloaded' && !r.isOverload) return false;
-        return true;
-      });
-    }
-
-    function renderCurrentRoster(){
-      const rows = getFilteredRosterRows();
-      if (!state.currentRosterCourse){
-        $('rosterTableWrap').innerHTML = '<div class="empty">No course selected.</div>';
-        return;
-      }
-
-      if (!rows.length){
-        $('rosterTableWrap').innerHTML = '<div class="empty">No students match the selected filters.</div>';
-        return;
-      }
-
-      const c = state.currentRosterCourse;
-      const courseTitle = c.subjectName || 'Unnamed Subject';
-      const courseInfo  = [
-        c.moduleCode || '',
-        c.syllabusInfo ? 'Year ' + (c.syllabusInfo.year || '-') : '',
-        c.syllabusInfo ? (c.syllabusInfo.semester || '') : ''
-      ].filter(Boolean).join(' • ');
-
-      $('rosterTableWrap').innerHTML = `
-        <div style="background:linear-gradient(135deg,var(--brand),var(--brand2));border-radius:14px;padding:16px 20px;margin-bottom:14px;color:#fff;">
-          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;opacity:.75;margin-bottom:4px;">Course Roster</div>
-          <div style="font-size:19px;font-weight:900;line-height:1.25;">${escapeHtml(courseTitle)}</div>
-          ${courseInfo ? `<div style="font-size:12px;opacity:.8;margin-top:4px;">${escapeHtml(courseInfo)}</div>` : ''}
-          <div style="font-size:12px;margin-top:8px;opacity:.85;">${rows.length} student(s) listed</div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:44px;">#</th>
-                <th>Name</th>
-                <th>Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows.map((r, i) => `
-                <tr style="${r.isOverload ? 'color:#b42318;font-weight:700' : ''}">
-                  <td style="color:var(--muted);font-weight:700;">${i + 1}</td>
-                  <td>${escapeHtml(r.nameKurdish || '-')}</td>
-                  <td>${r.isOverload ? 'Overloaded' : 'Regular'}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    function buildAttendanceSummaryRows(res){
-      const records = res.records || [];
-      const byKey = {};
-
-      records.forEach(r => {
-        const key = (r.studentCode || '') + '|' + (r.subject || '');
-        if (!byKey[key]){
-          byKey[key] = {
-            studentCode: r.studentCode,
-            studentName: r.studentName,
-            subject: r.subject || '-',
-            dates: [],
-            absenceCount: 0
-          };
+    function openApp(url) { window.open(url, '_blank', 'noopener,noreferrer'); }
+    function copyToClipboard(text) {
+        if (!navigator.clipboard) {
+            var txt = document.createElement("textarea"); txt.value = text; txt.style.position = "fixed"; document.body.appendChild(txt);
+            txt.focus(); txt.select(); document.execCommand('copy'); document.body.removeChild(txt); showToast("Link copied"); return;
         }
-        if (r.date) byKey[key].dates.push(r.date);
-        byKey[key].absenceCount++;
-      });
+        navigator.clipboard.writeText(text).then(() => showToast("Link copied successfully"));
+    }
+    function shareApp(title, url) { if (navigator.share) { navigator.share({ title: title, text: `Check out ${title}:`, url: url }).catch(() => {}); } else { copyToClipboard(url); } }
 
-      return Object.values(byKey).map(x => ({
-        studentCode: x.studentCode,
-        studentName: x.studentName,
-        subject: x.subject,
-        dates: x.dates.slice().sort().join(', '),
-        absenceCount: x.absenceCount,
-        absencePct: x.absenceCount * 5,
-        risk: x.absenceCount >= ABSENCE_RISK_LIMIT ? 'At Risk' : 'Normal'
-      }));
+    let toastTimeout;
+    function showToast(message) {
+        const toast = document.getElementById('toast'); document.getElementById('toast-msg').textContent = message;
+        toast.classList.remove('hidden', 'toast-enter'); void toast.offsetWidth; toast.classList.add('toast-enter');
+        clearTimeout(toastTimeout); toastTimeout = setTimeout(() => toast.classList.add('hidden'), 3000);
     }
 
-    function renderTeacherAttendance(){
-      const rows = state.attendanceView || [];
-
-      if (!rows.length){
-        $('teacherAttendanceWrap').innerHTML = '<div class="empty">No attendance records found for this teacher\'s enrolled students.</div>';
-        return;
-      }
-
-      $('teacherAttendanceWrap').innerHTML = `
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:44px;">#</th>
-                <th>Student Name</th>
-                <th>Subject</th>
-                <th>Absence Dates</th>
-                <th>Absence %</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows.map((r, i) => {
-                const pct = r.absencePct != null ? r.absencePct : r.absenceCount * 5;
-                const cls = pct >= 10 ? 'danger-text' : 'warn-text';
-                return `
-                  <tr>
-                    <td style="color:var(--muted);font-weight:700;">${i + 1}</td>
-                    <td style="font-weight:700;">${escapeHtml(r.studentName || '-')}</td>
-                    <td>${escapeHtml(r.subject || '-')}</td>
-                    <td style="font-size:12px;color:var(--muted);">${escapeHtml(r.dates || '-')}</td>
-                    <td><span class="${cls}" style="font-weight:800;">${pct}%</span></td>
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    function sortAttendance(mode){
-      if (!state.attendanceView) return;
-      state.attendanceView.sort((a,b) => mode === 'high' ? b.absenceCount - a.absenceCount : a.absenceCount - b.absenceCount);
-      renderTeacherAttendance();
-    }
-
-    function showOnlyRisk(){
-      const base = buildAttendanceSummaryRows(state.teacherAttendance || {records:[]});
-      state.attendanceView = base.filter(r => r.risk === 'At Risk');
-      renderTeacherAttendance();
-    }
-
-    function resetAttendanceFilter(){
-      state.attendanceView = buildAttendanceSummaryRows(state.teacherAttendance || {records:[]});
-      renderTeacherAttendance();
-    }
-
-    function renderTeacherSchedule(rows){
-      const lectureRows = rows.filter(r => (r.key || '').toLowerCase().indexOf('exam') === -1);
-      const examRows    = rows.filter(r => (r.key || '').toLowerCase().indexOf('exam') !== -1);
-
-      const today = new Date(); today.setHours(0,0,0,0);
-
-      function daysUntil(str){
-        const d = new Date(str);
-        if (isNaN(d.getTime())) return null;
-        d.setHours(0,0,0,0);
-        return Math.ceil((d - today) / 86400000);
-      }
-
-      function niceKey(k){
-        return (k || '').replace(/^schedule_/,'').replace(/_/g,' ')
-          .replace(/\b\w/g, c => c.toUpperCase());
-      }
-
-      // Lecture view
-      $('teacherLectureWrap').innerHTML = lectureRows.length ? `
-        <div class="table-wrap">
-          <table>
-            <thead><tr>
-              <th style="width:44px;">#</th>
-              <th>Session</th><th>Details</th><th>Note</th>
-            </tr></thead>
-            <tbody>
-              ${lectureRows.map((r,i) => `
-                <tr>
-                  <td style="color:var(--muted);font-weight:700;">${i+1}</td>
-                  <td style="font-weight:800;">${escapeHtml(niceKey(r.key))}</td>
-                  <td>${escapeHtml(r.value || '-')}</td>
-                  <td style="color:var(--muted);font-size:13px;">${escapeHtml(r.note || '-')}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      ` : '<div class="empty">No lecture schedule entries found.</div>';
-
-      // Exam view with countdown
-      $('teacherExamWrap').innerHTML = examRows.length ? examRows.map((r,i) => {
-        const days = daysUntil(r.value);
-        let badge = '';
-        if (days === null)     badge = `<span class="badge b-neutral">Date not set</span>`;
-        else if (days < 0)     badge = `<span class="badge b-neutral">Completed</span>`;
-        else if (days === 0)   badge = `<span class="badge b-bad">Today!</span>`;
-        else {
-          const cls = days <= 7 ? 'b-bad' : days <= 14 ? 'b-warn' : 'b-info';
-          badge = `<span class="badge ${cls}">${days} day${days !== 1 ? 's' : ''} remaining</span>`;
+    function initTheme() {
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark'); document.getElementById('theme-color-meta').setAttribute('content', '#050B14');
+        } else {
+            document.documentElement.classList.remove('dark'); document.getElementById('theme-color-meta').setAttribute('content', '#f8fafc');
         }
-        return `
-          <div style="border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:8px;background:#fbfdff;">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-              <div>
-                <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">${escapeHtml(niceKey(r.key))}</div>
-                <div style="font-size:16px;font-weight:900;color:var(--ink);">${escapeHtml(r.value || '-')}</div>
-                ${r.note ? `<div style="font-size:12px;color:var(--muted);margin-top:3px;">${escapeHtml(r.note)}</div>` : ''}
-              </div>
-              <div>${badge}</div>
-            </div>
-          </div>
-        `;
-      }).join('') : '<div class="empty">No exam entries found.</div>';
+    }
+    function toggleTheme() {
+        if (document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.remove('dark'); localStorage.theme = 'light'; document.getElementById('theme-color-meta').setAttribute('content', '#f8fafc');
+        } else {
+            document.documentElement.classList.add('dark'); localStorage.theme = 'dark'; document.getElementById('theme-color-meta').setAttribute('content', '#050B14');
+        }
     }
 
-    function switchScheduleView(view){
-      $('teacherLectureWrap').classList.toggle('hidden', view !== 'lecture');
-      $('teacherExamWrap').classList.toggle('hidden',   view !== 'exam');
-      $('schedLectureBtn').className = view === 'lecture' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
-      $('schedExamBtn').className    = view === 'exam'    ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+    // Production Service Worker Registration Engine with Auto Cache Invalidation Alert Logic
+    function registerProductionSW() {
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                .then(reg => {
+                    console.log('Network Caching Core Enabled Scope:', reg.scope);
+                    reg.addEventListener('updatefound', () => {
+                        const worker = reg.installing;
+                        worker.addEventListener('statechange', () => {
+                            if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+                                if (confirm('New system update available. Update and refresh now?')) {
+                                    location.reload();
+                                }
+                            }
+                        });
+                    });
+                })
+                .catch(err => console.error('PWA Core Initialization Failure:', err));
+            });
+        }
     }
-
-
-    
-
-
-
-    // =========================
-    // SCHEDULE AND EXAMS
-    // =========================
-    let fullSchedule = [];
-    let fullExams = [];
-    
-    function loadScheduleAndExams(){
-      $('scheduleWrap').innerHTML = '<div class="empty">Loading schedule...</div>';
-      $('examsWrap').innerHTML = '<div class="empty">Loading exams...</div>';
-      
-      callBackend('getStudentScheduleAndExams', { code: state.code })
-        .then(data => {
-          fullSchedule = data.schedule || [];
-          fullExams = data.exams || [];
-          renderSchedule('all');
-          renderExams();
-        })
-        .catch(err => {
-          $('scheduleWrap').innerHTML = '<div class="empty">'+escapeHtml(err.message)+'</div>';
-        });
-    }
-    
-    function renderSchedule(filter){
-      document.querySelectorAll('#view-schedule .btn').forEach(b=>b.classList.remove('active'));
-      $('schedFilter'+filter.charAt(0).toUpperCase()+filter.slice(1)).classList.add('active');
-      
-      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      const today = new Date();
-      const todayName = days[today.getDay()];
-      const tomorrowName = days[(today.getDay()+1)%7];
-      
-      let filtered = fullSchedule;
-      if(filter === 'today') filtered = fullSchedule.filter(s => s.day.toLowerCase() === todayName.toLowerCase());
-      if(filter === 'tomorrow') filtered = fullSchedule.filter(s => s.day.toLowerCase() === tomorrowName.toLowerCase());
-      
-      if(!filtered.length){
-        $('scheduleWrap').innerHTML = '<div class="empty">No classes found</div>';
-        return;
-      }
-      
-      let html = '<table><thead><tr><th>Day</th><th>Time</th><th>Subject</th><th>Teacher</th><th>Hall</th></tr></thead><tbody>';
-      filtered.forEach(s => {
-        html += `<tr><td>${escapeHtml(s.day)}</td><td>${escapeHtml(s.time)}</td><td>${escapeHtml(s.subject)}</td><td>${escapeHtml(s.teacher)}</td><td>${escapeHtml(s.hall)}</td></tr>`;
-      });
-      html += '</tbody></table>';
-      $('scheduleWrap').innerHTML = html;
-    }
-    
-    function filterSchedule(type){ renderSchedule(type); }
-    
-    function renderExams(){
-      if(!fullExams.length){
-        $('examsWrap').innerHTML = '<div class="empty">No exams scheduled</div>';
-        return;
-      }
-      let html = '<table><thead><tr><th>Date</th><th>Day</th><th>Subject</th><th>Status</th></tr></thead><tbody>';
-      fullExams.forEach(e => {
-        const statusColor = e.status === 'Completed' ? '#10b981' : '#f59e0b';
-        html += `<tr><td>${escapeHtml(e.date)}</td><td>${escapeHtml(e.day)}</td><td>${escapeHtml(e.subject)}</td><td><span style="color:${statusColor};font-weight:600;">${escapeHtml(e.status)}</span></td></tr>`;
-      });
-      html += '</tbody></table>';
-      $('examsWrap').innerHTML = html;
-    }
-    
-    // =========================
-    // ECTS
-    // =========================
-    function loadECTS(){
-      $('ectsInfo').innerHTML = '<div class="empty">Loading...</div>';
-
-      callBackend('getECTSInfo', { code: state.code })
-        .then(info => {
-          $('ectsInfo').innerHTML = `
-            <div class="stat"><div class="label">Regular Load</div><div class="value">${info.regular}</div></div>
-            <div class="stat"><div class="label">Your Limit</div><div class="value">${info.limit}</div></div>
-            <div class="stat"><div class="label">Used</div><div class="value">${info.used}</div></div>
-            <div class="stat"><div class="label">Available</div><div class="value">${info.available}</div></div>
-          `;
-          if(info.overLimit){
-            $('ectsWarning').classList.remove('hidden');
-            $('ectsWarning').innerHTML = '<strong>Over limit:</strong> Your selections exceed the allowed credits. Extra courses have been marked as postponed and sent to admin for review.';
-          } else {
-            $('ectsWarning').classList.add('hidden');
-          }
-        });
-    }
-
-    // =========================
-    // EXPORT HELPERS
-    // =========================
-    async function downloadXlsx(filename, headers, rows){
-      const wb = new ExcelJS.Workbook();
-      const ws = wb.addWorksheet('Sheet1');
-
-      // Header row — blue background, white bold text
-      const hRow = ws.addRow(headers);
-      hRow.height = 22;
-      hRow.eachCell(cell => {
-        cell.fill      = {type:'pattern', pattern:'solid', fgColor:{argb:'FF155EEF'}};
-        cell.font      = {name:'Calibri', size:11, bold:true, color:{argb:'FFFFFFFF'}};
-        cell.alignment = {vertical:'middle', horizontal:'left'};
-        cell.border    = {bottom:{style:'medium', color:{argb:'FF0F3FB3'}}};
-      });
-
-      // Data rows — alternating white / light blue
-      rows.forEach((r, i) => {
-        const row = ws.addRow(r.map(c => c == null ? '' : c));
-        row.height = 18;
-        row.eachCell({includeEmpty:true}, cell => {
-          cell.font      = {name:'Calibri', size:10};
-          cell.fill      = {type:'pattern', pattern:'solid', fgColor:{argb: i % 2 === 0 ? 'FFFFFFFF' : 'FFF0F5FF'}};
-          cell.border    = {bottom:{style:'hair', color:{argb:'FFDFE7F1'}}};
-          cell.alignment = {vertical:'middle'};
-        });
-      });
-
-      // Auto column widths
-      ws.columns.forEach((col, ci) => {
-        let max = String(headers[ci] || '').length;
-        rows.forEach(r => { const v = String(r[ci] == null ? '' : r[ci]); if (v.length > max) max = v.length; });
-        col.width = Math.min(max + 4, 55);
-      });
-
-      const buffer = await wb.xlsx.writeBuffer();
-      const blob = new Blob([buffer], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href = url; a.download = filename;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 100);
-    }
-
-    function downloadDocx(filename, title, headers, rows){
-      const thS = 'padding:10px 12px;color:#fff;background:#155eef;font-weight:bold;border:1px solid #0f3fb3;font-family:Calibri,Arial,sans-serif;font-size:11pt;text-align:left;';
-      const tdS = 'padding:9px 12px;border:1px solid #dfe7f1;font-family:Calibri,Arial,sans-serif;font-size:11pt;';
-
-      let thead = '<tr>';
-      headers.forEach(function(h){ thead += '<th style="' + thS + '">' + escapeHtml(h) + '</th>'; });
-      thead += '</tr>';
-
-      let tbody = '';
-      rows.forEach(function(r, i){
-        const bg = i % 2 === 0 ? '#ffffff' : '#f8fbff';
-        tbody += '<tr>';
-        r.forEach(function(c){
-          tbody += '<td style="' + tdS + 'background:' + bg + ';">' + escapeHtml(String(c == null ? '' : c)) + '</td>';
-        });
-        tbody += '</tr>';
-      });
-
-      const today = new Date();
-      const dateStr = today.toLocaleDateString('en-GB', { year:'numeric', month:'long', day:'numeric' });
-
-      const html =
-        '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
-        '<head><meta charset="utf-8"><title>'+escapeHtml(title)+'</title>' +
-        '<style>@page{size:A4;margin:2cm}body{font-family:"Calibri",Arial,sans-serif;font-size:11pt;color:#132238;} .header{text-align:center;border-bottom:2.5pt solid #155eef;padding-bottom:12pt;margin-bottom:18pt;} .uni{font-size:18pt;font-weight:bold;color:#0f3fb3;margin-bottom:4pt;} .dept{font-size:12pt;color:#475467;} .doc-title{font-size:15pt;font-weight:bold;margin:18pt 0 8pt;color:#132238;} .meta{font-size:10pt;color:#6f7d90;margin-bottom:14pt;} table{border-collapse:collapse;width:100%;} .footer{margin-top:24pt;padding-top:8pt;border-top:1pt solid #dfe7f1;font-size:9pt;color:#6f7d90;text-align:center;}</style></head>' +
-        '<body>' +
-        '<div class="header">' +
-          '<div class="uni">University of Raparin</div>' +
-          '<div class="dept">College of Basic Education — English Language Department</div>' +
-        '</div>' +
-        '<div class="doc-title">' + escapeHtml(title) + '</div>' +
-        '<div class="meta">Generated on: ' + dateStr + ' &nbsp; | &nbsp; Official Academic Record</div>' +
-        '<table>' +
-        '<thead>' + thead + '</thead>' +
-        '<tbody>' + tbody + '</tbody>' +
-        '</table>' +
-        '<div class="footer">This document is system-generated by the University of Raparin Portal. For verification, contact the department office.</div>' +
-        '</body></html>';
-
-      const blob = new Blob(['\ufeff' + html], {type: 'application/msword'});
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href = url;
-      a.download = filename.replace('.docx', '.doc');
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 100);
-    }
-
-    function downloadPdf(filename, title, headers, rows){
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({orientation:'landscape'});
-      doc.setFontSize(14);
-      doc.text(title, 14, 14);
-      doc.autoTable({
-        head:[headers],
-        body:rows,
-        startY:20,
-        styles:{fontSize:8, cellPadding:2},
-        headStyles:{fillColor:[21,94,239]}
-      });
-      doc.save(filename);
-    }
-
-    function exportRosterExcel(){
-      if (!state.currentRosterCourse) return;
-      const rows = getFilteredRosterRows().map((r, i) => [
-        i + 1,
-        r.nameKurdish || '',
-        r.isOverload ? 'Overloaded' : 'Regular'
-      ]);
-      downloadXlsx('teacher_roster.xlsx',
-        ['#', 'Name', 'Type'],
-        rows
-      );
-    }
-
-    function exportRosterWord(){
-      if (!state.currentRosterCourse) return;
-      const c = state.currentRosterCourse;
-      const title = c.subjectName || 'Teacher Roster';
-      const rows = getFilteredRosterRows().map((r, i) => [
-        String(i + 1),
-        r.nameKurdish || '',
-        r.isOverload ? 'Overloaded' : 'Regular'
-      ]);
-      downloadDocx('teacher_roster.docx',
-        title,
-        ['#', 'Name', 'Type'],
-        rows
-      );
-    }
-
-    function exportRosterPdf(){
-      if (!state.currentRosterCourse) return;
-      const rows = getFilteredRosterRows().map(r => [
-        r.code,
-        r.nameKurdish || '',
-        r.nameEnglish || '',
-        r.group || '',
-        r.stage || r.stageYear || '',
-        r.isOverload ? 'Overloaded' : 'Regular',
-        String(r.attemptCount || 0),
-        r.preFinal || ''
-      ]);
-      downloadPdf('teacher_roster.pdf',
-        'Teacher Roster',
-        ['Student Code','Kurdish Name','English Name','Group','Stage','Type','Attempt Count','Pre-Final Grade'],
-        rows
-      );
-    }
-
-    function exportAttendanceExcel(){
-      const rows = (state.attendanceView || []).map((r, i) => [
-        i + 1,
-        r.studentName || '',
-        r.subject || '',
-        r.dates || '',
-        (r.absencePct != null ? r.absencePct : r.absenceCount * 5) + '%'
-      ]);
-      downloadXlsx('attendance_review.xlsx',
-        ['#', 'Student Name', 'Subject', 'Absence Dates', 'Absence %'],
-        rows
-      );
-    }
-
-    function exportAttendanceWord(){
-      const rows = (state.attendanceView || []).map((r, i) => [
-        String(i + 1),
-        r.studentName || '',
-        r.subject || '',
-        r.dates || '',
-        (r.absencePct != null ? r.absencePct : r.absenceCount * 5) + '%'
-      ]);
-      downloadDocx('attendance_review.docx',
-        'Attendance Review',
-        ['#', 'Student Name', 'Subject', 'Absence Dates', 'Absence %'],
-        rows
-      );
-    }
-
-    // =========================
-    // GENERIC RENDER HELPERS
-    // =========================
-    function renderError(targetId, err){
-      $(targetId).innerHTML = `<div class="empty">${escapeHtml((err && err.message) || 'Failed to load data.')}</div>`;
-    }
-  </script>
+</script>
 </body>
 </html>
