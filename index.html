@@ -295,6 +295,16 @@
                 icon: "text-green-500 dark:text-green-400", title: "text-slate-800 dark:text-green-50", subtitle: "text-slate-500 dark:text-green-300/80", desc: "text-slate-600 dark:text-green-100/70", divider: "border-slate-200/60 dark:border-green-800/50",
                 btnBox: "bg-slate-100/80 dark:bg-green-900/40 group-hover/btn:bg-green-100 dark:group-hover/btn:bg-green-700/80 border-transparent dark:border-green-800/30", btnText: "text-slate-600 dark:text-green-300 group-hover/btn:text-green-600 dark:group-hover/btn:text-green-100"
             }
+        },
+        {
+            id: 17, titleEn: "AI Tools", titleKu: "ئامرازەکانی زیرەکی دەستکرد", desc: "AI-powered tools and utilities for teaching and learning.", icon: "brain-circuit", url: "https://english-uor.github.io/AI/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-fuchsia-300 dark:bg-fuchsia-950/30 dark:border-fuchsia-800/40 dark:hover:bg-fuchsia-900/50 dark:hover:border-fuchsia-500/60",
+                glow: "bg-fuchsia-500/20 dark:bg-fuchsia-500/30 group-hover:bg-fuchsia-400/40",
+                iconBox: "bg-white dark:bg-fuchsia-900/60 border-slate-100 dark:border-fuchsia-700/50",
+                icon: "text-fuchsia-500 dark:text-fuchsia-400", title: "text-slate-800 dark:text-fuchsia-50", subtitle: "text-slate-500 dark:text-fuchsia-300/80", desc: "text-slate-600 dark:text-fuchsia-100/70", divider: "border-slate-200/60 dark:border-fuchsia-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-fuchsia-900/40 group-hover/btn:bg-fuchsia-100 dark:group-hover/btn:bg-fuchsia-700/80 border-transparent dark:border-fuchsia-800/30", btnText: "text-slate-600 dark:text-fuchsia-300 group-hover/btn:text-fuchsia-600 dark:group-hover/btn:text-fuchsia-100"
+            }
         }
     ];
 
@@ -444,7 +454,7 @@
             pink: '#ec4899', slate: '#64748b', rose: '#f43f5e', emerald: '#10b981',
             amber: '#f59e0b', purple: '#a855f7', cyan: '#06b6d4', blue: '#3b82f6',
             violet: '#8b5cf6', indigo: '#6366f1', sky: '#0ea5e9', teal: '#14b8a6', 
-            orange: '#f97316', green: '#22c55e'
+            orange: '#f97316', green: '#22c55e', fuchsia: '#d946ef'
         };
 
         const sortedData = [...appsData].sort((a, b) => {
@@ -483,8 +493,8 @@
                         <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border group-hover:scale-110 transition-transform duration-300 mb-2 ${c.iconBox}">
                             <i data-lucide="${app.icon}" class="w-6 h-6 ${c.icon}"></i>
                         </div>
-                        <h3 class="font-bold text-[13px] sm:text-[14px] text-center leading-tight w-full truncate px-1 ${c.title}">${app.titleEn}</h3>
-                        <h4 class="font-medium text-[11px] sm:text-[12px] text-center mt-1 font-kurdish leading-tight w-full truncate px-1 opacity-80 ${c.subtitle}" dir="rtl">${app.titleKu}</h4>
+                        <h3 class="font-bold text-[26px] sm:text-[28px] text-center leading-tight w-full truncate px-1 ${c.title}">${app.titleEn}</h3>
+                        <h4 class="font-medium text-[22px] sm:text-[24px] text-center mt-1 font-kurdish leading-tight w-full truncate px-1 opacity-80 ${c.subtitle}" dir="rtl">${app.titleKu}</h4>
                     </div>`;
             } else {
                 // DETAILED / GRID VIEW (Original)
