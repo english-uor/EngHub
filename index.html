@@ -285,6 +285,16 @@
                 icon: "text-orange-500 dark:text-orange-400", title: "text-slate-800 dark:text-orange-50", subtitle: "text-slate-500 dark:text-orange-300/80", desc: "text-slate-600 dark:text-orange-100/70", divider: "border-slate-200/60 dark:border-orange-800/50",
                 btnBox: "bg-slate-100/80 dark:bg-orange-900/40 group-hover/btn:bg-orange-100 dark:group-hover/btn:bg-orange-700/80 border-transparent dark:border-orange-800/30", btnText: "text-slate-600 dark:text-orange-300 group-hover/btn:text-orange-600 dark:group-hover/btn:text-orange-100"
             }
+        },
+        {
+            id: 16, titleEn: "Topic Check", titleKu: "پشکنینی بابەت", desc: "Check and verify the status of graduation research topics.", icon: "clipboard-check", url: "https://english-uor.github.io/Topic-checker/",
+            colors: {
+                cardStyle: "bg-white/70 border-white/60 hover:border-green-300 dark:bg-green-950/30 dark:border-green-800/40 dark:hover:bg-green-900/50 dark:hover:border-green-500/60",
+                glow: "bg-green-500/20 dark:bg-green-500/30 group-hover:bg-green-400/40",
+                iconBox: "bg-white dark:bg-green-900/60 border-slate-100 dark:border-green-700/50",
+                icon: "text-green-500 dark:text-green-400", title: "text-slate-800 dark:text-green-50", subtitle: "text-slate-500 dark:text-green-300/80", desc: "text-slate-600 dark:text-green-100/70", divider: "border-slate-200/60 dark:border-green-800/50",
+                btnBox: "bg-slate-100/80 dark:bg-green-900/40 group-hover/btn:bg-green-100 dark:group-hover/btn:bg-green-700/80 border-transparent dark:border-green-800/30", btnText: "text-slate-600 dark:text-green-300 group-hover/btn:text-green-600 dark:group-hover/btn:text-green-100"
+            }
         }
     ];
 
@@ -425,7 +435,7 @@
 
         // Apply grid classes. Compact view uses many columns to eliminate scrolling.
         if (isCompactView) {
-            container.className = 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 pb-6 relative';
+            container.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 pb-6 relative';
         } else {
             container.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5 lg:gap-6 pb-6 relative';
         }
@@ -434,7 +444,7 @@
             pink: '#ec4899', slate: '#64748b', rose: '#f43f5e', emerald: '#10b981',
             amber: '#f59e0b', purple: '#a855f7', cyan: '#06b6d4', blue: '#3b82f6',
             violet: '#8b5cf6', indigo: '#6366f1', sky: '#0ea5e9', teal: '#14b8a6', 
-            orange: '#f97316'
+            orange: '#f97316', green: '#22c55e'
         };
 
         const sortedData = [...appsData].sort((a, b) => {
@@ -446,6 +456,7 @@
             const colorMatch = c.icon.match(/text-([a-z]+)-/);
             const themeName = colorMatch ? colorMatch[1] : 'slate';
             const hexColor = colorMap[themeName] || '#64748b';
+            const orderNumber = appsData.findIndex(a => a.id === app.id) + 1;
 
             const card = document.createElement('div');
             card.setAttribute('data-name-en', app.titleEn.toLowerCase()); 
@@ -456,10 +467,13 @@
                 // COMPACT / ONE-SCREEN VIEW
                 card.className = `app-card relative rounded-2xl p-2 sm:p-3 backdrop-blur-xl border shadow-sm transition-all duration-300 animate-card flex flex-col items-center justify-center text-center group hover:-translate-y-1 hover:shadow-md ${c.cardStyle} ${isPinned ? 'is-pinned-card' : ''}`;
                 card.style.animationDelay = `${delay}s`;
+                card.style.backgroundColor = `${hexColor}26`;
                 card.title = `${app.titleEn} - ${app.titleKu}`; // Tooltip for full text
                 
                 card.innerHTML = `
                     <div class="dynamic-border-glow pointer-events-none" style="--card-color: ${hexColor}; border-radius: calc(1rem + 3px);"></div>
+                    
+                    <div class="absolute top-1 left-1 z-30 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold text-white shadow-sm" style="background-color: ${hexColor};">${orderNumber}</div>
                     
                     <button onclick="window.toggleAppPin(${app.id}, event)" class="absolute top-1 right-1 z-30 w-6 h-6 rounded-full flex items-center justify-center border backdrop-blur-md transition-all duration-300 ${isPinned ? 'bg-amber-500/20 border-amber-500/60 text-amber-500' : 'bg-slate-500/10 border-slate-300/20 text-slate-400 opacity-0 group-hover:opacity-100'}">
                         <i data-lucide="pin" class="w-3 h-3 ${isPinned ? 'fill-current rotate-45' : ''}"></i>
