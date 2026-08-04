@@ -465,7 +465,7 @@
             // Conditional Rendering Logic based on View Mode
             if (isCompactView) {
                 // COMPACT / ONE-SCREEN VIEW
-                card.className = `app-card relative rounded-2xl p-2 sm:p-3 backdrop-blur-xl border shadow-sm transition-all duration-300 animate-card flex flex-col items-center justify-center text-center group hover:-translate-y-1 hover:shadow-md ${c.cardStyle} ${isPinned ? 'is-pinned-card' : ''}`;
+                card.className = `app-card relative rounded-2xl p-3 sm:p-4 backdrop-blur-xl border shadow-sm transition-all duration-300 animate-card flex flex-col items-center justify-center text-center group hover:-translate-y-1 hover:shadow-md ${c.cardStyle} ${isPinned ? 'is-pinned-card' : ''}`;
                 card.style.animationDelay = `${delay}s`;
                 card.style.backgroundColor = `${hexColor}26`;
                 card.title = `${app.titleEn} - ${app.titleKu}`; // Tooltip for full text
@@ -473,18 +473,18 @@
                 card.innerHTML = `
                     <div class="dynamic-border-glow pointer-events-none" style="--card-color: ${hexColor}; border-radius: calc(1rem + 3px);"></div>
                     
-                    <div class="absolute top-1 left-1 z-30 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-extrabold text-white shadow-sm" style="background-color: ${hexColor};">${orderNumber}</div>
+                    <div class="absolute top-1 left-1 z-30 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-extrabold text-white shadow-sm" style="background-color: ${hexColor};">${orderNumber}</div>
                     
                     <button onclick="window.toggleAppPin(${app.id}, event)" class="absolute top-1 right-1 z-30 w-6 h-6 rounded-full flex items-center justify-center border backdrop-blur-md transition-all duration-300 ${isPinned ? 'bg-amber-500/20 border-amber-500/60 text-amber-500' : 'bg-slate-500/10 border-slate-300/20 text-slate-400 opacity-0 group-hover:opacity-100'}">
                         <i data-lucide="pin" class="w-3 h-3 ${isPinned ? 'fill-current rotate-45' : ''}"></i>
                     </button>
                     
                     <div class="relative z-10 flex flex-col items-center w-full justify-center">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border group-hover:scale-110 transition-transform duration-300 mb-2 ${c.iconBox}">
-                            <i data-lucide="${app.icon}" class="w-5 h-5 ${c.icon}"></i>
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border group-hover:scale-110 transition-transform duration-300 mb-2 ${c.iconBox}">
+                            <i data-lucide="${app.icon}" class="w-6 h-6 ${c.icon}"></i>
                         </div>
-                        <h3 class="font-bold text-[10px] sm:text-[11px] text-center leading-tight w-full truncate px-1 ${c.title}">${app.titleEn}</h3>
-                        <h4 class="font-medium text-[9px] text-center mt-0.5 font-kurdish leading-tight w-full truncate px-1 opacity-80 ${c.subtitle}" dir="rtl">${app.titleKu}</h4>
+                        <h3 class="font-bold text-[13px] sm:text-[14px] text-center leading-tight w-full truncate px-1 ${c.title}">${app.titleEn}</h3>
+                        <h4 class="font-medium text-[11px] sm:text-[12px] text-center mt-1 font-kurdish leading-tight w-full truncate px-1 opacity-80 ${c.subtitle}" dir="rtl">${app.titleKu}</h4>
                     </div>`;
             } else {
                 // DETAILED / GRID VIEW (Original)
