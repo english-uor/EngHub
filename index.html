@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Attendance">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <link id="app-icon-link" rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzFlM2E4YSIvPjxwYXRoIGQ9Ik0xNDAgMjYwbDcwIDcwIDE3MC0xNzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2VhYjMwOCIgc3Ryb2tlLXdpZHRoPSI0OCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHRleHQgeD0iMjU2IiB5PSI0MzAiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iNzIiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlVvUjwvdGV4dD48L3N2Zz4=">
+  <link id="app-favicon" rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzFlM2E4YSIvPjxwYXRoIGQ9Ik0xNDAgMjYwbDcwIDcwIDE3MC0xNzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2VhYjMwOCIgc3Ryb2tlLXdpZHRoPSI0OCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHRleHQgeD0iMjU2IiB5PSI0MzAiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iNzIiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlVvUjwvdGV4dD48L3N2Zz4=">
+  
+  <script>
+    // Generate inline dynamic PWA manifest with beautiful UoR Icon
+    const manifestJSON = {
+      "name": "UoR Attendance Portal",
+      "short_name": "UoR Attend",
+      "display": "standalone",
+      "background_color": "#ffffff",
+      "theme_color": "#1e3a8a",
+      "icons": [{
+        "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEwMCIgZmlsbD0iIzFlM2E4YSIvPjxwYXRoIGQ9Ik0xNDAgMjYwbDcwIDcwIDE3MC0xNzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2VhYjMwOCIgc3Ryb2tlLXdpZHRoPSI0OCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHRleHQgeD0iMjU2IiB5PSI0MzAiIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iNzIiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlVvUjwvdGV4dD48L3N2Zz4=",
+        "sizes": "512x512",
+        "type": "image/svg+xml"
+      }]
+    };
+    const manifestString = JSON.stringify(manifestJSON);
+    const manifestBlob = new Blob([manifestString], {type: 'application/json'});
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    document.write('<link rel="manifest" href="' + manifestURL + '">');
+  </script>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+  <style>
+  body { font-family: 'Inter', sans-serif; direction: rtl; text-align: right; transition: direction 0.15s ease; }
+  body.ltr { direction: ltr; text-align: left; }
+  .animate-fadeIn { animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .admin-tab-btn { border-bottom: 2px solid transparent; color: #6b7280; transition: all 0.2s ease; }
+  .admin-tab-btn.active { border-bottom-color: #1f2937; color: #1f2937; font-weight: 700; }
+  
+  .student-card-absent { background-color: #fef2f2 !important; border-color: #fca5a5 !important; color: #b91c1c !important; font-weight: 600; transition: all 0.2s ease; }
+  .student-card-permitted { background-color: #fefcbf !important; border-color: #faf089 !important; color: #b7791f !important; font-weight: 600; transition: all 0.2s ease; }
+  
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+  .chip-tag { display: inline-flex; items-center: center; background-color: #e2e8f0; color: #1a202c; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; margin: 0.125rem; }
+  .chip-remove { margin-right: 0.25rem; margin-left: 0.25rem; cursor: pointer; color: #e53e3e; font-weight: bold; }
+  .absent-x { -webkit-appearance: none; appearance: none; width: 1.75rem; height: 1.75rem; border: 2px solid #cbd5e0; border-radius: 0.375rem; background: #fff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; transition: all .15s; }
+  .absent-x:checked { background: #e53e3e; border-color: #e53e3e; }
+  .absent-x:checked::after { content: "✗"; color: #fff; font-size: 1.25rem; font-weight: 700; line-height: 1; }
+</style>
+</head>
+<body class="bg-gray-50 font-sans antialiased text-gray-900 text-right transition-all duration-300">
+  
+  <div id="offline-toast" class="hidden fixed top-4 right-4 z-50 bg-red-600 text-white px-4 py-3 rounded-lg shadow-xl flex items-center space-x-2 space-x-reverse">
+    <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-3.536 4.978 4.978 0 011.414-3.536m0 0L4.243 4.243M9.9 9.9l4.2 4.2"></path></svg>
+    <span class="font-medium text-sm">مۆدی کارکردنی دابڕاو (Offline) چالاکە | Offline Mode Active</span>
+  </div>
+
+  <div id="app-container" class="max-w-md mx-auto md:max-w-6xl min-h-screen flex flex-col bg-white shadow-2xl relative">
+    
+    <button id="lang-btn" onclick="toggleLanguage()" class="absolute top-4 left-4 z-10 bg-white/20 text-white px-4 py-1.5 rounded-lg shadow-md text-sm font-bold border border-white/40 hover:bg-white/30 transition-all backdrop-blur-sm">
+      English
+    </button>
+
+    <header class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white p-6 flex flex-col items-center justify-center space-y-3 relative border-b-4 border-yellow-500 pt-12">
+      <img src="https://drive.google.com/thumbnail?id=1A4hx_bCo65G4id21oPkrl8qARC0QvYTk&sz=w300" alt="UoR Department Logo" class="h-20 w-20 object-contain rounded-full bg-white p-1 shadow-lg border-2 border-yellow-400">
+      <div class="text-center">
+        <h1 class="text-xl font-bold tracking-wide uppercase">زانکۆی ڕاپەڕین | University of Raparin</h1>
+        <p class="text-xs text-indigo-200 tracking-widest mt-0.5">سیستەمی تۆمارکردنی ئامادەبوونی خوێندکاران- بەشی زمانی ئینگلیزی | Digital Attendance System</p>
+      </div>
+    </header>
+
+    <main class="flex-grow p-4 md:p-8">
+      <section id="view-gateway" class="space-y-6 py-8">
+        <div class="text-center space-y-2">
+          <h2 class="text-2xl font-bold text-gray-800">ڕوکاری سەرەکی پۆرتاڵ | Main System Gateway</h2>
+          <p class="text-sm text-gray-500">تکایە پڕۆفایلی مامۆستا دیاریبکە بۆ چونەژورەوە | Please select your profile to log in</p>
+        </div>
+        <div class="grid grid-cols-1 gap-4 max-w-sm mx-auto">
+          <button onclick="switchView('view-teacher-auth')" class="flex items-center justify-center space-x-3 space-x-reverse p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg transition-all font-semibold text-lg">
+            <span>پۆرتاڵی مامۆستا | Teachers Console</span>
+          </button>
+          <button onclick="switchView('view-admin-auth')" class="flex items-center justify-center space-x-3 space-x-reverse p-4 bg-gray-800 hover:bg-gray-900 text-white rounded-xl shadow-lg transition-all font-semibold text-lg">
+            <span>پۆرتاڵی کارگێڕی ئەدمین | Admin Control Panel</span>
+          </button>
+        </div>
+      </section>
+
+      <section id="view-teacher-auth" class="hidden max-w-sm mx-auto space-y-6 py-4">
+  <div class="flex items-center space-x-2 mb-4">
+    <button onclick="goHome()" class="text-gray-400 p-1">
+      <svg class="w-6 h-6 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l-7 7m7-7h18"></path></svg>
+    </button>
+    <span class="text-sm text-gray-500 font-medium"><span class="lang-ku">گەڕانەوە</span><span class="lang-en">Back</span></span>
+  </div>
+  <h2 class="text-2xl font-bold text-gray-800"><span class="lang-ku">چوونەژوورەوەی مامۆستا</span><span class="lang-en">Teacher Login</span></h2>
+  <div class="space-y-4 bg-gray-50 p-5 rounded-2xl border">
+    <select id="teacher-shift" class="w-full p-3 border rounded-xl bg-white font-bold">
+      <option value="Morning" class="lang-ku">دەوامی بەیانیان</option><option value="Morning" class="lang-en">Morning Shift</option>
+      <option value="Evening" class="lang-ku">دەوامی ئێواران</option><option value="Evening" class="lang-en">Evening Shift</option>
+    </select>
+    <input type="password" id="teacher-code" placeholder="کۆدی مامۆستا بنووسە | Enter Teacher Code" class="w-full p-3 border rounded-xl text-right">
+    <button id="teacher-login-btn" onclick="processTeacherLogin()" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold"><span class="lang-ku">چوونەژوورەوە</span><span class="lang-en">Login</span></button>
+  </div>
+</section>
+
+<section id="view-teacher-modules" class="hidden max-w-sm mx-auto space-y-6 py-4">
+  <div class="flex justify-between items-center border-b pb-2">
+    <div>
+      <h2 class="text-xl font-bold text-gray-800"><span class="lang-ku">وانەی دیاریکراو</span><span class="lang-en">Assigned Modules</span></h2>
+      <p id="display-teacher-name" class="text-sm text-blue-600 font-semibold mt-1"></p>
+    </div>
+    <button onclick="logoutTeacher()" class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-lg"><span class="lang-ku">چوونەدەرەوە</span><span class="lang-en">Logout</span></button>
+  </div>
+  <div id="module-selector-container" class="space-y-4"></div>
+</section>
+
+<div id="group-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-xs space-y-4 shadow-2xl">
+    <h3 class="text-lg font-bold text-center text-gray-800 border-b pb-2"><span class="lang-ku">دیاریبکە</span><span class="lang-en">Select Group</span></h3>
+    <button id="btn-group-A" onclick="selectGroupAndLaunch('A')" class="w-full py-4 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl font-bold text-lg hover:bg-indigo-100"><span class="lang-ku">گرووپی A</span><span class="lang-en">Group A</span></button>
+    <button id="btn-group-B" onclick="selectGroupAndLaunch('B')" class="w-full py-4 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl font-bold text-lg hover:bg-indigo-100"><span class="lang-ku">گرووپی B</span><span class="lang-en">Group B</span></button>
+    <button onclick="closeGroupModal()" class="w-full py-2 text-gray-500 font-bold underline mt-2"><span class="lang-ku">پاشگەزبوونەوە</span><span class="lang-en">Cancel</span></button>
+  </div>
+</div>
+
+<section id="view-teacher-roster" class="hidden max-w-md mx-auto space-y-4 py-4">
+  <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border">
+    <div>
+      <h3 id="roster-title-module" class="text-md font-bold text-gray-800"></h3>
+      <p id="roster-title-meta" class="text-xs text-gray-500"></p>
+    </div>
+    <button onclick="switchView('view-teacher-modules')" class="px-3 py-2 bg-gray-200 text-gray-700 text-xs font-bold rounded-lg"><span class="lang-ku">گەڕانەوە</span><span class="lang-en">Back</span></button>
+  </div>
+  
+  <div id="teacher-export-container" class="hidden text-left mb-2">
+    <button onclick="downloadTeacherRoster()" class="px-4 py-2 bg-green-600 text-white text-xs font-bold rounded-lg shadow-sm"><span class="lang-ku">داگرتنی لیستی غیابات</span><span class="lang-en">Export to Excel</span></button>
+  </div>
+
+  <div class="bg-blue-50 text-blue-800 text-xs p-3 rounded-xl border border-blue-200">
+    <span class="lang-ku"><strong>ڕێنمایی:</strong> نیشانەی ڕاست (✗) دابنێ بۆ ئەوەی خوێندکارەکە بە <strong>نائامادە</strong> تۆمار بکرێت. بەبێ نیشانە واتە ئامادەیە.</span>
+    <span class="lang-en"><strong>Instruction:</strong> Check the box (✗) to mark a student as <strong>Absent</strong>. Unchecked means Present.</span>
+  </div>
+  <div id="roster-list-container" class="space-y-2 pb-24 text-right"></div>
+  <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
+    <button id="submit-btn" onclick="submitRosterForm()" class="w-full max-w-md mx-auto block py-4 bg-green-600 text-white text-lg font-bold rounded-xl shadow-lg"><span class="lang-ku">ناردنی کۆتایی ئامادەبوونی خوێندکاران</span><span class="lang-en">Submit Final Roster</span></button>
+  </div>
+</section>
+      <section id="view-admin-auth" class="hidden max-w-sm mx-auto space-y-6 py-4">
+  <div class="flex items-center space-x-2 mb-4">
+    <button onclick="goHome()" class="text-gray-400 hover:text-gray-600 p-1">
+      <svg class="w-6 h-6 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l-7 7m7-7h18"></path></svg>
+    </button>
+    <span class="text-sm text-gray-500 font-medium">گەڕانەوە بۆ سەرەکی | Home</span>
+  </div>
+  <h2 class="text-xl font-bold text-gray-800">پەسەندکردنی ناسنامەی ئەدمین | Admin Authentication</h2>
+  <div class="space-y-4 bg-gray-50 p-5 rounded-2xl border border-gray-200">
+    <input type="password" id="admin-security-key" placeholder="کۆدی پاراستنی ئەدمین بنووسە | Enter security key" class="w-full p-3 border border-gray-300 rounded-xl text-right">
+    <button onclick="processAdminLogin()" class="w-full py-3 bg-gray-800 text-white rounded-xl font-bold shadow-md hover:bg-gray-900 transition-all">داواکردنی دەسەڵاتی کارگێڕی | Request Access</button>
+  </div>
+</section>
+
+<section id="view-admin-dashboard" class="hidden space-y-8 animate-fadeIn text-right">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 gap-4">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">تێرمیناڵی فەرماندەیی کارگێڕی | Admin Command Terminal</h2>
+      <p class="text-xs text-gray-500">بزوێنەری داتاکان | Core Data Federation Engine</p>
+    </div>
+    
+    <div class="flex flex-col items-end space-y-2">
+      <div class="flex items-center space-x-3 bg-gray-50 p-2 rounded-xl border space-x-reverse">
+        <span class="text-xs font-bold text-gray-700 uppercase">ناردنی ئیمەیڵ | Emails:</span>
+        <button id="btn-email-toggle" onclick="toggleAdminFeature('email')" class="px-3 py-1 text-xs font-extrabold text-white rounded-lg shadow-sm bg-green-600">چالاکە | Active</button>
+        
+        <span class="text-xs font-bold text-gray-700 uppercase mr-3">داگرتنی لیستی مامۆستا | Teacher Export:</span>
+        <button id="btn-export-toggle" onclick="toggleAdminFeature('export')" class="px-3 py-1 text-xs font-extrabold text-white rounded-lg shadow-sm bg-red-600">ڕاگیراوە | Suspended</button>
+      </div>
+      <button onclick="logoutAdmin()" class="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg shadow-sm">چوونەدەرەوەی ئەدمین | Admin Logout</button>
+    </div>
+  </div>
+
+  <div class="flex space-x-2 space-x-reverse border-b overflow-x-auto pb-1">
+    <button onclick="switchAdminTab('tab-reports')" class="admin-tab-btn active px-4 py-2 text-sm font-semibold whitespace-nowrap">ڕێژەی ئامادەنەبوون | Absence Metrics</button>
+    <button onclick="switchAdminTab('tab-permitted')" class="admin-tab-btn px-4 py-2 text-sm font-semibold whitespace-nowrap">بەشی مۆڵەتپێدان | Permit Manager</button>
+    <button onclick="switchAdminTab('tab-management')" class="admin-tab-btn px-4 py-2 text-sm font-semibold whitespace-nowrap">تۆماری خوێندکاری سەربار | Overload Entry</button>
+    <button onclick="switchAdminTab('tab-monitoring')" class="admin-tab-btn px-4 py-2 text-sm font-semibold whitespace-nowrap">چاودێریکردنی سیستم | Audit System</button>
+  </div>
+
+  <div id="tab-reports" class="admin-tab-content space-y-6">
+    <div class="flex flex-wrap items-center gap-3 bg-gray-50 p-4 rounded-xl border">
+      <select id="admin-report-shift" class="p-2 border rounded-lg text-xs font-bold bg-white">
+        <option value="Morning">خوێندنی بەیانیان | Morning</option>
+        <option value="Evening">خوێندنی ئێواران | Evening</option>
+      </select>
+      
+      <select id="admin-report-year" class="p-2 border rounded-lg text-xs font-bold bg-white">
+        <option value="All">هەموو قۆناغەکان | All Years</option>
+        <option value="Year1">قۆناغی یەکەم | First Year</option>
+        <option value="Year2">قۆناغی دووەم | Second Year</option>
+        <option value="Year3">قۆناغی سێیەم | Third Year</option>
+        <option value="Year4">قۆناغی چوارەم | Fourth Year</option>
+      </select>
+
+      <select id="admin-report-group" class="p-2 border rounded-lg text-xs font-bold bg-white">
+        <option value="All">هەموو گرووپەکان | All Groups</option>
+        <option value="A">گرووپی A | Group A</option>
+        <option value="B">گرووپی B | Group B</option>
+      </select>
+
+      <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-lg border">
+        <label class="text-[11px] font-bold text-gray-500 px-1">لە | From</label>
+        <input type="date" id="admin-report-date-from" class="p-1.5 border rounded-lg text-xs bg-white">
+        <label class="text-[11px] font-bold text-gray-500 px-1">بۆ | To</label>
+        <input type="date" id="admin-report-date-to" class="p-1.5 border rounded-lg text-xs bg-white">
+        <button onclick="clearReportDates()" title="سڕینەوەی بەروار | Clear dates" class="px-2 py-1 text-gray-400 hover:text-red-600 font-bold text-xs">✕</button>
+      </div>
+
+      <button onclick="loadAbsenceReports(5)" class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-bold text-xs rounded-lg shadow-sm">پێوەری 5% | Metric 5%</button>
+      <button onclick="loadAbsenceReports(10)" class="px-3 py-2 text-white font-bold text-xs rounded-lg shadow-sm transition-colors" style="background-color: #f97316;" onmouseover="this.style.backgroundColor='#f97316'" onmouseout="this.style.backgroundColor='#f97316'">پێوەری 10% | Metric 10%</button>
+      <button onclick="loadAbsenceReports(15)" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg shadow-sm">سەروو 10%  | Metric 15%</button>
+      
+      <div class="mr-auto flex items-center space-x-1.5 space-x-reverse">
+        <button onclick="exportReportData('excel')" class="p-2 bg-green-700 text-white text-xs font-bold rounded-lg hover:bg-green-800">داگرتن بە Excel</button>
+        <button onclick="exportReportData('docx')" class="p-2 bg-blue-700 text-white text-xs font-bold rounded-lg hover:bg-blue-800">داگرتن بە DOCX</button>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
+      <table class="w-full text-right border-collapse bg-white" id="table-admin-reports">
+        <thead>
+          <tr class="bg-gray-800 text-white text-xs uppercase tracking-wider font-semibold">
+            <th class="p-3 text-right">ڕیزبەندی | Rank</th>
+            <th class="p-3 text-right">ناوی تەواو | Full Name</th>
+            <th class="p-3 text-right">قۆناغ و گرووپ | Year & Group</th>
+            <th class="p-3 text-right">ڕێژەی نائامادەیی | Absences</th>
+            <th class="p-3 text-left">بەرزترین ڕێژە | Max %</th>
+          </tr>
+        </thead>
+        <tbody id="admin-reports-tbody" class="text-xs divide-y text-gray-700">
+          <tr><td colspan="5" class="p-4 text-center text-gray-400">بۆ پیشاندانی داتاکان فلتەرێک دیاریبکە | Apply filter to show data</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="tab-permitted" class="admin-tab-content hidden space-y-6">
+    <div class="grid grid-cols-1 gap-6">
+      <div class="bg-gray-50 rounded-2xl border space-y-2 overflow-hidden">
+        <button onclick="togglePermitAccordion()" class="w-full p-5 bg-gray-200 hover:bg-gray-300 font-bold text-sm text-gray-800 flex justify-between items-center focus:outline-none">
+          <span>تۆمارکردنی مۆڵەتی کارگێڕی نوێ | Register New Permit</span>
+          <span id="accordion-arrow" class="transform transition-transform">▼</span>
+        </button>
+        
+        <div id="permit-accordion-container" class="p-5 space-y-4 hidden bg-gray-50 border-t">
+          <div class="grid grid-cols-1 gap-3 text-xs">
+            <select id="perm-shift" onchange="updatePermitStudentList()" class="p-2.5 border rounded-lg bg-white"><option value="Morning">خوێندنی بەیانیان | Morning</option><option value="Evening">خوێندنی ئێواران | Evening</option></select>
+            <select id="perm-year" onchange="updatePermitStudentList()" class="p-2.5 border rounded-lg bg-white"><option value="">ساڵ/قۆناغ هەڵبژێرە... | Select Year...</option><option value="Year1">قۆناغی یەکەم | First Year</option><option value="Year2">قۆناغی دووەم | Second Year</option><option value="Year3">قۆناغی سێیەم | Third Year</option><option value="Year4">قۆناغی چوارەم | Fourth Year</option></select>
+            <select id="perm-group" onchange="updatePermitStudentList()" class="p-2.5 border rounded-lg bg-white"><option value="">گرووپ هەڵبژێرە... | Select Group...</option><option value="A">گرووپی A | Group A</option><option value="B">گرووپی B | Group B</option></select>
+            <select id="perm-name" onchange="autoFillPermitEmail()" class="p-2.5 border rounded-lg bg-white"><option value="">سەرەتا دەوام، ساڵ و گرووپ دیاریبکە... | Set details first...</option></select>
+            <input type="text" id="perm-email" readonly placeholder="ئیمەیڵی خوێندکار | Auto-filled email" class="p-2.5 border rounded-lg bg-gray-100 text-left cursor-not-allowed">
+            <input type="date" id="perm-date" class="p-2.5 border rounded-lg bg-white">
+            <input type="text" id="perm-reason" placeholder="هۆکاری پێدانی مۆڵەت | Reason for permit..." class="p-2.5 border rounded-lg bg-white">
+            <button onclick="submitAdministrativePermitClearance()" class="w-full py-3 bg-blue-600 text-white text-xs font-bold rounded-xl shadow-md hover:bg-blue-700 transition-all uppercase tracking-wide">تۆمارکردنی کۆتایی مۆڵەتەکە | Submit Permit</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 p-5 rounded-2xl border space-y-4">
+        <div class="flex justify-between items-center">
+          <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wider">ئاماری مۆڵەتەکان | Permit Analytics</h4>
+          <button onclick="refreshPermitAnalytics()" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-xs font-bold rounded-lg">نوێکردنەوە | Refresh</button>
+        </div>
+        <div class="overflow-y-auto max-h-64 rounded-xl border bg-white">
+          <table class="w-full text-right text-xs">
+            <thead class="bg-gray-100 text-gray-600 font-bold"><tr><th class="p-2.5 text-right">خوێندکار | Student</th><th class="p-2.5 text-left">مۆڵەتەکان | Count</th></tr></thead>
+            <tbody id="perm-analytics-tbody" class="divide-y text-gray-700"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-management" class="admin-tab-content hidden flex flex-col max-w-xl mx-auto space-y-6">
+    <div class="bg-gray-50 p-5 rounded-2xl border space-y-4">
+      <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wider">خوێندکاری تێپەڕیو | Overload Registration</h4>
+      <div class="grid grid-cols-1 gap-3 text-xs">
+        <select id="add-o-shift" onchange="loadOverloadModules()" class="p-2.5 border rounded-lg bg-white"><option value="Morning">خوێندنی بەیانیان | Morning</option><option value="Evening">خوێندنی ئێواران | Evening</option></select>
+        <input type="text" id="add-o-name" placeholder="ناوی سیانی تەواو | Full Name" class="p-2.5 border rounded-lg bg-white">
+        <input type="email" id="add-o-email" placeholder="ئیمەیڵی زانکۆیی | University Email" class="p-2.5 border rounded-lg bg-white text-left">
+        <select id="add-o-year" class="p-2.5 border rounded-lg bg-white"><option value="Year1">قۆناغی یەکەم | Year1</option><option value="Year2">قۆناغی دووەم | Year2</option><option value="Year3">قۆناغی سێیەم | Year3</option><option value="Year4">قۆناغی چوارەم | Year4</option></select>
+        <select id="add-o-group" class="p-2.5 border rounded-lg bg-white"><option value="A">گرووپی A | Group A</option><option value="B">گرووپی B | Group B</option><option value="Both">هەردووکیان | Both</option></select>
+        
+        <div class="p-3 border rounded-lg bg-white space-y-3">
+           <label class="block text-gray-600 font-bold">بابەتە بەردەستەکان بەپێی قۆناغ | Available Modules by Year</label>
+           <select id="filter-o-year" onchange="renderAvailableModules()" class="p-2 border rounded bg-gray-50 w-full mb-2 text-xs">
+             <option value="First Year">بابەتەکانی قۆناغی یەکەم | First Year Modules</option>
+             <option value="Second Year">بابەتەکانی قۆناغی دووەم | Second Year Modules</option>
+             <option value="Third Year">بابەتەکانی قۆناغی سێیەم | Third Year Modules</option>
+             <option value="Fourth Year">بابەتەکانی قۆناغی چوارەم | Fourth Year Modules</option>
+           </select>
+           <div id="available-modules-container" class="flex flex-wrap gap-1 bg-gray-50 p-2 rounded min-h-[50px] border border-dashed border-gray-300">
+              <span class="text-gray-400">تکایە دەوام دیاریبکە | Select shift first...</span>
+           </div>
+        </div>
+
+        <div class="p-3 border rounded-lg bg-blue-50 space-y-2">
+           <label class="block text-blue-800 font-bold">بابەتە هەڵبژێردراوەکان | Selected Modules</label>
+           <div id="selected-modules-container" class="flex flex-wrap gap-1 min-h-[40px]">
+              <span class="text-gray-400">هیچ بابەتێک هەڵنەبژێردراوە | No modules selected</span>
+           </div>
+        </div>
+        
+        <button onclick="submitEntityForm('Overload_lessons')" class="w-full py-3 bg-indigo-900 text-white font-bold rounded-xl shadow-md hover:bg-indigo-950 transition-all text-sm">تۆمارکردنی خوێندکاری تێپەڕیو | Register Overload</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-monitoring" class="admin-tab-content hidden space-y-6">
+    <div class="bg-gray-50 p-5 rounded-2xl border space-y-4">
+      
+      <div class="flex flex-col space-y-3 bg-white p-4 rounded-xl border border-blue-100 shadow-sm mb-4">
+        <label class="text-sm font-bold text-gray-800">وێنۆچکەی بەرنامە | App Icon URL</label>
+        <div class="flex items-center gap-2">
+          <input type="text" id="admin-icon-url" placeholder="https://..." class="p-2 border rounded-lg text-xs font-bold bg-white flex-grow text-left" dir="ltr">
+          <button onclick="saveAppIcon()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg shadow-sm whitespace-nowrap">پاشەکەوت | Save</button>
+        </div>
+      </div>
+
+      <div class="flex flex-col space-y-3 bg-white p-4 rounded-xl border border-red-100 shadow-sm mb-4">
+        <label class="text-sm font-bold text-gray-800">بەدواداچوون بۆ نەهاتووەکان | Audit Missing Submissions</label>
+        <div class="flex items-center gap-2">
+          <input type="date" id="audit-date" class="p-2 border rounded-lg text-xs font-bold bg-white flex-grow">
+          <button onclick="auditMissingTeachers()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-lg shadow-sm whitespace-nowrap">گەڕان | Search</button>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center border-t pt-4">
+        <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wider">تۆماری گەیشتووی ئەمڕۆ | Received Today</h4>
+        <button onclick="auditTeacherCompliance()" class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-bold text-xs rounded-lg shadow-sm">نوێکردنەوە | Refresh</button>
+      </div>
+      <ul id="compliance-audit-results" class="text-xs space-y-2 text-gray-700 divide-y bg-white p-3 rounded-xl border max-h-64 overflow-y-auto">
+        <li class="p-2 text-gray-400 text-center">ئامادەیە بۆ پشکنین | Ready for audit...</li>
+      </ul>
+    </div>
+  </div>
+</section>
+    </main>
+    <footer class="p-4 bg-gray-50 border-t border-gray-100 text-center text-xs text-gray-400 font-sans">
+      .گشت داتاکان پارێزراون | Secure Management Engine &bull; 2026
+    </footer>
+  </div>
+  <script>
+  let currentTeacherState = null;
+  let activeRosterCache = [];
+  let currentSelectedModuleIndex = null;
+  let masterAdminCalculatedData = [];
+  let submittedGroupsCache = [];
+  let permitStudentsCache = [];
+  let adminConfig = { emailStatus: true, teacherExport: false };
+  let isKurdish = true;
+  let globalModulesCache = {};
+  let selectedOverloadModules = new Set();
+  let currentAdminType = null; // Tracks 'All' or 'Evening'
+
+  // --- NEW API CONFIGURATION ---
+  const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbygY3CPFCRnY60AwER4FkdbDv6_-MmHcdmeHW6NkZJWXsBknpRHk2QD9ZbAGfGp0lE/exec";
+
+  const apiCall = async (action, payload = {}) => {
+    try {
+      const response = await fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action, payload })
+      });
+      return await response.json();
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error;
+    }
+  };
+  // -----------------------------
+
+  window.addEventListener('load', () => { 
+      setupBilingualStrings(); 
+      updateOnlineStatus();
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+      
+      // Load Dynamic Icon
+      apiCall('getAdminSettings').then(settings => {
+          if(settings && settings.appIconUrl) setAppIcon(settings.appIconUrl);
+      });
+
+      // Restore a previously logged-in teacher (stay logged in across refreshes until Logout)
+      const savedTeacherSession = localStorage.getItem('teacherSession');
+      if (savedTeacherSession) {
+        try {
+          const { shift, code } = JSON.parse(savedTeacherSession);
+          if (shift && code) performTeacherLogin(shift, code, true);
+        } catch (e) {
+          localStorage.removeItem('teacherSession');
+        }
+      }
+  });
+
+  function updateOnlineStatus() {
+     const toast = document.getElementById('offline-toast');
+     if (!navigator.onLine) {
+         toast.classList.remove('hidden');
+         toast.querySelector('span').innerText = isKurdish ? "مۆدی کارکردنی دابڕاو (Offline) چالاکە | Offline Mode Active" : "Offline Mode Active";
+     } else {
+         toast.classList.add('hidden');
+         syncOfflineData();
+     }
+  }
+
+  function setAppIcon(url) {
+      if(!url) return;
+      document.getElementById('app-icon-link').href = url;
+      document.getElementById('app-favicon').href = url;
+  }
+
+  function setupBilingualStrings(root = document.body) {
+    const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    let node;
+    const nodesToReplace = [];
+    while(node = walk.nextNode()) {
+      if(node.nodeValue.includes(' | ') && node.parentElement.tagName !== 'SCRIPT' && node.parentElement.tagName !== 'STYLE' && !node.parentElement.classList.contains('bilingual-processed')) {
+        nodesToReplace.push(node);
+      }
+    }
+    nodesToReplace.forEach(n => {
+      const parts = n.nodeValue.split(' | ');
+      if(parts.length >= 2) {
+         const span = document.createElement('span');
+         span.className = "bilingual-processed inline-block w-full";
+         span.innerHTML = `<span class="lang-ku">${parts[0].trim()}</span><span class="lang-en hidden">${parts[1].trim()}</span>`;
+         n.parentNode.replaceChild(span, n);
+      }
+    });
+
+    document.querySelectorAll('input[placeholder], select').forEach(el => {
+       if(el.placeholder && el.placeholder.includes(' | ')) {
+          el.setAttribute('data-ku', el.placeholder.split(' | ')[0].trim());
+          el.setAttribute('data-en', el.placeholder.split(' | ')[1].trim());
+          el.placeholder = isKurdish ? el.getAttribute('data-ku') : el.getAttribute('data-en');
+       }
+    });
+    toggleLanguage(false);
+  }
+
+  function toggleLanguage(toggle = true) {
+    if (toggle) isKurdish = !isKurdish;
+    
+    document.querySelectorAll('.lang-ku').forEach(el => el.style.display = isKurdish ? 'inline' : 'none');
+    document.querySelectorAll('.lang-en').forEach(el => el.style.display = isKurdish ? 'none' : 'inline');
+    document.body.dir = isKurdish ? 'rtl' : 'ltr';
+    document.body.style.textAlign = isKurdish ? 'right' : 'left';
+    
+    const btn = document.getElementById('lang-btn');
+    if(btn) btn.innerText = isKurdish ? 'English' : 'کوردی';
+    
+    document.querySelectorAll('input[data-ku]').forEach(el => {
+       el.placeholder = isKurdish ? el.getAttribute('data-ku') : el.getAttribute('data-en');
+    });
+  }
+
+  function switchView(viewId) {
+    const screens = ['view-gateway', 'view-teacher-auth', 'view-teacher-modules', 'view-teacher-roster', 'view-admin-auth', 'view-admin-dashboard'];
+    screens.forEach(s => { const el = document.getElementById(s); if(el) el.classList.add('hidden'); });
+    document.getElementById(viewId).classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(setupBilingualStrings, 50);
+  }
+  
+  function goHome() { switchView('view-gateway'); }
+
+  function processTeacherLogin() {
+    const shift = document.getElementById('teacher-shift').value;
+    const code = document.getElementById('teacher-code').value;
+    if(!code) return alert(isKurdish ? "کۆدی چوونەژوورەوە داواکراوە" : "Login code required.");
+    performTeacherLogin(shift, code, false);
+  }
+
+  // silent = true is used to quietly restore a saved session on page load,
+  // without showing the "please wait" state or an alert if it fails.
+  function performTeacherLogin(shift, code, silent) {
+    const loginBtn = document.getElementById('teacher-login-btn');
+    if(!silent && loginBtn) loginBtn.innerText = isKurdish ? "چاوەڕوانبە..." : "Please wait...";
+
+    return apiCall('authenticateTeacher', { shift, code }).then(response => {
+        if(!silent && loginBtn) loginBtn.innerText = isKurdish ? "چوونەژوورەوەی فەرمی" : "Confirm Login";
+        if(!response || !response.data) {
+          localStorage.removeItem('teacherSession');
+          if(!silent) alert(isKurdish ? "هەڵە لە چوونەژوورەوە: کۆدەکە نادروستە" : "Error: Invalid code.");
+          return;
+        }
+
+        currentTeacherState = response.data;
+        submittedGroupsCache = response.submitted || []; // Pre-load today's submitted groups to prevent duplicates on refresh
+
+        // Remember this login so refreshing the page keeps the teacher signed in until Logout
+        localStorage.setItem('teacherSession', JSON.stringify({ shift, code }));
+
+        document.getElementById('display-teacher-name').innerText = "مامۆستا | Teacher: " + currentTeacherState[0].name;
+        checkTeacherPermissions();
+        renderTeacherModuleDashboard();
+        switchView('view-teacher-modules');
+      }).catch(err => {
+        if(!silent && loginBtn) loginBtn.innerText = isKurdish ? "چوونەژوورەوەی فەرمی" : "Confirm Login";
+        if(!silent) alert(isKurdish ? "هەڵەیەک ڕوویدا. تکایە دووبارە هەوڵبدەرەوە" : "An error occurred. Please try again.");
+      });
+  }
+
+  function checkTeacherPermissions() {
+    apiCall('getAdminSettings').then(settings => {
+      adminConfig = settings;
+      const exportBtn = document.getElementById('teacher-export-container');
+      if (exportBtn) exportBtn.style.display = settings.teacherExport ? 'block' : 'none';
+    });
+  }
+
+  function renderTeacherModuleDashboard() {
+    const container = document.getElementById('module-selector-container');
+    container.innerHTML = "";
+    currentTeacherState.forEach((item, index) => {
+      const card = document.createElement('div');
+      card.className = "p-5 bg-white border-2 border-gray-200 rounded-xl shadow-sm hover:border-blue-500 cursor-pointer transition-all active:bg-gray-50";
+      card.setAttribute('onclick', `openGroupModal(${index})`);
+      card.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-xs font-bold px-2 py-1 bg-indigo-100 text-indigo-800 rounded-md">${item.year}</span>
+        </div>
+        <h4 class="text-lg font-bold text-gray-800">${item.module}</h4>
+        <p class="text-xs text-gray-500 mt-1">لە خوارەوە گروپێک دیاریبکە | Weekly classes: ${item.frequency}</p>
+        <div class="mt-4 text-left" style="${isKurdish ? 'text-align: right;' : 'text-align: left;'}">
+          <span class="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-3 py-2 rounded-lg shadow-sm">دیاریکردنی گرووپ | Select Group ➡️</span>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+    setupBilingualStrings(container);
+  }
+
+  function openGroupModal(index) {
+    currentSelectedModuleIndex = index;
+    const context = currentTeacherState[index];
+    const btnA = document.getElementById('btn-group-A');
+    const btnB = document.getElementById('btn-group-B');
+    const tokenA = `${context.module}-${context.shift}-${context.year}-A`;
+    const tokenB = `${context.module}-${context.shift}-${context.year}-B`;
+    
+    btnA.disabled = false; btnA.innerText = "گرووپی A | Group A";
+    btnA.className = "w-full py-4 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl font-bold text-lg hover:bg-indigo-100";
+    btnB.disabled = false; btnB.innerText = "گرووپی B | Group B";
+    btnB.className = "w-full py-4 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl font-bold text-lg hover:bg-indigo-100";
+    
+    if (submittedGroupsCache.includes(tokenA)) {
+      btnA.disabled = true; btnA.innerText = "گرووپی A (نێردراوە) | Group A (Submitted)";
+      btnA.className = "w-full py-4 bg-gray-200 text-gray-400 border border-gray-300 rounded-xl font-bold cursor-not-allowed";
+    }
+    if (submittedGroupsCache.includes(tokenB)) {
+      btnB.disabled = true; btnB.innerText = "گرووپی B (نێردراوە) | Group B (Submitted)";
+      btnB.className = "w-full py-4 bg-gray-200 text-gray-400 border border-gray-300 rounded-xl font-bold cursor-not-allowed";
+    }
+    document.getElementById('group-modal').classList.remove('hidden');
+    setupBilingualStrings(document.getElementById('group-modal'));
+  }
+  
+  function closeGroupModal() { document.getElementById('group-modal').classList.add('hidden'); }
+  
+  function selectGroupAndLaunch(groupName) {
+    closeGroupModal();
+    currentTeacherState[currentSelectedModuleIndex].group = groupName;
+    launchRosterLedger(currentSelectedModuleIndex);
+  }
+
+  function launchRosterLedger(index) {
+    const context = currentTeacherState[index];
+    document.getElementById('roster-title-module').innerText = context.module;
+    document.getElementById('roster-title-meta').innerText = `مامۆستا: ${context.name} • ${context.shift} • ${context.year} • Group ${context.group}`;
+    document.getElementById('roster-list-container').innerHTML = "<div class='text-center p-6 text-gray-500 font-bold animate-pulse'>(چاوەڕێبە) ناوی خوێندکاران... | Fetching list...</div>";
+    switchView('view-teacher-roster');
+    
+    apiCall('getRoster', { shift: context.shift, year: context.year, group: context.group, moduleName: context.module })
+      .then(roster => { activeRosterCache = roster; renderInteractiveRosterDOM(); });
+  }
+
+  function renderInteractiveRosterDOM() {
+    const container = document.getElementById('roster-list-container');
+    container.innerHTML = "";
+    if(activeRosterCache.length === 0) return container.innerHTML = "<div class='p-4 text-center text-sm text-gray-500'>هیچ خوێندکارێک نەدۆزرایەوە | No students found.</div>";
+    
+    activeRosterCache.forEach((student, idx) => {
+      const isPermitted = student.status === "Permitted";
+      const isAbsent = student.status === "Absent";
+      const card = document.createElement('div');
+      card.id = `student-idx-${idx}`;
+      card.className = `flex items-center justify-between p-4 bg-white border rounded-xl shadow-sm ${isAbsent ? 'bg-red-50 border-red-300' : ''}`;
+      
+      let inputControl = `<input type="checkbox" id="chk-${idx}" ${isAbsent ? 'checked' : ''} onchange="toggleAbsence(${idx})" class="absent-x">`;
+      if(isPermitted) inputControl = `<span class="px-2 py-1 bg-green-200 text-green-900 font-bold rounded text-xs">مۆڵەتدار | Permitted</span>`;
+      
+      card.innerHTML = `
+        <div class="flex flex-col text-${isKurdish ? 'right' : 'left'}">
+          <span class="text-sm font-bold ${isAbsent ? 'text-red-700' : 'text-gray-800'}"><span class="text-gray-500 mr-1">${idx + 1}-</span> ${student.name}</span>
+        </div>
+        <div>${inputControl}</div>
+      `;
+      container.appendChild(card);
+    });
+    setupBilingualStrings(container);
+  }
+
+  function toggleAbsence(idx) {
+    const chk = document.getElementById(`chk-${idx}`);
+    const card = document.getElementById(`student-idx-${idx}`);
+    if(chk.checked) {
+      activeRosterCache[idx].status = "Absent";
+      card.classList.add('bg-red-50', 'border-red-300');
+    } else {
+      activeRosterCache[idx].status = "Present";
+      card.classList.remove('bg-red-50', 'border-red-300');
+    }
+  }
+
+  function submitRosterForm() {
+    const context = currentTeacherState[currentSelectedModuleIndex];
+    const payload = {
+      shift: context.shift, year: context.year, group: context.group, module: context.module,
+      teacherCode: context.code, teacherName: context.name, teacherEmail: context.email,
+      allRecords: activeRosterCache 
+    };
+    
+    document.getElementById('submit-btn').innerText = isKurdish ? "ناردن..." : "Sending...";
+    
+    // Offline Queue handling
+    if (!navigator.onLine) {
+        let queue = JSON.parse(localStorage.getItem('offlineRosterQueue') || '[]');
+        queue.push(payload);
+        localStorage.setItem('offlineRosterQueue', JSON.stringify(queue));
+        submittedGroupsCache.push(`${context.module}-${context.shift}-${context.year}-${context.group}`);
+        
+        alert(isKurdish ? "ئینتەرنێت پچڕاوە. داتا خەزن کرا و کاتی گەڕانەوەی ئینتەرنێت دەنێردرێت!" : "Offline. Data saved locally and will sync when online!");
+        document.getElementById('submit-btn').innerText = isKurdish ? "ناردنی کۆتایی ئامادەبوونی خوێندکاران" : "Submit Final Roster";
+        switchView('view-teacher-modules');
+        setupBilingualStrings();
+        updateOnlineStatus();
+        return;
+    }
+
+    apiCall('submitAttendance', { payload }).then((response) => {
+        document.getElementById('submit-btn').innerText = isKurdish ? "ناردنی کۆتایی ئامادەبوونی خوێندکاران" : "Submit Final Roster";
+        
+        if(!response.success) {
+            return alert(response.message);
+        }
+        
+        alert(isKurdish ? "ئامادەبوونی خوێندکاران بەسەرکەوتوویی تۆمارکرا!" : "Attendance Saved Successfully!");
+        submittedGroupsCache.push(`${context.module}-${context.shift}-${context.year}-${context.group}`);
+        switchView('view-teacher-modules');
+        setupBilingualStrings();
+      });
+  }
+
+  function syncOfflineData() {
+       let queue = JSON.parse(localStorage.getItem('offlineRosterQueue') || '[]');
+       if (queue.length > 0 && navigator.onLine) {
+           const toast = document.getElementById('offline-toast');
+           toast.classList.remove('hidden');
+           toast.querySelector('span').innerText = isKurdish ? "خەریکی ناردنی داتای ئۆفلاین..." : "Syncing offline data...";
+
+           function processNext() {
+               if(queue.length === 0) {
+                   localStorage.setItem('offlineRosterQueue', '[]');
+                   toast.classList.add('hidden');
+                   alert(isKurdish ? "گشت داتا ئۆفلاینەکان نێردراون بەسەرکەوتوویی!" : "All offline data synced successfully!");
+                   return;
+               }
+               apiCall('submitAttendance', { payload: queue[0] }).then(res => {
+                   // Remove processed from queue regardless of success (avoids duplicate blocks)
+                   queue.shift();
+                   localStorage.setItem('offlineRosterQueue', JSON.stringify(queue));
+                   processNext();
+               });
+           }
+           processNext();
+       }
+  }
+
+  function logoutTeacher() { currentTeacherState = null; localStorage.removeItem('teacherSession'); goHome(); }
+  function logoutAdmin() { goHome(); }
+
+  function downloadTeacherRoster() {
+    const ws = XLSX.utils.json_to_sheet(activeRosterCache.map((s, i) => ({ "No": i + 1, "Name": s.name, "Status": s.status })));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Roster");
+    XLSX.writeFile(wb, `Roster_${currentTeacherState[currentSelectedModuleIndex].module}.xlsx`);
+  }
+
+  function processAdminLogin() {
+    const key = document.getElementById('admin-security-key').value;
+    apiCall('verifyAdminCode', { code: key }).then(res => {
+        if(!res.success) return alert(isKurdish ? "کۆدی پاراستنی ئەدمین هەڵەیە" : "Invalid Admin Key.");
+        currentAdminType = res.type; // Sets 'All' or 'Evening'
+        initAdminDashboard();
+        switchView('view-admin-dashboard');
+      });
+  }
+
+  function initAdminDashboard() {
+    apiCall('getAdminSettings').then(settings => {
+      adminConfig = settings;
+      updateAdminToggleUI('email', settings.emailStatus);
+      updateAdminToggleUI('export', settings.teacherExport);
+      
+      if(settings.appIconUrl) {
+          document.getElementById('admin-icon-url').value = settings.appIconUrl;
+      }
+
+      // Lock shift selections if Evening Admin
+      const shiftEls = ['admin-report-shift', 'perm-shift', 'add-o-shift'];
+      shiftEls.forEach(id => {
+         const el = document.getElementById(id);
+         if (currentAdminType === 'Evening') {
+            el.value = 'Evening';
+            el.setAttribute('disabled', 'true');
+            el.classList.add('bg-gray-200', 'cursor-not-allowed', 'opacity-70');
+         } else {
+            el.removeAttribute('disabled');
+            el.classList.remove('bg-gray-200', 'cursor-not-allowed', 'opacity-70');
+         }
+      });
+
+      refreshPermitAnalytics();
+      loadOverloadModules(); // trigger to load modules for locked or default shift
+    });
+  }
+
+  function switchAdminTab(tabId) {
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.admin-tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.remove('hidden');
+    event.currentTarget.classList.add('active');
+  }
+
+  const kurdishYearMap = {
+    "year1": "قۆناغی یەکەم", "year2": "قۆناغی دووەم",
+    "year3": "قۆناغی سێیەم", "year4": "قۆناغی چوارەم"
+  };
+
+  // Keeps only the modules whose absence % matches the selected metric exactly
+  // 5 -> only 5% | 10 -> only 10% | 15 -> above 10%
+  function filterByMetric(data, threshold) {
+    const filterYear = document.getElementById('admin-report-year').value;
+    const filterGroup = document.getElementById('admin-report-group').value;
+    let result = [];
+    (data || []).forEach(s => {
+      if (filterYear !== "All" && String(s.year).replace(/\s+/g, '').toLowerCase() !== filterYear.toLowerCase()) return;
+      if (filterGroup !== "All" && String(s.group).trim().toUpperCase() !== filterGroup.toUpperCase()) return;
+      let kept = {};
+      for (let m in s.breakdown) {
+        let v = Number(s.breakdown[m]);
+        let match = (threshold === 15) ? v > 10 : v === threshold;
+        if (match) kept[m] = v;
+      }
+      let keys = Object.keys(kept);
+      if (keys.length === 0) return;
+      let maxPct = Math.max(...keys.map(k => kept[k]));
+      result.push(Object.assign({}, s, { breakdown: kept, percentage: maxPct }));
+    });
+    return result;
+  }
+
+  function clearReportDates() {
+    document.getElementById('admin-report-date-from').value = "";
+    document.getElementById('admin-report-date-to').value = "";
+  }
+
+  function loadAbsenceReports(threshold) {
+    const shift = document.getElementById('admin-report-shift').value;
+    const filterYear = document.getElementById('admin-report-year').value;
+    const filterGroup = document.getElementById('admin-report-group').value;
+    const dateFrom = document.getElementById('admin-report-date-from').value;
+    const dateTo = document.getElementById('admin-report-date-to').value;
+
+    if (dateFrom && dateTo && dateFrom > dateTo) {
+      return alert(isKurdish ? "بەرواری دەستپێک دەبێت پێش بەرواری کۆتایی بێت" : "The 'From' date must be before the 'To' date.");
+    }
+    
+    document.getElementById('table-admin-reports').dataset.currentThreshold = threshold;
+    document.getElementById('table-admin-reports').dataset.currentDateFrom = dateFrom;
+    document.getElementById('table-admin-reports').dataset.currentDateTo = dateTo;
+    
+    document.getElementById('admin-reports-tbody').innerHTML = "<tr><td colspan='5' class='text-center p-4 font-bold animate-pulse'>لێکدانەوەی ڕێژەکان... | Calculating...</td></tr>";
+    
+    apiCall('calculateAbsenceMetrics', { shift, dateFrom, dateTo }).then(data => {
+      masterAdminCalculatedData = data;
+      renderAdminReports(filterByMetric(data, threshold));
+    });
+  }
+
+  function renderAdminReports(dataset) {
+    const tbody = document.getElementById('admin-reports-tbody');
+    tbody.innerHTML = "";
+    if(dataset.length === 0) return tbody.innerHTML = "<tr><td colspan='5' class='p-4 text-center'>هیچ داتایەک نەدۆزرایەوە | No data found</td></tr>";
+    dataset.forEach((row, i) => {
+      let mods = Object.entries(row.breakdown).map(([m,v]) => `${m} (${v}%)`).join('<br>');
+      let cleanYear = row.year.replace(/\s+/g, '').toLowerCase();
+      let localizedYear = kurdishYearMap[cleanYear] || row.year;
+      tbody.innerHTML += `<tr class="border-b"><td class="p-2">${i+1}</td><td class="p-2 font-bold">${row.name}</td><td class="p-2">${localizedYear} - Group ${row.group}</td><td class="p-2 text-xs">${mods}</td><td class="p-2 font-bold text-red-600">${row.percentage}%</td></tr>`;
+    });
+  }
+
+  function exportReportData(type) {
+    if (!masterAdminCalculatedData || masterAdminCalculatedData.length === 0) return alert(isKurdish ? "هیچ داتایەک نییە بۆ ناردن!" : "No data to export!");
+
+    const threshold = parseInt(document.getElementById('table-admin-reports').dataset.currentThreshold) || 0;
+    const filterYear = document.getElementById('admin-report-year').value;
+    const filterGroup = document.getElementById('admin-report-group').value;
+    const dateFrom = document.getElementById('table-admin-reports').dataset.currentDateFrom || "";
+    const dateTo = document.getElementById('table-admin-reports').dataset.currentDateTo || "";
+    const dateSuffix = (dateFrom || dateTo) ? `_${dateFrom || 'start'}_${dateTo || 'today'}` : "";
+    const dateRangeLabel = (dateFrom || dateTo) ? `بەرواری | Date range: ${dateFrom || '...'} → ${dateTo || (isKurdish ? 'ئەمڕۆ' : 'today')}` : "";
+
+    let filtered = filterByMetric(masterAdminCalculatedData, threshold);
+
+    let exportData = filtered.map((row, i) => {
+       let cleanYear = row.year.replace(/\s+/g, '').toLowerCase();
+       let localizedYear = kurdishYearMap[cleanYear] || row.year;
+       
+       let subjects = Object.keys(row.breakdown).join('، ');
+       
+       return {
+         "ژمارە": i + 1,
+         "ناوی تەواو": row.name,
+         "قۆناغ": localizedYear,
+         "گرووپ": row.group,
+         "بابەت": subjects,
+         "ڕێژە": `${row.percentage}%`
+       };
+    });
+
+    if (type === 'excel') {
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "ڕاپۆرتی غیابات");
+      XLSX.writeFile(wb, `Pukhtey_Ghyabat_2026${dateSuffix}.xlsx`);
+    } else if (type === 'docx') {
+      let html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>ڕاپۆرتی نائامادەبوون</title><style>table { border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; } th, td { border: 1px solid black; padding: 8px; text-align: center; font-size: 14px; } th { background-color: #f2f2f2; }</style></head><body dir="rtl"><h2 style="text-align:center;">ڕاپۆرتی نائامادەبوون (غیابات)</h2>${dateRangeLabel ? `<p style="text-align:center;font-size:12px;color:#555;">${dateRangeLabel}</p>` : ""}<table><thead><tr><th>ژمارە</th><th>ناوی تەواو</th><th>قۆناغ</th><th>گرووپ</th><th>بابەت</th><th>ڕێژە</th></tr></thead><tbody>`;
+      exportData.forEach(r => {
+        html += `<tr><td>${r["ژمارە"]}</td><td>${r["ناوی تەواو"]}</td><td>${r["قۆناغ"]}</td><td>${r["گرووپ"]}</td><td>${r["بابەت"]}</td><td>${r["ڕێژە"]}</td></tr>`;
+      });
+      html += `</tbody></table></body></html>`;
+      const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url; link.download = `Pukhtey_Ghyabat_2026${dateSuffix}.doc`; link.click();
+    }
+  }
+
+  function toggleAdminFeature(type) {
+    const newState = type === 'email' ? !adminConfig.emailStatus : !adminConfig.teacherExport;
+    apiCall('toggleAdminSetting', { settingType: type, status: newState }).then(res => {
+      if(type === 'email') adminConfig.emailStatus = res;
+      if(type === 'export') adminConfig.teacherExport = res;
+      updateAdminToggleUI(type, res);
+    });
+  }
+
+  function saveAppIcon() {
+      const url = document.getElementById('admin-icon-url').value;
+      apiCall('updateAppIcon', { url }).then(res => {
+          alert(isKurdish ? "وێنۆچکە بەسەرکەوتوویی نوێکرایەوە!" : "App Icon updated successfully!");
+          setAppIcon(res);
+      });
+  }
+
+  function updateAdminToggleUI(type, status) {
+    const btn = document.getElementById(type === 'email' ? 'btn-email-toggle' : 'btn-export-toggle');
+    if(!btn) return;
+    btn.innerText = status ? (isKurdish ? "چالاکە" : "Active") : (isKurdish ? "ڕاگیراوە" : "Suspended");
+    btn.className = status ? "px-3 py-1 text-xs font-extrabold text-white rounded-lg shadow-sm bg-green-600" : "px-3 py-1 text-xs font-extrabold text-white rounded-lg shadow-sm bg-red-600";
+  }
+
+  function togglePermitAccordion() {
+    const container = document.getElementById('permit-accordion-container');
+    const arrow = document.getElementById('accordion-arrow');
+    container.classList.toggle('hidden');
+    arrow.innerText = container.classList.contains('hidden') ? "▼" : "▲";
+  }
+
+  function updatePermitStudentList() {
+    const shift = document.getElementById('perm-shift').value;
+    const year = document.getElementById('perm-year').value;
+    const group = document.getElementById('perm-group').value;
+    const nameSelect = document.getElementById('perm-name');
+    
+    document.getElementById('perm-email').value = "";
+    nameSelect.innerHTML = isKurdish ? "<option value=''>گەڕان...</option>" : "<option value=''>Searching...</option>";
+    if(!shift || !year || !group) return nameSelect.innerHTML = isKurdish ? "<option value=''>پڕکردنەوەی زانیاری</option>" : "<option value=''>Required fields missing</option>";
+    
+    apiCall('getRoster', { shift, year, group, moduleName: "" }).then(roster => {
+      permitStudentsCache = roster;
+      nameSelect.innerHTML = roster.length ? (isKurdish ? "<option value=''>هەڵبژێرە</option>" : "<option value=''>Select...</option>") : (isKurdish ? "<option value=''>نەدۆزرایەوە</option>" : "<option value=''>Not found</option>");
+      roster.forEach((s, idx) => nameSelect.innerHTML += `<option value="${idx}">${s.name}</option>`);
+    });
+  }
+
+  function autoFillPermitEmail() {
+    const index = document.getElementById('perm-name').value;
+    document.getElementById('perm-email').value = (index !== "" && permitStudentsCache[index]) ? permitStudentsCache[index].email : "";
+  }
+
+  function submitAdministrativePermitClearance() {
+    const idx = document.getElementById('perm-name').value;
+    if(!idx) return alert(isKurdish ? "تکایە خوێندکارێک دیاریبکە" : "Select a student.");
+    const payload = {
+      shift: document.getElementById('perm-shift').value, year: document.getElementById('perm-year').value,
+      group: document.getElementById('perm-group').value, name: permitStudentsCache[idx].name,
+      date: document.getElementById('perm-date').value, reason: document.getElementById('perm-reason').value
+    };
+    if(!payload.date || !payload.reason) return alert(isKurdish ? "تەواوی زانیارییەکان پڕبکەرەوە" : "Fill all fields.");
+    
+    apiCall('addPermittedStudent', { payload }).then(() => {
+      alert(isKurdish ? "مۆڵەت تۆمارکرا و سیستمی غیابات نوێکرایەوە!" : "Permit logged and absences updated!");
+      document.getElementById('perm-reason').value = "";
+      refreshPermitAnalytics();
+    });
+  }
+
+  function refreshPermitAnalytics() {
+    const shift = document.getElementById('perm-shift').value || 'Morning';
+    apiCall('getPermittedAnalytics', { shift }).then(data => {
+      const tbody = document.getElementById('perm-analytics-tbody');
+      tbody.innerHTML = "";
+      data.forEach(r => tbody.innerHTML += `<tr><td class="p-2.5 font-bold">${r.name}</td><td class="p-2.5 text-left">${r.count}</td></tr>`);
+    });
+  }
+
+  function loadOverloadModules() {
+     const shift = document.getElementById('add-o-shift').value;
+     document.getElementById('available-modules-container').innerHTML = isKurdish ? "<span class='text-gray-500'>چاوەڕوانبە...</span>" : "<span class='text-gray-500'>Loading...</span>";
+     apiCall('getModulesList', { shift }).then(data => {
+         globalModulesCache = data;
+         renderAvailableModules();
+     });
+  }
+
+  function renderAvailableModules() {
+     const year = document.getElementById('filter-o-year').value;
+     const container = document.getElementById('available-modules-container');
+     container.innerHTML = "";
+     
+     let mappedYear = year.replace('First Year', 'Year1').replace('Second Year', 'Year2').replace('Third Year', 'Year3').replace('Fourth Year', 'Year4');
+     
+     if(!globalModulesCache[mappedYear] || globalModulesCache[mappedYear].length === 0) {
+       container.innerHTML = isKurdish ? "<span class='text-gray-400'>هیچ بابەتێک نەدۆزرایەوە</span>" : "<span class='text-gray-400'>No modules found</span>";
+       return;
+     }
+
+     globalModulesCache[mappedYear].forEach(mod => {
+        const btn = document.createElement('button');
+        btn.className = "m-1 px-3 py-1 bg-gray-200 hover:bg-gray-300 text-xs font-bold rounded shadow-sm border border-gray-300 transition-colors";
+        btn.innerText = mod;
+        btn.onclick = () => {
+           selectedOverloadModules.add(mod);
+           renderSelectedModules();
+        };
+        container.appendChild(btn);
+     });
+  }
+
+  function renderSelectedModules() {
+     const container = document.getElementById('selected-modules-container');
+     container.innerHTML = "";
+     if(selectedOverloadModules.size === 0) {
+        container.innerHTML = isKurdish ? "<span class='text-gray-400'>هیچ بابەتێک هەڵنەبژێردراوە</span>" : "<span class='text-gray-400'>No modules selected</span>";
+        return;
+     }
+     selectedOverloadModules.forEach(mod => {
+        const badge = document.createElement('span');
+        badge.className = "inline-flex items-center m-1 px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-bold rounded border border-indigo-200 shadow-sm";
+        badge.innerHTML = `${mod} <button class="mr-2 ml-1 font-bold text-red-500 text-sm hover:text-red-700 focus:outline-none" onclick="removeOverloadModule('${mod}')">&times;</button>`;
+        container.appendChild(badge);
+     });
+  }
+
+  function removeOverloadModule(mod) {
+     selectedOverloadModules.delete(mod);
+     renderSelectedModules();
+  }
+
+  function submitEntityForm(entityType) {
+    const shift = document.getElementById('add-o-shift').value;
+    const selectedArray = Array.from(selectedOverloadModules);
+    
+    if (selectedArray.length === 0) return alert(isKurdish ? "پێویستە لایەنی کەم یەک بابەت هەڵبژێریت!" : "Must select at least 1 module!");
+    if (selectedArray.length > 7) return alert(isKurdish ? "ناتوانیت لە ٧ بابەت زیاتر هەڵبژێریت!" : "Cannot exceed 7 modules!");
+
+    let payload = [
+      "", 
+      document.getElementById('add-o-name').value, document.getElementById('add-o-email').value,
+      document.getElementById('add-o-year').value, document.getElementById('add-o-group').value,
+      ...selectedArray
+    ];
+    
+    apiCall('submitSystemEntity', { shift, sheetName: entityType, rowData: payload }).then(() => {
+        alert(isKurdish ? "بە سەرکەوتوویی تۆمارکرا!" : "Registered successfully.");
+        selectedOverloadModules.clear();
+        renderSelectedModules();
+        document.getElementById('add-o-name').value = "";
+    });
+  }
+
+  function auditTeacherCompliance() {
+    const shift = document.getElementById('admin-report-shift').value || "Morning";
+    document.getElementById('compliance-audit-results').innerHTML = isKurdish ? "<li class='p-2 text-center'>پشکنین...</li>" : "<li class='p-2 text-center'>Auditing...</li>";
+    apiCall('runTeacherAudit', { shift }).then(results => {
+      document.getElementById('compliance-audit-results').innerHTML = results.map(r => `<li class="p-2">${r}</li>`).join('');
+      setupBilingualStrings(document.getElementById('compliance-audit-results'));
+    });
+  }
+
+  function auditMissingTeachers() {
+    const shift = document.getElementById('admin-report-shift').value || "Morning";
+    const targetDate = document.getElementById('audit-date').value;
+    
+    document.getElementById('compliance-audit-results').innerHTML = isKurdish ? "<li class='p-2 text-center'>پشکنینی نەهاتووەکان...</li>" : "<li class='p-2 text-center'>Searching missing...</li>";
+    apiCall('runMissingSubmissionsAudit', { shift, targetDateStr: targetDate }).then(results => {
+      document.getElementById('compliance-audit-results').innerHTML = results.map(r => `<li class="p-2">${r}</li>`).join('');
+      setupBilingualStrings(document.getElementById('compliance-audit-results'));
+    });
+  }
+</script>
+</body>
+</html>
